@@ -1,0 +1,5 @@
+[paths]
+data_root = "data/cases/ieee33-v54-q1"
+spec_root = "docs/experiments"
+campaign_root = "artifacts/campaigns/ieee33-v54-q1"
+frozen_source_root = "provenance/legacy_s01"

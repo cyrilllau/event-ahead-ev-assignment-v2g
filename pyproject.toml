@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools==75.8.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "evcs-experiments"
+version = "0.1.0"
+description = "Reproducible IEEE33 EV assignment experiments"
+requires-python = ">=3.12,<3.13"
+dependencies = ["numpy==2.4.2", "scipy==1.18.1", "networkx==3.6.1"]
+
+[project.scripts]
+evcs = "evcs_experiments.cli:main"
+evcs-case0 = "evcs_experiments.case0_campaign:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

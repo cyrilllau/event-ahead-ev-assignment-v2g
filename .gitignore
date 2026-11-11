@@ -1,0 +1,21 @@
+# Keep this checkout source-only by default.
+*
+!*/
+!/.gitignore
+!/README.md
+!/pyproject.toml
+!/requirements.lock
+!/configs/local.example.toml
+!/src/evcs_experiments/**/*.py
+!/tests/**/*.py
+!/scripts/**/*.py
+!/powerai_l08/**/*.py
+
+**/.venv/
+**/__pycache__/
+**/artifacts/
+**/archive/
+**/results/
+**/outputs/
+**/checkpoints/
+**/nodefiles/

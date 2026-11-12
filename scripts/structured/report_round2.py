@@ -223,7 +223,9 @@ def run_record(ev, root, stage, run_id, budget):
     timing = optimization.get("timing", {})
     audit_started = bool(audits or optimization.get("audit_completed", 0)
                          or (numeric(timing.get("audit")) and timing["audit"] > 0))
-    if complete_original:
+    if not optimization_job:
+        phase = "NOT_APPLICABLE_NON_OPTIMIZATION_JOB"
+    elif complete_original:
         phase = "ORIGINAL_AUDIT_COMPLETE"
     elif audit_started:
         phase = "ORIGINAL_AUDIT_INCOMPLETE"
@@ -231,7 +233,9 @@ def run_record(ev, root, stage, run_id, budget):
         phase = "LAST_RECORDED_RECOURSE_EVALUATION"
     else:
         phase = "NOT_RECORDED"
-    if accepted:
+    if not optimization_job:
+        completion = "NOT_APPLICABLE_NON_OPTIMIZATION_JOB"
+    elif accepted:
         completion = "ACCEPTED_GAP_AND_ORIGINAL_AUDIT"
     elif gap_passed and not complete_original:
         completion = "GAP_PASSED_AUDIT_INCOMPLETE" if audit_started else "GAP_PASSED_AUDIT_NOT_ESTABLISHED"
@@ -257,6 +261,8 @@ def run_record(ev, root, stage, run_id, budget):
         status=recovery_record["status"] if recovery else raw.get("status", "PARTIAL_PROGRESS_ONLY" if partial else "NO_RESULT"),
         reported_passed=False if recovery else raw.get("passed", False), acceptance_supported=accepted,
         attempted=attempted, job_acceptance_supported=job_accepted,
+        optimization_job=optimization_job,
+        bounds_audit_applicability="APPLICABLE" if optimization_job else "NOT_APPLICABLE",
         gap_passed=gap_passed, gap_threshold=gap_threshold, audit_complete=complete_original,
         completion_class=completion, last_saved_phase=phase,
         last_saved_phase_basis="saved audit rows/counter/timing, otherwise last current_evaluation; not a live phase observation",
@@ -338,6 +344,87 @@ def job_coverage(records):
     return dict(expected=len(records), attempted=sum(r["attempted"] for r in records),
                 settled=sum(r["settled"] for r in records),
                 accepted=sum(r["job_acceptance_supported"] for r in records))
+
+
+def validation_findings(core, mechanisms, core_run_ids):
+    """Count each accepted evidence scope separately, without altering any gate."""
+    p3 = [r for r in core if r["id"] in {names["P3"] for names in core_run_ids.values()}]
+    accepted = [r for r in p3 if r["acceptance_supported"] and r["support"] == 400]
+    aro = [r for r in core if r["id"] in {names["ARO"] for names in core_run_ids.values()}]
+    groups = {}
+    for method in ("P2", "P3-noadvance"):
+        rows = [p for p in mechanisms if p["methods"] == ["P3", method]]
+        available = [p for p in rows if p["both_accepted"] and p["status"] == "INTERVALS_AVAILABLE"]
+        groups[method] = dict(expected=len(rows), accepted_intervals=len(available),
+            accepted_interval_seeds=[p["seed"] for p in available],
+            strictly_negative_beyond_1e_5=sum(p["difference_a_minus_b"][1] < -1e-5 for p in available),
+            unresolved=len(rows) - len(available),
+            contradictory=sum(p["status"] == "CONTRADICTORY_INTERVALS" for p in rows))
+    return dict(p3_full400=dict(expected=len(p3), accepted=len(accepted),
+            accepted_seeds=[r["seed"] for r in accepted], runs=[r["id"] for r in accepted],
+            deployments=[dict(seed=r["seed"], run=r["id"],
+                selected_vehicles=r["deployment"].get("selected_vehicles"),
+                contract_kwh=r["deployment"].get("contract_kwh"),
+                selected_stations=r["deployment"].get("selected_stations")) for r in accepted]),
+        mechanism_comparisons=groups,
+        aro=dict(expected=len(aro), accepted=sum(r["acceptance_supported"] for r in aro)),
+        interval_scope="Separately counted same-case comparisons, not statistically independent replications or OOS superiority; numeric evidence only",
+        strict_separation_reporting_tolerance=1e-5)
+
+
+def algorithm_timing_findings(pairs, records):
+    """Describe saved matched-run timings; the prioritization rule is not an acceptance gate."""
+    by_id = {r["id"]: r for r in records}
+    rows = []
+    for pair in pairs:
+        a, b = by_id[pair["a"]], by_id[pair["b"]]
+        ratio = pair["controller_time_ratio_b_over_a"]
+        reserved = [r["claim"].get("reserved_seconds") for r in (a, b)]
+        same_budget = all(numeric(v) and v > 0 for v in reserved) and reserved[0] == reserved[1]
+        usable = ratio is not None and same_budget
+        wrapper_ratio = (b["wrapper_seconds"] / a["wrapper_seconds"]
+            if usable and all(numeric(r["wrapper_seconds"]) and r["wrapper_seconds"] > 0 for r in (a, b)) else None)
+        at, bt = a["timing_seconds"], b["timing_seconds"]
+        keys = ("build", "audit", "recourse", "master", "probability", "certificate_and_io")
+        timing_complete = all(numeric(at.get(k)) and at[k] >= 0 for k in keys)
+        candidate = bool(usable and timing_complete and numeric(bt.get("audit")) and bt["audit"] >= 0
+            and at["audit"] > bt["audit"]
+            and at["build"] + at["audit"] >= sum(at[k] for k in keys[2:]))
+        rows.append(dict(seed=pair["seed"], count=a["id"], individual=b["id"],
+            matched_and_both_accepted=pair["identity_matched"] and pair["both_accepted"],
+            same_reserved_budget=same_budget, reserved_seconds_count_individual=reserved,
+            usable_timing_comparison=usable,
+            actual_gap_count_individual=[a["gap"], b["gap"]],
+            gap_threshold_count_individual=[a["gap_threshold"], b["gap_threshold"]],
+            same_gap_acceptance_rule="max(1, 0.01 * max(1, abs(UB))); actual gaps need not match",
+            controller_seconds_count_individual=[a["controller_seconds"], b["controller_seconds"]],
+            build_seconds_count_individual=[at.get("build"), bt.get("build")],
+            audit_seconds_count_individual=[at.get("audit"), bt.get("audit")],
+            controller_ratio_individual_over_count=ratio if usable else None,
+            observed_wrapper_ratio_individual_over_count=wrapper_ratio,
+            count_controller_faster_observed=ratio > 1 if usable else None,
+            count_end_to_end_faster_observed=wrapper_ratio > 1 if wrapper_ratio is not None else None,
+            audit_mapping_reuse_candidate=candidate))
+    candidates = [r["seed"] for r in rows if r["audit_mapping_reuse_candidate"]]
+    return dict(pairs=rows, audit_mapping_reuse_candidate_seeds=candidates,
+        prioritization_rule="Accepted same-problem/equal-reservation runs only: count audit exceeds individual audit, and count build+audit >= other recorded phase times combined. Engineering heuristic, not a scientific acceptance criterion or causal profiling result.",
+        construction_time_within_audit_not_separately_measured=True,
+        controller_includes_build_and_audit=True,
+        timing_scope="Single observed runs at the same gap rule, not necessarily the same achieved gap or policy; no controlled-load speedup or runtime CI")
+
+
+def next_improvement(timing):
+    seeds = timing["audit_mapping_reuse_candidate_seeds"]
+    if seeds:
+        return (f"优先工程假说（seed {', '.join(map(str, seeds))} 的同问题已接受计时支持排查）："
+            "在独立版本实现直接count→原逐车审计向量映射，复用经身份校验确实不变的索引/稀疏结构，"
+            "减少中间逐车catalogue模板的重复构建。该建议尚未实现或验证提速；audit内部构建占比未单独计量，"
+            "不能把计时差当作因果证明。仍须逐场景覆盖全部400支持、未选套餐Big-M、原matrix.assemble全部行/界及目标审计，"
+            "保留原容差和验收门。高服务规模设计与丰富moments仍是独立论文缺口，不由这项工程优化解决。")
+    return ("当前已接受的同问题配对计时未满足审计映射复用的优先排查条件，不据此认定构建瓶颈；"
+        "端到端时间结论仍只按匹配对照的已保存wrapper计时给出。"
+        "下一项实例设计建议仍是容量受限的多区域/多时段服务需求，并保留健康网可行性与原限额；"
+        "高服务规模和丰富moments的科学证据仍缺。这里只提出后续假说，不授权新运行。")
 
 
 def certificate_limitations(critic):
@@ -498,6 +585,13 @@ def collect(root, stopped=None):
         ev.ref(path)
     limitations = certificate_limitations(ev.ref(root / "IMPLEMENTATION_CRITIC_CN.md"))
     all_core_pass = all(r["acceptance_supported"] for r in core)
+    findings = validation_findings(core, mechanisms, freeze["core_run_ids"])
+    timing_findings = algorithm_timing_findings(pairs, runs)
+    mechanism_counts = list(findings["mechanism_comparisons"].values())
+    mechanism_status = ("MECHANISM_INTERVALS_REQUIRE_REVIEW" if any(g["contradictory"] for g in mechanism_counts) else
+        "SCOPED_GLOBAL_COMPARISONS_AVAILABLE" if all(g["accepted_intervals"] == g["expected"] for g in mechanism_counts) else
+        "SOME_SCOPED_GLOBAL_COMPARISONS_AVAILABLE" if any(g["accepted_intervals"] for g in mechanism_counts) else
+        "NO_ACCEPTED_MECHANISM_INTERVALS")
     oos = [by_id[freeze["oos_run_ids"][str(seed)]] for seed in freeze["validation_seeds"]]
     formal_stats = all(s["summary"] and s["summary"].get("formal_ci") for s in stats.values())
     complete_oos = all(r["reported_passed"] and r["raw"].get("common_completed") == 1000 for r in oos)
@@ -506,7 +600,7 @@ def collect(root, stopped=None):
         adapter_status="SAME_CASE_INTERVAL_AND_ORIGINAL_AUDIT_PASS" if r0["both_accepted"] and r0["status"] != "CONTRADICTORY_INTERVALS" else "INCOMPLETE_OR_REVIEW_REQUIRED",
         fixed_load_full400_status="PASS" if r2["acceptance_supported"] and r2["support"] == 400 else "NOT_ACCEPTED",
         physical_design_status="FIXED_N6_LOAD_HEALTHY_ZERO_EV_ZERO_SHED_PASS" if healthy_complete else "NOT_ESTABLISHED",
-        mechanism_status="SCOPED_GLOBAL_COMPARISONS_AVAILABLE" if all_core_pass and not contradiction else "GLOBAL_VALIDATION_INCOMPLETE_OR_REVIEW_REQUIRED",
+        mechanism_status=mechanism_status,
         moment_scope="P3_THREE_MOMENTS_NOT_ORIGINAL_322311",
         algorithm_comparison_status="THREE_MATCHED_PAIRS_ACCEPTED" if all(p["both_accepted"] for p in pairs) and not contradiction else "MATCHED_COMPARISONS_INCOMPLETE_OR_REVIEW_REQUIRED",
         validation_status="COMPLETE_CORE_AND_PAIRED_OOS_EVIDENCE" if complete and all_core_pass and complete_oos and formal_stats and vreport["reported_passed"] and not contradiction and dev_budget["within_limit"] and val_budget["within_limit"] else
@@ -523,6 +617,7 @@ def collect(root, stopped=None):
         all_frozen_jobs_settled=all_settled, all_frozen_jobs_reported_passed=all(r["reported_passed"] for r in runs),
         report_is_new_scientific_certificate=False, contradiction_requires_review=contradiction,
         known_certificate_limitations=limitations,
+        validation_findings=findings, algorithm_timing_evidence=timing_findings,
         recovered_failed_jobs=[r["id"] for r in runs if r["recovery"]],
         orchestration_recovery_manifest=orchestration_recovery,
         development=[public_run(r) for r in dev], validation=[public_run(r) for r in runs],
@@ -569,7 +664,9 @@ def collect(root, stopped=None):
             "Stress G changes physical types/SOC and seed; it is not a pure representation timing experiment.",
             "R04/r05 historical oracle settings were not all capped at60; later releases cap calls. Do not relabel old execution.",
             "All statistics are copied from VREPORT, conditional on fixed training policies; no probability-set or simultaneous coverage claim."],
-        next_improvement="If broader service participation is needed, design a capacity-constrained multi-area/duration service instance with healthy-grid feasibility, preserving limits; no new runs authorized by this report.")
+        paper_gaps=["高服务规模：按各seed实际选车/合同/站点及放电证据判断；扩充候选池或full400通过不等于容量受限的多区域服务已得到验证。",
+                    "丰富moments：P3仍只有三行，不恢复原322311行；这需要独立科学版本与证据，不能由表示或审计工程优化替代。"],
+        next_improvement=next_improvement(timing_findings))
     result["evidence"] = list(ev.refs.values())
     # A read-only snapshot must not silently mix ledger states during assembly.
     for ledger, budget in zip(ledgers, (dev_budget, val_budget), strict=True):
@@ -615,14 +712,46 @@ def evidence_link(ref, label="证据", *, execution_root=None, display_root=None
 
 
 def run_table(rows):
-    return table(["Run", "原状态 / 完成分类", "gap_passed / audit_complete / acceptance_supported",
+    return table(["Run", "原状态 / 完成分类", "job accepted", "gap_passed / audit_complete / acceptance_supported",
                   "LB / UB ($)", "gap ($)", "原审计/支持", "原残差", "observed wrapper / final worker / saved controller (s)",
                   "charged(s) / accounting basis"],
-        [[r["id"], f"{r['status']} / {r['completion_class']}",
-          [r["gap_passed"], r["audit_complete"], r["acceptance_supported"]], [r["LB"], r["UB"]], r["gap"],
-          f"{r['original_audit_count']}/{r['support']}", r["original_max_residual"],
+        [[r["id"], f"{r['status']} / {r['completion_class']}" if r["optimization_job"] else f"{r['status']} / N/A（非优化作业）",
+          r["job_acceptance_supported"],
+          [r["gap_passed"], r["audit_complete"], r["acceptance_supported"]] if r["optimization_job"] else "N/A",
+          [r["LB"], r["UB"]] if r["optimization_job"] else "N/A", r["gap"] if r["optimization_job"] else "N/A",
+          f"{r['original_audit_count']}/{r['support']}" if r["optimization_job"] else "N/A",
+          r["original_max_residual"] if r["optimization_job"] else "N/A",
           [r["wrapper_seconds"], r["worker_seconds"], r["controller_seconds"]],
           [r["charged_seconds"], r["accounting_basis"]]] for r in rows])
+
+
+def findings_prose(findings):
+    p3, aro = findings["p3_full400"], findings["aro"]
+    mechanisms = []
+    for method, group in findings["mechanism_comparisons"].items():
+        mechanisms.append(f"P3−{method}有{group['accepted_intervals']}/{group['expected']}组双方接受且身份匹配的值差区间，"
+            f"其中{group['strictly_negative_beyond_1e_5']}组上端小于−1e-5，按数值区间辨识出该受限训练问题的目标值差；"
+            f"{group['unresolved']}组未确立（含{group['contradictory']}组需矛盾复核）")
+    deployments = []
+    for item in p3["deployments"]:
+        stations = item["selected_stations"]
+        deployments.append(f"seed{item['seed']}选{fmt(item['selected_vehicles'])}车、合同{fmt(item['contract_kwh'])}kWh、"
+            f"{len(stations) if isinstance(stations, list) else '未记录'}站")
+    return dict(p3=f"验证P3已有{p3['accepted']}/{p3['expected']}组full400通过项目gap门及全部原逐车审计"
+                f"（seed：{fmt(p3['accepted_seeds'])}）。这是数值审计接受，不是严格有理证明。",
+        mechanisms="；".join(mechanisms) + "。这些比较分别计数，不要求其他核心方法全部通过，也不表示统计独立或OOS优势。",
+        deployment="；".join(deployments) + "。合同能量不等于实际放电量。" if deployments else "尚无已接受P3部署证据。",
+        aro=f"ARO完整接受{aro['accepted']}/{aro['expected']}组；未接受的ARO及其他作业继续保留原状态，不能据此抹去已完成的P3和机制证据。")
+
+
+def timing_prose(timing):
+    usable = [r for r in timing["pairs"] if r["usable_timing_comparison"]]
+    wrappers = [r for r in usable if r["count_end_to_end_faster_observed"] is not None]
+    return (f"{len(usable)}/{len(timing['pairs'])}组同问题、同预留预算且双方接受的计时可比；"
+        f"count含构建/审计的controller总时间较短{sum(r['count_controller_faster_observed'] for r in usable)}组、"
+        f"未较短{sum(not r['count_controller_faster_observed'] for r in usable)}组。"
+        f"有实际wrapper计时的{len(wrappers)}组中，count端到端较短{sum(r['count_end_to_end_faster_observed'] for r in wrappers)}组。"
+        "实际gap和所选政策可不同，采用同一max(1美元,1%×max(1,|UB|))规则；不称为相同终止gap的受控速度实验。")
 
 
 def certificate_section(data, *, display_root=None):
@@ -643,20 +772,24 @@ def render_report(data, *, display_root=None):
     def link(ref, label="证据"):
         return evidence_link(ref, label, execution_root=data["root"], display_root=display_root)
 
+    def phase_time(record, key):
+        return record["timing_seconds"].get(key) if record["optimization_job"] else "N/A"
+
     by_id = {r["id"]: r for r in data["validation"]}
     core = [by_id[k] for k in data["core_run_order"]]
     r2 = data["development"][3]
     budget = data["budget"]
     service = r2["service"].get("metrics", {})
+    findings = findings_prose(data["validation_findings"])
     questions = [
         ("新分解器是否实际运行、正确性对照是否通过？", data["adapter_status"] + "；R0比较合法区间与原矩阵审计，不把项目gap通过写成两个精确最优值证明。"),
-        ("固定负荷30车/full400是否得到完整证书？", f"{data['fixed_load_full400_status']}；LB={fmt(r2['LB'])}，UB={fmt(r2['UB'])}，gap={fmt(r2['gap'])}；原审计{r2['original_audit_count']}/400。"),
-        ("实际选用和放电车辆有多少，规模压力是否充分？", f"R2选用{fmt(r2['deployment'].get('selected_vehicles'))}车；名义平均放电车数{fmt(service.get('discharging_vehicles', {}).get('nominal_weighted'))}，AC放电{fmt(service.get('discharge_AC_kwh', {}).get('nominal_weighted'))}kWh。候选池扩充不代表大服务规模。"),
+        ("固定负荷30车/full400是否得到完整证书？", findings["p3"] + f" 开发R2：{data['fixed_load_full400_status']}；LB={fmt(r2['LB'])}，UB={fmt(r2['UB'])}，gap={fmt(r2['gap'])}；原审计{r2['original_audit_count']}/400。"),
+        ("实际选用和放电车辆有多少，规模压力是否充分？", findings["deployment"] + f" 开发R2选用{fmt(r2['deployment'].get('selected_vehicles'))}车；名义平均放电车数{fmt(service.get('discharging_vehicles', {}).get('nominal_weighted'))}，AC放电{fmt(service.get('discharge_AC_kwh', {}).get('nominal_weighted'))}kWh。候选池扩充不代表大服务规模。"),
         ("容量约束修订是否执行、是否通过健康网和完整优化？", f"{data['R3_R4']['status']}；{data['R3_R4']['reason']}。固定需求健康网：{data['physical_design_status']}。"),
-        ("全局政策是否支持提前部署/联合信息机制？", data["mechanism_status"] + "；逐seed区间及OOS见下表，固定三政策排序不能替代全局结果。"),
-        ("算法速度结论基于哪一概率集、哪一同问题对照？", data["algorithm_comparison_status"] + "；仅P3三矩、同case/support/fees的计数与逐车表示；只有双方接受才给时间比。"),
+        ("全局政策是否支持提前部署/联合信息机制？", findings["mechanisms"] + "固定三政策排序不能替代全局结果。"),
+        ("算法速度结论基于哪一概率集、哪一同问题对照？", timing_prose(data["algorithm_timing_evidence"]) + "仅P3三矩、同case/support/fees的计数与逐车表示。"),
         ("开发总账及验证总账分别用了多少？", f"开发{budget['development']['spent_seconds']!r}/7200秒（已含旧{OLD_COST!r}）；验证{budget['validation']['spent_seconds']!r}/28800秒。"),
-        ("是否可以进入论文主实验，依据及剩余限制是什么？", data["validation_status"] + "；可引用相应已验收的受限合成诊断，不能自动升级为原丰富矩模型、高服务规模或普遍加速/OOS优越结论。论文采用仍需研究者判断。"),
+        ("是否可以进入论文主实验，依据及剩余限制是什么？", findings["aro"] + "可引用已验收的受限合成诊断；原丰富矩模型、高服务规模、普遍加速和完整六方法OOS证据分别判断。整轮状态：" + data["validation_status"] + "。论文采用仍需研究者判断。"),
     ]
     parts = ["# Round 2 实例设计与验证报告", "\n".join(f"{i}. **{q}** {a}" for i, (q, a) in enumerate(questions, 1)),
              f"报告时间：{data['generated_utc']}。显式停止原因：{fmt(data['stopped_reason'])}。campaign完成={data['campaign_complete']}；本文件只整理已有证据，不新增科学证书。Markdown链接显示根={fmt(display_root)}（仅展示映射，证据仍为实际执行路径）。",
@@ -669,6 +802,7 @@ def render_report(data, *, display_root=None):
              "数值口径：原行容差1e-9、目标分项1e-5、gap阈值max(1美元,1%×max(1,|UB|))。LB来自native bound或有限盒证书；UB依赖数值审计原recourse及风险对偶，**不是精确有理数物理可行性证明**。固定政策风险下界不是全局LB。",
              certificate_section(data, display_root=display_root),
              "**gap闭合、原矩阵审计完成、最终接受分开报告。** gap_passed只核对已保存LB/UB达到项目阈值；audit_complete还要求完整匹配支持和1e-9原残差；acceptance_supported保留正式接受与结算条件，不要求每个native子调用都返回OPTIMAL。TIME_LIMIT可能发生在原审计而非优化搜索：`GAP_PASSED_AUDIT_INCOMPLETE`不是gap未收敛，但仍未达到完整验收。原status/native_status不改写。",
+             "非优化作业（准备、固定政策评价、OOS与汇总）的全局LB/UB、gap及优化原审计列为N/A；其job状态与自身验收单列，不因这些字段不适用而记为界失败。",
              "审计覆盖采用保存的original_audit列表长度；audit_completed是可能滞后的progress计数，单独保留而不替代实际行数。即使gap已闭合，未完成原审计的政策仍不满足冻结OOS准入；缺任一方法时全部六方法的正式CI保持NOT_ELIGIBLE，不事后放宽。",
              "## 开发全局结果与失败历史", run_table(data["development"]),
              "额外Run（若存在只列历史，不替换冻结job）：", run_table(data["additional_runs_not_substituted_for_frozen_jobs"]),
@@ -691,6 +825,15 @@ def render_report(data, *, display_root=None):
              "## 同问题算法与消融", run_table([r for r in data["validation"] if r["stage"] in ("VIND", "VABL")]),
              table(["seed", "count/individual", "身份一致/双方接受", "值差区间(count−individual)", "controller秒比individual/count"],
                    [[p["seed"], [p["a"], p["b"]], [p["identity_matched"], p["both_accepted"]], p["difference_a_minus_b"], p["controller_time_ratio_b_over_a"]] for p in data["algorithm_pairs"]]),
+             table(["seed", "同预算且双方接受可比", "实际gap(count/individual)", "gap门限(count/individual)",
+                    "controller总秒(count/individual)", "build秒(count/individual)", "audit秒(count/individual)",
+                    "实测wrapper秒比individual/count", "count端到端较短"],
+                   [[p["seed"], p["usable_timing_comparison"], p["actual_gap_count_individual"],
+                     p["gap_threshold_count_individual"], p["controller_seconds_count_individual"],
+                     p["build_seconds_count_individual"], p["audit_seconds_count_individual"],
+                     p["observed_wrapper_ratio_individual_over_count"], p["count_end_to_end_faster_observed"]]
+                    for p in data["algorithm_timing_evidence"]["pairs"]]),
+             timing_prose(data["algorithm_timing_evidence"]),
              table(["seed", "prepass/no-prepass", "状态", "值差区间", "秒比no-prepass/prepass"],
                    [[p["seed"], [p["a"], p["b"]], p["status"], p["difference_a_minus_b"], p["controller_time_ratio_b_over_a"]] for p in data["no_prepass_comparisons"]]),
              "时间比是同问题、同预算条件下单次运行的观测比；已有健康DET任务同机运行，没有CPU绑核或独占服务器保证。后台负载未受实验控制，不能据此给普遍加速结论或受控负载的时间CI。两方未接受、身份不一致或缺计时则null。不能用旧322311行问题作分母归因类型聚合。",
@@ -721,11 +864,11 @@ def render_report(data, *, display_root=None):
     parts += ["## 计时、模型大小与累计预算",
         table(["Run", "最后保存阶段 / controller累计(s)", "准备计时(s)", "build(s)", "master / direct native(s)",
                "recourse(s)", "probability(s)", "certificate+IO(s)", "原audit(s)", "最大已记录阶段"],
-              [[r["id"], [r["last_saved_phase"], r["controller_seconds"]], r["preparation_timing_seconds"],
-                r["timing_seconds"].get("build"), [r["timing_seconds"].get("master"), r["timing_seconds"].get("native")],
-                r["timing_seconds"].get("recourse"), r["timing_seconds"].get("probability"),
-                r["timing_seconds"].get("certificate_and_io"), r["timing_seconds"].get("audit"),
-                r["largest_recorded_timing_part"]]
+              [[r["id"], [r["last_saved_phase"], r["controller_seconds"]] if r["optimization_job"] else f"N/A；job={r['status']}",
+                r["preparation_timing_seconds"], phase_time(r, "build"), [phase_time(r, "master"), phase_time(r, "native")],
+                phase_time(r, "recourse"), phase_time(r, "probability"),
+                phase_time(r, "certificate_and_io"), phase_time(r, "audit"),
+                r["largest_recorded_timing_part"] if r["optimization_job"] else "N/A"]
                for r in [*data["development"], *data["validation"]]]),
         "阶段判断只依据保存的审计行/计数/计时及current_evaluation，不是新观察。最后快照可能落后；进行中audit计时若尚未写回，即使显示0也不表示审计没有耗时。最大已记录项只比较已有计时，不当作完整实际瓶颈证明。首次gap闭合时刻未单独保存则null，不用总elapsed减audit时间反推。",
         table(["Run", "阶段计时(s，原字段)", "实际master大小", "calls/attempts"],
@@ -754,7 +897,9 @@ def render_report(data, *, display_root=None):
         "编排恢复登记（不替换冻结worker）：" + fmt(data["orchestration_recovery_manifest"]),
         "冻结源码：" + fmt(data["release_at_validation_freeze"]) + "。报告脚本：" + fmt(data["reporter_source"]),
         table(["证据", "SHA256", "bytes"], [[link(r, Path(r["path"]).name), r["sha256"], r["bytes"]] for r in data["evidence"]]),
-        "## 下一步的单项改进", data["next_improvement"],
+        "## 下一步的单项改进与论文缺口", data["next_improvement"],
+        "工程优先排查依据（非验收门、非因果证明）：" + fmt(data["algorithm_timing_evidence"]["prioritization_rule"]),
+        *data["paper_gaps"],
         "本报告不启动任何新任务，不批准发布，也不改写原Round1结论、冻结配置或源码。复现及安全恢复见REPRODUCE_CN.md。"]
     return "\n\n".join(parts) + "\n"
 
@@ -840,6 +985,8 @@ def main(argv=None):
     status = "# Round2状态\n\n" + "\n\n".join(f"{k}: {data[k]}" for k in (
         "adapter_status", "fixed_load_full400_status", "physical_design_status", "mechanism_status",
         "moment_scope", "algorithm_comparison_status", "validation_status"))
+    prose = findings_prose(data["validation_findings"])
+    status += "\n\n" + "\n\n".join(prose[k] for k in ("p3", "mechanisms", "aro"))
     status += f"\n\n显式停止原因：{fmt(args.stopped)}；campaign完成：{data['campaign_complete']}。活动claim原样记录在JSON，未推定已死。\n\n"
     status += "冻结job覆盖（expected/attempted/settled/accepted分别统计）：" + fmt(data["frozen_job_coverage"]) + "。全部尝试不等于全部接受。\n\n"
     status += "开发/验证累计秒：" + fmt([data["budget"][k]["spent_seconds"] for k in ("development", "validation")])

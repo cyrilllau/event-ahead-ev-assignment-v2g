@@ -56,7 +56,8 @@ def test_selected_bundle_has_exact_installable_source_and_reproducible_tables(
         capture_output=True,
     )
     assert manifest["generator_source"]["id"] in manifest["source_releases"]
-    import io, zipfile
+    import io
+    import zipfile
 
     bad_source = io.BytesIO()
     with zipfile.ZipFile(bad_source, "w") as z:

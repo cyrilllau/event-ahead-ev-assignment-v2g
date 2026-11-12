@@ -14,11 +14,13 @@ previous bytes and reference are preserved inside the new results JSON.
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 import math
 from pathlib import Path
 import shlex
 import time
+import zipfile
 
 from ev_assignment_experiments.analysis.diagnostic import read, reference
 from ev_assignment_experiments.runtime.ledger import BudgetLedger
@@ -32,10 +34,33 @@ OUTPUTS = ("CASE_DESIGN_ROUND2_REPORT_CN.md", "CASE_DESIGN_ROUND2_RESULTS.json",
            "CASE_DESIGN_STATUS.md", "REPRODUCE_CN.md")
 OLD_COST = 211.08199704252183
 RECOVERY_REASON = "dead_owner_unknown_overhead_conservatively_charged_full_reservation"
+# Exact historical artifacts reviewed for this pair only; never infer a domain
+# from two missing fields or extend this adapter to later/other runs.
+LEGACY_R0 = {
+    "decompose-r04": dict(release="r04", mode="decompose", attempt="624c95c7abf74a1d9c6d4b4684aab898",
+        claim="86a044b102b2e5bfa1e4127aae32861bb367a85125713abb98c6188fbfc055d1",
+        result="3f326294e6cb0a7c9bacd4bfcbf8c5bec3aad01c4f980130b0ac1aafcd017abc",
+        wait="c7539bf6811c65d403e88a935d69047c41184f25eb7db2f380280682e644eec5",
+        worker="5e746809f76569e1360c377e94a46084e67787e646fce1343793992e233a1e7f",
+        wheel="718f2ae436ff0d7b1a309b02525189ef8d75675c55f46f4c467cf3af80c608ab",
+        solver="ev_assignment/methods/catalogue.py",
+        solver_sha="85a87eae36810b9f8f0cd5bab6aab04509bbc0bb9c3c608fb1f35c88fb3b8867",
+        worker_lines=[[33, 47], [78, 84]], solver_lines=[[32, 47], [79, 84], [148, 150]]),
+    "direct-r05": dict(release="r05", mode="direct", attempt="d9d91a95ce2043a290860c827c262c97",
+        claim="0310e1dd2dbe4a3c08a3cb49782b3710b8a892b8174cdd75fe177d972060fd1b",
+        result="906a834bc71eb45f2625a85064be2a89e0473cd4c3ffce21f010ef924cac39aa",
+        wait="3ce86bd4fc9d9dfb998b73816793341efcd949bfd0d0d01ef01255cda60d6616",
+        worker="dbed3189ff8da503cc0d52d6b307f4c8802fd4bd441b9e1cc855ee195b0bf42c",
+        wheel="581e2a57d424faf4d9d546bbfd55c6bffa3e16304fa9ef002e1149b4785609fa",
+        solver="ev_assignment/methods/catalogue_direct.py",
+        solver_sha="d382fc388ee1062f1b89de0417ce24a6e3c9ea33b346fb39e508c245c419ce18",
+        worker_lines=[[76, 93], [127, 133]], solver_lines=[[55, 79], [85, 104], [241, 243], [285, 301]]),
+}
+_LEGACY_RESTRICTION_TOKEN = object()
 
 
 class Evidence:
-    """JSON/text only. Never open CASE pickles, arrays, or native models."""
+    """Parse JSON/text only. May hash CASE bytes/ZIP source, never deserialize data or execute it."""
 
     def __init__(self):
         self.refs = {}
@@ -68,10 +93,30 @@ def numeric(value):
 
 
 def max_residual(value):
+    """Scalar frozen schema, or explicit row/bound components; invalid leaves poison the result."""
     if isinstance(value, dict):
+        if not ({"row", "bound"} <= value.keys() or {"row", "bounds"} <= value.keys()):
+            return None
         values = [max_residual(v) for v in value.values()]
-        return max((v for v in values if v is not None), default=None)
-    return float(value) if numeric(value) else None
+        return max(values) if values and all(v is not None for v in values) else None
+    return float(value) if numeric(value) and value >= 0 else None
+
+
+def sha256(value):
+    return isinstance(value, str) and len(value) == 64 and all(c in "0123456789abcdef" for c in value)
+
+
+def hashed_identity(value):
+    return isinstance(value, dict) and sha256(value.get("sha256"))
+
+
+def unique_support(value):
+    return isinstance(value, list) and bool(value) and all(sha256(v) for v in value) and len(set(value)) == len(value)
+
+
+def metadata_digest(value):
+    """Frozen JSON identity encoding, without importing a scientific generator."""
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
 
 
 def ledger_summary(ledger, *, development):
@@ -184,6 +229,10 @@ def run_record(ev, root, stage, run_id, budget):
                    and c["attempt"] == claim.get("attempt")]
     settled = bool(claim and wait and len(settlements) == 1
                    and settlements[0]["actual_parent_wait"] is True
+                   and settlements[0].get("claim_payload") == claim
+                   and type(wait.get("returncode")) is int
+                   and type(settlements[0].get("returncode")) is int
+                   and wait["returncode"] == settlements[0]["returncode"]
                    and settlements[0]["receipt"] == receipt
                    and claim["run"].get("stage") == stage
                    and claim["run"].get("run_id") == run_id)
@@ -202,24 +251,29 @@ def run_record(ev, root, stage, run_id, budget):
         progress = progress if progress is not None else ev.json(folder / "PROGRESS.json")
         optimization = progress.get("optimization", progress)
         partial = True
+    if settled and not recovery and wait["returncode"] != 0 and (
+            raw.get("passed") is True or optimization.get("passed") is True):
+        raise ValueError(f"Nonzero process returncode conflicts with passed=true; review required: {folder}")
     lb, ub = optimization.get("LB"), optimization.get("UB")
     gap = ub - lb if numeric(lb) and numeric(ub) else None
     gap_threshold = max(1., .01 * max(1., abs(ub))) if numeric(ub) else None
     gap_passed = 0 <= gap <= gap_threshold if gap is not None else None
-    audits = optimization.get("original_audit", [])
-    residuals = [max_residual(a.get("residual")) for a in audits]
-    residual = max((r for r in residuals if r is not None), default=None)
+    saved_audits = optimization.get("original_audit", [])
+    audits = saved_audits if isinstance(saved_audits, list) else []
+    residuals = [max_residual(a.get("residual")) if isinstance(a, dict) else None for a in audits]
+    residual = max(residuals) if residuals and all(r is not None for r in residuals) else None
     support = optimization.get("ordered_support", [])
     count = optimization.get("full_support", raw.get("optimization_support", raw.get("support")))
-    complete_original = bool(optimization.get("original_expansion_audited") and support
-        and len(audits) == count and [a.get("sid") for a in audits] == support
-        and all(r is not None for r in residuals) and residual <= 1e-9)
-    accepted = bool(not partial and raw.get("passed") and optimization.get("passed")
-        and settled and complete_original and gap_passed)
+    complete_original = bool(optimization.get("original_expansion_audited") is True and unique_support(support)
+        and type(count) is int and count > 0 and len(audits) == count
+        and all(isinstance(a, dict) for a in audits) and [a.get("sid") for a in audits] == support
+        and residual is not None and residual <= 1e-9)
+    accepted = bool(not partial and raw.get("passed") is True and optimization.get("passed") is True
+        and settled and wait.get("returncode") == 0 and complete_original and gap_passed is True)
     attempted = bool(claim.get("attempt") and claim["run"].get("stage") == stage
                      and claim["run"].get("run_id") == run_id)
     optimization_job = bool(optimization) or stage in ("R0", "R1", "R2", "VCORE", "VIND", "VABL", "VSTRESS")
-    job_accepted = accepted if optimization_job else bool(raw.get("passed") and settled)
+    job_accepted = accepted if optimization_job else bool(raw.get("passed") is True and settled and wait.get("returncode") == 0)
     timing = optimization.get("timing", {})
     audit_started = bool(audits or optimization.get("audit_completed", 0)
                          or (numeric(timing.get("audit")) and timing["audit"] > 0))
@@ -259,7 +313,12 @@ def run_record(ev, root, stage, run_id, budget):
         ev.ref(folder / name)
     return dict(id=run_id, stage=stage, directory=str(folder),
         status=recovery_record["status"] if recovery else raw.get("status", "PARTIAL_PROGRESS_ONLY" if partial else "NO_RESULT"),
-        reported_passed=False if recovery else raw.get("passed", False), acceptance_supported=accepted,
+        reported_passed=False if recovery else raw.get("passed") is True, acceptance_supported=accepted,
+        reported_passed_raw=raw.get("passed"),
+        invalid_boolean_flags=[label for label, doc, field in (("RESULT.passed", raw, "passed"),
+            ("optimization.passed", optimization, "passed"),
+            ("optimization.original_expansion_audited", optimization, "original_expansion_audited"))
+            if field in doc and type(doc[field]) is not bool],
         attempted=attempted, job_acceptance_supported=job_accepted,
         optimization_job=optimization_job,
         bounds_audit_applicability="APPLICABLE" if optimization_job else "NOT_APPLICABLE",
@@ -285,10 +344,16 @@ def run_record(ev, root, stage, run_id, budget):
         LB=lb, UB=ub, gap=gap, stored_gap=optimization.get("gap"),
         relative_gap=gap / max(1., abs(ub)) if gap is not None else None,
         support=count, original_audit_count=len(audits), original_max_residual=residual,
+        invalid_original_residual_count=sum(r is None for r in residuals),
+        original_audit_list_valid=isinstance(saved_audits, list), ordered_support_unique=unique_support(support),
         original_complete=complete_original, deployment=deployment, service=raw.get("service", {}),
         method=raw.get("method", optimization.get("method")), seed=raw.get("seed"),
         representation=optimization.get("representation", raw.get("representation")),
-        native_status=optimization.get("native_status"), error=raw.get("error", optimization.get("reason")),
+        native_status=optimization.get("native_status"),
+        native_status_scope="last saved master status; not all recourse/oracle calls" if raw.get("mode") != "direct" else "last direct extensive MIP status",
+        last_master_native_status=optimization.get("native_status") if raw.get("mode") != "direct" else None,
+        optimization_reason=optimization.get("reason"), raw_error=raw.get("error"),
+        error=raw.get("error", optimization.get("reason")),
         lower_evidence=optimization.get("lower_evidence"), upper_evidence=optimization.get("upper_evidence"),
         model_sizes=raw.get("model_sizes", {}), master_size=optimization.get("master_size", optimization.get("model_size")),
         physical_screen={k: v for k, v in raw.get("physical_screen", {}).items()
@@ -300,31 +365,276 @@ def run_record(ev, root, stage, run_id, budget):
         raw=raw, optimization=optimization)
 
 
+def _legacy_restriction_subject(record):
+    return {k: record.get(k) for k in ("id", "stage", "directory", "claim", "result", "raw", "optimization",
+        "settled", "wait", "returncode", "actual_parent_wait", "effective_first_stage_restriction", "restriction_source_review")}
+
+
+def bind_legacy_r0(ev, root, record, budget):
+    """Hash-bound all-packages inference for the two reviewed R0 artifacts only.
+
+    Read/hash files and ZIP members; never import wheel code, unpickle CASE,
+    rebuild a model, alter saved records, or generalize missing-field semantics.
+    """
+    if record["stage"] != "R0" or record["id"] not in LEGACY_R0:
+        return None
+    spec = LEGACY_R0[record["id"]]
+    folder, release = root / "R0" / record["id"], root / "releases" / spec["release"]
+
+    def pinned(path, expected):
+        ref = ev.ref(path)
+        if not ref or ref["sha256"] != expected:
+            raise ValueError(f"legacy-r0-all-packages-v1 artifact hash mismatch: {path}")
+        return ref
+
+    refs = {key: pinned(folder / name, spec[key]) for key, name in
+            (("claim", "CLAIM.json"), ("result", "RESULT.json"), ("wait", "WAIT.json"))}
+    claim, raw, wait = (ev.bound_json(refs[k]) for k in ("claim", "result", "wait"))
+    opt, science = raw["optimization"], raw["optimization"]["science_identity"]
+    settlements = [c for c in budget["charges"] if c["kind"] == "settlement" and c["attempt"] == spec["attempt"]]
+    if (record["directory"] != str(folder) or record["settled"] is not True
+            or record["claim"] != claim or record["raw"] != raw or record["optimization"] != opt
+            or record["result"] != refs["result"] or record["wait"] != refs["wait"]
+            or claim.get("attempt") != spec["attempt"] or len(settlements) != 1
+            or settlements[0].get("claim_payload") != claim or settlements[0].get("receipt") != refs["wait"]
+            or settlements[0].get("actual_parent_wait") is not True
+            or type(wait.get("returncode")) is not int or wait["returncode"] != 0
+            or type(settlements[0].get("returncode")) is not int or settlements[0]["returncode"] != 0
+            or claim["run"].get("stage") != "R0" or claim["run"].get("run_id") != record["id"]
+            or any(k in claim["run"] for k in ("argv", "release", "freeze"))
+            or "first_stage_restriction" in opt or "first_stage_restriction" in science):
+        raise ValueError("legacy-r0-all-packages-v1 requires the exact original settlement/schema")
+    refs["worker"] = pinned(release / "round2_worker.py", spec["worker"])
+    refs["wrapper"] = pinned(release / "stage.py", "270f9237005c4f4404236422f74365ae0cf4b88e78e241a5dc9214201a49cd57")
+    refs["wheel"] = pinned(release / "ev_assignment-0.2.0.dev0-py3-none-any.whl", spec["wheel"])
+    refs["original_case"] = pinned(root.parent / "A2/r03/C11/CASE.pkl",
+        "f81a6b131a43ba1f826f3d9337fbb0ad867cda5fa8cc9c5bff8bee94ffbc2648")
+    refs["case"] = pinned(folder / "CASE.pkl", "b124de49a936b1a750b0a07a91962b26564a2dc4c4fc040e3ada22839fe79000")
+    refs["probability"] = pinned(folder / "PROBABILITY_DOMAIN.json",
+        "d15820bd961f6cd48fe68914e5a58d28945515f8c23ff92972a603a23e12600e")
+    domain = ev.bound_json(refs["probability"])
+    if (claim["run"]["source"] != raw.get("source") or raw["source"] != refs["worker"]
+            or claim["run"]["wrapper"] != refs["wrapper"] or raw.get("original_frozen_case") != refs["original_case"]
+            or raw.get("case") != refs["case"] or raw.get("mode") != spec["mode"]
+            or (raw.get("N"), raw.get("G"), raw.get("packages"), raw.get("support")) != (6, 6, 72, 8)
+            or raw.get("case_identity") != science or science.get("sha256") != "bdbbcd8db41d3867e11d5ef49e4cd40476f9322f17db249afff0159491bf8d72"
+            or science.get("catalogue") != "bb638cf9235825fd35fcfa9a475af5c9b2ae463104c5dbeea265cfb0afb6a2d4"
+            or opt.get("ambiguity_identity") != "7199dac03516ce75d8a618095b5a18b0e9695f53694dbe831dad8643deca3991"
+            or domain.get("identity") != opt["ambiguity_identity"] or domain.get("feature_rows") != 3
+            or opt.get("first_stage_weights") != [1, 1, 1, 1] or opt.get("representation") != "count"
+            or not unique_support(opt.get("ordered_support")) or len(opt["ordered_support"]) != 8
+            or opt["ordered_support"] != science.get("scenarios")):
+        raise ValueError("legacy-r0-all-packages-v1 case/probability/source identity mismatch")
+    sources = [dict(reference=refs["worker"], lines=spec["worker_lines"],
+        finding="Load the exact CASE and pass it unchanged to the selected solver; no departure restriction argument")]
+    with zipfile.ZipFile(refs["wheel"]["path"]) as archive:
+        for member, expected, lines, finding in (
+                (spec["solver"], spec["solver_sha"], spec["solver_lines"],
+                 "Pass all case packages to build_first; preserve its complete rows and bounds in the model"),
+                ("ev_assignment/l08/catalogue.py", "dfaef697609945e8df900ee828824ebc65f4ee7b7b36f534ca33d9aa282dd297",
+                 [[58, 59], [77, 98], [105, 130]], "Enumerate all declared packages; only declared capacity, contract and port constraints")):
+            if archive.namelist().count(member) != 1:
+                raise ValueError(f"Ambiguous/missing legacy wheel member: {member}")
+            content = archive.read(member)
+            if hashlib.sha256(content).hexdigest() != expected:
+                raise ValueError(f"Legacy wheel member hash mismatch: {member}")
+            sources.append(dict(archive=refs["wheel"], member=member, sha256=expected,
+                                bytes=len(content), lines=lines, finding=finding))
+    pinned(Path(refs["wheel"]["path"]), spec["wheel"])
+    release_ref = ev.ref(release / "RELEASE.json")
+    if spec["release"] == "r04":
+        if release_ref is not None:
+            raise ValueError("Reviewed r04 schema had no RELEASE.json")
+    else:
+        release_ref = pinned(release / "RELEASE.json", "7ddb1d880bce122d6b7b96395d892e572c0aee85b4ea54dc31eb3c45c166340d")
+        manifest = ev.bound_json(release_ref)
+        if any(manifest.get("files", {}).get(name) != refs[key]["sha256"] for name, key in
+               (("round2_worker.py", "worker"), ("stage.py", "wrapper"), (Path(refs["wheel"]["path"]).name, "wheel"))):
+            raise ValueError("Legacy r05 release manifest does not bind reviewed artifacts")
+    proof = dict(schema="legacy-r0-all-packages-v1", status="HASH_BOUND_SOURCE_REVIEW", run=record["id"],
+        inferred_restriction="all_packages", artifacts=refs, source_review=sources,
+        settlement_event=settlements[0].get("ledger_event"), release_manifest=release_ref,
+        original_field_missing=True, science_identity_restriction_missing=True,
+        claim_fields_missing=["argv", "release", "freeze"], r04_release_manifest_missing=spec["release"] == "r04",
+        scope="Exact reviewed N6/G6/S8 count pair and all72 declared catalogue packages only; no old-full-model equivalence, execution-time module attestation or new scientific certificate")
+    record["effective_first_stage_restriction"] = "all_packages"
+    record["restriction_source_review"] = proof
+    record["_legacy_restriction_binding"] = (_LEGACY_RESTRICTION_TOKEN, metadata_digest(_legacy_restriction_subject(record)))
+    return proof
+
+
+def effective_restriction(record):
+    """A serialized 'bound' flag alone cannot activate the legacy inference."""
+    opt = record["optimization"]
+    if "first_stage_restriction" in opt:
+        value = opt["first_stage_restriction"]
+        return value if value in ("all_packages", "latest_departure_only") else None
+    binding = record.get("_legacy_restriction_binding")
+    if (record["stage"] == "R0" and record["id"] in LEGACY_R0 and binding
+            and binding[0] is _LEGACY_RESTRICTION_TOKEN
+            and binding[1] == metadata_digest(_legacy_restriction_subject(record))
+            and record.get("effective_first_stage_restriction") == "all_packages"):
+        return "all_packages"
+    return None
+
+
+def bind_frozen_job(ev, validation, freeze, release, job, record):
+    """Standalone copy of the controller's pure expected-identity construction."""
+    if not record["claim"]:
+        return None
+    root = Path(freeze["source_release"]["path"]).parent
+    folder = validation / job["stage"] / job["id"]
+    source, wrapper = ev.ref(root / job["worker"]), ev.ref(root / "stage.py")
+    config, design = ev.ref(folder / "EXECUTION_CONFIG.json"), ev.ref(validation / "DESIGN_CONFIG.json")
+    if (not source or not wrapper or not config or not design
+            or source["sha256"] != release.get("files", {}).get(job["worker"])
+            or wrapper["sha256"] != release.get("files", {}).get("stage.py")
+            or (config["sha256"], config["bytes"]) != (design["sha256"], design["bytes"])):
+        raise ValueError(f"Frozen source/wrapper/config hash mismatch: {job['id']}")
+    expected = dict(stage=job["stage"], run_id=job["id"], source=source,
+        argv=[str(root / ".venv/bin/python"), str(root / job["worker"]), *job["args"]],
+        release=freeze["source_release"], freeze=ev.ref(validation / "FREEZE.json"), wrapper=wrapper, config=config)
+    if record["claim"].get("run") != expected:
+        raise ValueError(f"CLAIM differs from expected frozen job identity: {job['id']}")
+    if "source" in record["raw"] and record["raw"]["source"] != source:
+        raise ValueError(f"RESULT worker source differs from frozen job: {job['id']}")
+    return dict(status="FROZEN_EXECUTION_METADATA_BOUND", expected=expected,
+                scope="source/argv/wrapper/config/release/FREEZE; no scientific execution")
+
+
+def bind_prepared_support(ev, validation, freeze, job, record, preparation):
+    """Bind saved validation SID metadata to frozen V0; never open CASE/NPZ data."""
+    if job["worker"] != "validation_worker.py" or not record["optimization"]:
+        return None
+    case_path, method, seed, representation, prepass = job["args"]
+    seed = int(seed)
+    if preparation["job_acceptance_supported"] is not True:
+        raise ValueError("Optimization metadata requires an accepted frozen V0")
+    entries = [c for c in preparation["raw"].get("cases", []) if c.get("split") == "validation" and c.get("seed") == seed]
+    manifest_path = Path(preparation["directory"]) / f"validation_{seed}_MANIFEST.json"
+    prepared = ev.json(manifest_path)
+    if (len(entries) != 1 or entries[0] != prepared
+            or preparation["raw"].get("freeze") != ev.ref(validation / "FREEZE.json")
+            or prepared.get("case", {}).get("path") != case_path):
+        raise ValueError(f"Frozen V0 manifest/case mismatch: {job['id']}")
+    identity, ids, weights = prepared.get("identity", {}), prepared.get("ordered_ids"), prepared.get("weights")
+    if (not hashed_identity(identity) or identity["sha256"] != metadata_digest({k: v for k, v in identity.items() if k != "sha256"})
+            or not unique_support(ids) or len(ids) != 400 or identity.get("scenarios") != ids
+            or identity.get("weights") != weights or not isinstance(weights, list) or len(weights) != 400
+            or not all(numeric(w) and w >= 0 for w in weights) or not sha256(identity.get("forecast"))
+            or identity.get("split") != "validation" or identity.get("seed") != seed
+            or identity.get("fleet_size") != 30 or identity.get("groups") != 6):
+        raise ValueError(f"Invalid prepared validation support identity: {job['id']}")
+    raw, opt = record["raw"], record["optimization"]
+    folder = validation / job["stage"] / job["id"]
+    support = ev.json(folder / "SUPPORT_MANIFEST.json")
+    expected = dict(case_identity=identity["sha256"], split="validation", seed=seed,
+        ordered_ids=ids, weights=weights, forecast_id=identity["forecast"], N=30, G=6, S=400,
+        catalogue_sha256=identity["catalogue"])
+    if support != dict(expected, sha256=metadata_digest(expected)):
+        raise ValueError(f"Worker support manifest differs from V0: {job['id']}")
+    for field, value in (("base_case_identity", identity), ("frozen_case", prepared["case"]),
+                         ("method", method), ("seed", seed), ("representation", representation),
+                         ("prepass", prepass == "prepass")):
+        if field in raw and (raw[field] != value or (field == "prepass" and type(raw[field]) is not bool)):
+            raise ValueError(f"RESULT {field} differs from frozen input: {job['id']}")
+    model = ev.json(folder / "MODEL_VIEW.json")
+    expected_ids = [identity["forecast"]] if method == "DET" else ids
+    restriction = "latest_departure_only" if method == "P3-noadvance" else "all_packages"
+    if (not hashed_identity(model) or model["sha256"] != metadata_digest({k: v for k, v in model.items() if k != "sha256"})
+            or opt.get("science_identity") != model or raw.get("model_identity", model) != model
+            or model.get("parent_case_identity") != identity["sha256"] or model.get("requested_method") != method
+            or model.get("source") != identity.get("source") or model.get("catalogue") != identity.get("catalogue")
+            or model.get("ordered_optimization_ids") != expected_ids or model.get("scenarios") != expected_ids
+            or opt.get("ordered_support") != expected_ids or opt.get("full_support") != len(expected_ids)
+            or model.get("first_stage_restriction") != restriction or opt.get("first_stage_restriction") != restriction
+            or opt.get("representation") != representation):
+        raise ValueError(f"Model/support/restriction differs from frozen method: {job['id']}")
+    domain_ref = ev.ref(folder / "PROBABILITY_DOMAIN.json")
+    if raw.get("probability_domain", domain_ref) != domain_ref:
+        raise ValueError(f"Probability metadata reference mismatch: {job['id']}")
+    domain = ev.bound_json(domain_ref)
+    # Frozen finite_domain stores fixed probabilities as identity rows (DET=1, SAA=400).
+    rows = {"DET": 1, "SAA": 400, "ARO": 0, "P3": 3, "P2": 2, "P3-noadvance": 3}[method]
+    if (not sha256(domain.get("identity")) or domain["identity"] != opt.get("ambiguity_identity")
+            or domain["identity"] != model.get("probability_identity") or domain.get("ordered_support") != expected_ids
+            or domain.get("moment_rows") != rows or raw.get("moment_rows", rows) != rows):
+        raise ValueError(f"Probability identity/declared dimensions mismatch: {job['id']}")
+    record["probability_metadata"] = domain
+    return dict(status="V0_ORDERED_SUPPORT_METADATA_BOUND", expected_support_count=len(expected_ids),
+        forecast_only=method == "DET", preparation_result=preparation["result"],
+        prepared_manifest=ev.ref(manifest_path), worker_manifest=ev.ref(folder / "SUPPORT_MANIFEST.json"),
+        model_view=ev.ref(folder / "MODEL_VIEW.json"), probability_domain=domain_ref,
+        scope="Saved SID/weight/case/hash/method metadata only; no CASE/NPZ read or physics/probability recomputation")
+
+
+def declared_variant_matches(a, b, variant):
+    aa, bb = a["optimization"], b["optimization"]
+    left, right = aa.get("science_identity", {}), bb.get("science_identity", {})
+    allowed = {"sha256", "method", "requested_method", "probability_identity"}
+    if variant == "noadvance":
+        allowed |= {"first_stage_restriction", "noadvance_rule"}
+    if (left.get("schema") != "fixed_load_validation_subproblem_v1" or left.get("requested_method") != "P3"
+            or left.get("method") != "P3-DRO" or right.get("method") != ("P2-DRO" if variant == "P2" else "P3-DRO/no-advance")
+            or right.get("requested_method") != ("P2" if variant == "P2" else "P3-noadvance")
+            or {k: v for k, v in left.items() if k not in allowed} != {k: v for k, v in right.items() if k not in allowed}):
+        return False
+    if variant == "noadvance":
+        return (aa.get("first_stage_restriction") == left.get("first_stage_restriction") == "all_packages"
+            and bb.get("first_stage_restriction") == right.get("first_stage_restriction") == "latest_departure_only"
+            and left.get("noadvance_rule") is None
+            and right.get("noadvance_rule") == "departure_choice == 2 (d=64); no other constraints changed"
+            and aa.get("ambiguity_identity") == bb.get("ambiguity_identity") == left.get("probability_identity") == right.get("probability_identity"))
+    pa, pb = a.get("probability_metadata", {}), b.get("probability_metadata", {})
+    scope = pa.get("feature_scope", {})
+    bounds_valid = all(isinstance(p.get(k), list) and len(p[k]) == n
+        and all(numeric(v) for v in p[k]) for p, n in ((pa, 3), (pb, 2)) for k in ("lower", "upper"))
+    return (aa.get("first_stage_restriction") == bb.get("first_stage_restriction")
+        == left.get("first_stage_restriction") == right.get("first_stage_restriction") == "all_packages"
+        and pa.get("identity") == aa.get("ambiguity_identity") == left.get("probability_identity")
+        and pb.get("identity") == bb.get("ambiguity_identity") == right.get("probability_identity")
+        and pa.get("moment_rows") == pa.get("feature_rows") == 3 and pb.get("moment_rows") == pb.get("feature_rows") == 2
+        and bool(scope) and scope == pb.get("feature_scope") and scope.get("joint_row_indices") == [2]
+        and scope.get("declared_row_count") == 3 and bounds_valid
+        and scope.get("marginal_rule") == "remove only joint_row_indices=[2]; preserve support and all other rows/bounds"
+        and all(0 <= lo <= hi <= 1 for p in (pa, pb) for lo, hi in zip(p["lower"], p["upper"], strict=True))
+        and all(pa[k][:2] == pb[k] for k in ("lower", "upper"))
+        and isinstance(pa.get("rule"), dict) and bool(pa["rule"]) and pa["rule"] == pb.get("rule"))
+
+
 def compare(a, b, *, variant="equal"):
     """Arithmetic on stored intervals only; no new optimality/physics proof."""
     aa, bb = a["optimization"], b["optimization"]
-    shared = (bool(aa and bb) and aa.get("first_stage_weights") == bb.get("first_stage_weights") == [1, 1, 1, 1]
+    restrictions = [effective_restriction(r) for r in (a, b)]
+    shared = (bool(aa and bb) and all(hashed_identity(o.get("science_identity")) and sha256(o.get("ambiguity_identity"))
+              and unique_support(o.get("ordered_support")) and o.get("first_stage_weights") == [1, 1, 1, 1]
+              and all(numeric(w) for w in o["first_stage_weights"]) for o in (aa, bb))
               and aa.get("ordered_support") == bb.get("ordered_support"))
     if variant == "equal":
         shared = shared and aa.get("science_identity") == bb.get("science_identity")
         shared = shared and aa.get("ambiguity_identity") == bb.get("ambiguity_identity")
-        shared = shared and aa.get("first_stage_restriction") == bb.get("first_stage_restriction")
+        shared = shared and restrictions[0] in ("all_packages", "latest_departure_only")
+        shared = shared and restrictions[0] == restrictions[1]
     else:
         left, right = a["raw"].get("base_case_identity", {}), b["raw"].get("base_case_identity", {})
-        shared = shared and bool(left.get("sha256")) and left == right
-        if variant == "noadvance":
-            shared = shared and aa.get("ambiguity_identity") == bb.get("ambiguity_identity")
-        elif variant != "P2":
+        if variant not in ("P2", "noadvance"):
             raise ValueError("Unknown comparison variant")
+        shared = (shared and hashed_identity(left) and left == right
+            and aa["science_identity"].get("parent_case_identity") == bb["science_identity"].get("parent_case_identity") == left["sha256"]
+            and declared_variant_matches(a, b, variant))
     interval = None
-    if (shared and a["original_complete"] and b["original_complete"]
+    if (shared and a["original_complete"] is True and b["original_complete"] is True
             and all(numeric(r[k]) for r in (a, b) for k in ("LB", "UB"))):
         interval = [a["LB"] - b["UB"], a["UB"] - b["LB"]]
     contradicted = bool(interval and (interval[0] > 1e-5 or
                          (variant == "equal" and interval[1] < -1e-5)))
-    both = bool(shared and a["acceptance_supported"] and b["acceptance_supported"])
+    both = bool(shared and a["acceptance_supported"] is True and b["acceptance_supported"] is True)
     return dict(a=a["id"], b=b["id"], variant=variant,
         identity_matched=bool(shared), both_accepted=both,
+        effective_first_stage_restrictions=restrictions,
+        source_review_restriction_applied=["first_stage_restriction" not in r["optimization"] and effective_restriction(r) is not None for r in (a, b)],
+        identity_check_scope="Nonempty SHA identities, unique ordered support, explicit restriction or exact hash-bound legacy R0 source review; variants compare declared metadata only, not NPZ coefficients",
+        missing_restriction_metadata=any(o.get("first_stage_restriction") not in ("all_packages", "latest_departure_only") for o in (aa, bb)),
         difference_a_minus_b=interval,
         status="CONTRADICTORY_INTERVALS" if contradicted else
                "INTERVALS_AVAILABLE" if interval else "UNRESOLVED_OR_IDENTITY_MISMATCH",
@@ -336,7 +646,7 @@ def compare(a, b, *, variant="equal"):
 
 
 def public_run(record):
-    return {k: v for k, v in record.items() if k not in ("raw", "optimization")}
+    return {k: v for k, v in record.items() if k not in ("raw", "optimization", "probability_metadata", "_legacy_restriction_binding")}
 
 
 def job_coverage(records):
@@ -392,6 +702,10 @@ def algorithm_timing_findings(pairs, records):
             and at["build"] + at["audit"] >= sum(at[k] for k in keys[2:]))
         rows.append(dict(seed=pair["seed"], count=a["id"], individual=b["id"],
             matched_and_both_accepted=pair["identity_matched"] and pair["both_accepted"],
+            identity_matched=pair["identity_matched"],
+            count_accepted=a["acceptance_supported"], individual_accepted=b["acceptance_supported"],
+            count_status=a["status"], individual_status=b["status"],
+            individual_completion_class=b["completion_class"],
             same_reserved_budget=same_budget, reserved_seconds_count_individual=reserved,
             usable_timing_comparison=usable,
             actual_gap_count_individual=[a["gap"], b["gap"]],
@@ -507,6 +821,8 @@ def collect(root, stopped=None):
     if len(jobs) != 30 or len({j["id"] for j in jobs}) != 30:
         raise ValueError("Expected the frozen 30 distinct validation jobs")
     dev = [run_record(ev, root, stage, rid, dev_budget) for stage, rid in DEV_RUNS]
+    for record in dev:
+        bind_legacy_r0(ev, root, record, dev_budget)
     runs = [run_record(ev, validation, j["stage"], j["id"], val_budget) for j in jobs]
     additional = []
     for base, budget, known, pattern in ((root, dev_budget, {(r["stage"], r["id"]) for r in dev}, "R*/*/RESULT.json"),
@@ -522,19 +838,18 @@ def collect(root, stopped=None):
                     and all_settled and not val_budget["active"] and not dev_budget["active"])
     if not complete and not stopped:
         raise RuntimeError("Campaign incomplete: no final report without --stopped REASON")
-    for r in runs:
-        if r["claim"]:
-            identity = r["claim"]["run"]
-            if identity.get("freeze") != ev.ref(validation / "FREEZE.json"):
-                raise ValueError(f"Run not bound to frozen campaign: {r['id']}")
-            if identity.get("release") != freeze["source_release"]:
-                raise ValueError(f"Run uses a different release: {r['id']}")
+    preparation = next(r for r in runs if r["stage"] == "V0")
+    for job, r in zip(jobs, runs, strict=True):
+        r["frozen_execution_binding"] = bind_frozen_job(ev, validation, freeze, release, job, r)
+        r["frozen_support_binding"] = bind_prepared_support(ev, validation, freeze, job, r, preparation)
     orchestration_recovery = verified_controller_recovery(ev, validation, freeze, runs)
     vreport = next(r for r in runs if r["stage"] == "VREPORT")
     stats = {}
     for seed in freeze["validation_seeds"]:
         ref = vreport["raw"].get("oos_statistics", {}).get(str(seed))
         summary = ev.bound_json(ref) if ref else None
+        if summary and "formal_ci" in summary and type(summary["formal_ci"]) is not bool:
+            raise ValueError(f"Stored formal_ci is not a boolean: seed{seed}")
         if summary and (summary.get("seed") != 910000 + seed or summary.get("expected_n") != 1000
                         or summary.get("replicates") != 500 or summary.get("fixture_override")):
             raise ValueError(f"Stored statistics do not match preregistration: seed{seed}")
@@ -562,10 +877,10 @@ def collect(root, stopped=None):
     r2["service"] = dict(status="SAVED_R5_OPTIMIZED_SERVICE", metrics=evidence.get("optimized_service", {}))
     physical = r2["raw"].get("physical_screen", {})
     healthy = physical.get("healthy_grid_audit", {})
-    healthy_complete = bool(physical.get("passed") and healthy.get("passed")
-        and healthy.get("scenario_count") == 401 and healthy.get("unchanged_demand")
-        and healthy.get("all_grid_lines_healthy") and healthy.get("zero_ev_injection")
-        and healthy.get("shedding_fixed_zero"))
+    healthy_complete = bool(physical.get("passed") is True and healthy.get("passed") is True
+        and healthy.get("scenario_count") == 401 and healthy.get("unchanged_demand") is True
+        and healthy.get("all_grid_lines_healthy") is True and healthy.get("zero_ev_injection") is True
+        and healthy.get("shedding_fixed_zero") is True)
     r0 = compare(dev[0], dev[1])
     entry = ev.json(root / "DEVELOPMENT_ACCEPTANCE.json", optional=True)
     old = {}
@@ -581,7 +896,8 @@ def collect(root, stopped=None):
                 for p in sorted((root / "releases").glob("*/RELEASE.json"))}
     for path in (root / "ROUND2_PROTOCOL_CN.md", root / "CASE_SEARCH_LEDGER.jsonl",
                  validation / "CASE_SEARCH_LEDGER.jsonl", root / "DEVELOPMENT_CRITIC_CN.md",
-                 root / "PRE_VALIDATION_REVIEW_CN.md", vreport_path(vreport) / "FROZEN_EVIDENCE_HASHES.json"):
+                 root / "PRE_VALIDATION_REVIEW_CN.md", root / "FINAL_EVIDENCE_CRITIC_PRELIM_CN.md",
+                 vreport_path(vreport) / "FROZEN_EVIDENCE_HASHES.json"):
         ev.ref(path)
     limitations = certificate_limitations(ev.ref(root / "IMPLEMENTATION_CRITIC_CN.md"))
     all_core_pass = all(r["acceptance_supported"] for r in core)
@@ -593,7 +909,7 @@ def collect(root, stopped=None):
         "SOME_SCOPED_GLOBAL_COMPARISONS_AVAILABLE" if any(g["accepted_intervals"] for g in mechanism_counts) else
         "NO_ACCEPTED_MECHANISM_INTERVALS")
     oos = [by_id[freeze["oos_run_ids"][str(seed)]] for seed in freeze["validation_seeds"]]
-    formal_stats = all(s["summary"] and s["summary"].get("formal_ci") for s in stats.values())
+    formal_stats = all(s["summary"] and s["summary"].get("formal_ci") is True for s in stats.values())
     complete_oos = all(r["reported_passed"] and r["raw"].get("common_completed") == 1000 for r in oos)
     contradiction = any(p["status"] == "CONTRADICTORY_INTERVALS" for p in [r0, *pairs, *mechanisms, *ablations])
     statuses = dict(
@@ -635,7 +951,10 @@ def collect(root, stopped=None):
             software_work=dict(session_wall_seconds=wall, new_actual_wrapper_wall_seconds=wrappers,
                 session_wall_minus_new_wrapper_wall_seconds=wall - wrappers, exact_active_coding_seconds=None,
                 note="Wall difference includes reading/coding/deployment/waiting and unmeasured interrupted-worker time; coding can overlap wrappers. Conservative reservation debits are not observed wall time. Not additive CPU/active labor time; old211.081997 is not subtracted again.")),
-        runtime_environment_scope=dict(existing_healthy_DET_task_colocated=True,
+        runtime_environment_scope=dict(existing_healthy_DET_task_colocated_during_part_of_campaign=True,
+            legacy_finalization_observation=ev.json(root / "observations/LEGACY_FINALIZATION_20261112T2042Z.json", optional=True),
+            legacy_saved_audit_observation=ev.json(root / "observations/LEGACY_AUDIT_20261112T2042Z.json", optional=True),
+            legacy_scope="Read-only legacy finalization metadata; no adoption, restart, new solve or independent recertification",
             dedicated_server_claim=False, cpu_pinning_claim=False,
             timing_ratios="Observed single same-case/budget runs; background load is not experimentally controlled; no universal speedup or runtime CI claim"),
         memory_scope=dict(R2_per_run_MemoryPeak_bytes=None,
@@ -730,7 +1049,7 @@ def findings_prose(findings):
     mechanisms = []
     for method, group in findings["mechanism_comparisons"].items():
         mechanisms.append(f"P3−{method}有{group['accepted_intervals']}/{group['expected']}组双方接受且身份匹配的值差区间，"
-            f"其中{group['strictly_negative_beyond_1e_5']}组上端小于−1e-5，按数值区间辨识出该受限训练问题的目标值差；"
+            f"其中{group['strictly_negative_beyond_1e_5']}组在保存的数值界证据下与零分离（上端小于−1e-5）；"
             f"{group['unresolved']}组未确立（含{group['contradictory']}组需矛盾复核）")
     deployments = []
     for item in p3["deployments"]:
@@ -747,7 +1066,10 @@ def findings_prose(findings):
 def timing_prose(timing):
     usable = [r for r in timing["pairs"] if r["usable_timing_comparison"]]
     wrappers = [r for r in usable if r["count_end_to_end_faster_observed"] is not None]
-    return (f"{len(usable)}/{len(timing['pairs'])}组同问题、同预留预算且双方接受的计时可比；"
+    matched = [r for r in timing["pairs"] if r["identity_matched"] and r["same_reserved_budget"]]
+    return (f"同问题、同预留预算的{len(matched)}组中，count完整接受{sum(r['count_accepted'] for r in matched)}组，"
+        f"individual完整接受{sum(r['individual_accepted'] for r in matched)}组；其余资源中断与gap/审计超时分列，失败不生成成功时间比。"
+        f"{len(usable)}/{len(timing['pairs'])}组同问题、同预留预算且双方接受的计时可比；"
         f"count含构建/审计的controller总时间较短{sum(r['count_controller_faster_observed'] for r in usable)}组、"
         f"未较短{sum(not r['count_controller_faster_observed'] for r in usable)}组。"
         f"有实际wrapper计时的{len(wrappers)}组中，count端到端较短{sum(r['count_end_to_end_faster_observed'] for r in wrappers)}组。"
@@ -803,10 +1125,16 @@ def render_report(data, *, display_root=None):
              certificate_section(data, display_root=display_root),
              "**gap闭合、原矩阵审计完成、最终接受分开报告。** gap_passed只核对已保存LB/UB达到项目阈值；audit_complete还要求完整匹配支持和1e-9原残差；acceptance_supported保留正式接受与结算条件，不要求每个native子调用都返回OPTIMAL。TIME_LIMIT可能发生在原审计而非优化搜索：`GAP_PASSED_AUDIT_INCOMPLETE`不是gap未收敛，但仍未达到完整验收。原status/native_status不改写。",
              "非优化作业（准备、固定政策评价、OOS与汇总）的全局LB/UB、gap及优化原审计列为N/A；其job状态与自身验收单列，不因这些字段不适用而记为界失败。",
+             "报告额外核对完整CLAIM与账本payload、整数退出码、冻结source/argv/wrapper/config身份，以及V0中原始SID/权重和方法支持。仅核验metadata及字节哈希，不反序列化CASE/NPZ或重算模型。非有限、负值、缺失分量及非法残差不能被其他0分量抵消；异常布尔标志不当作接受。",
              "审计覆盖采用保存的original_audit列表长度；audit_completed是可能滞后的progress计数，单独保留而不替代实际行数。即使gap已闭合，未完成原审计的政策仍不满足冻结OOS准入；缺任一方法时全部六方法的正式CI保持NOT_ELIGIBLE，不事后放宽。",
              "## 开发全局结果与失败历史", run_table(data["development"]),
              "额外Run（若存在只列历史，不替换冻结job）：", run_table(data["additional_runs_not_substituted_for_frozen_jobs"]),
              "R0区间对照：" + fmt(data["R0_comparison"]),
+             "R0的legacy-r0-all-packages-v1仅适用于decompose-r04/direct-r05：确切CLAIM/RESULT/CASE/概率域、worker、wheel及ZIP成员哈希核对后，由已审阅源码推导全72套餐域。original first_stage_restriction缺失仍保留，effective字段不回填原记录；旧CLAIM缺argv/release/freeze，r04无RELEASE.json也明确保留。任何身份不符拒绝适配，不推广到其他Run，不声称执行时模块取证或新科学证明。",
+             table(["R0 Run", "源码文件或wheel成员", "审阅行（含首尾）", "SHA256", "域证据"],
+                   [[r["id"], link(s.get("reference", s.get("archive")), s.get("member", "round2_worker.py")),
+                     s["lines"], s.get("sha256", s.get("reference", {}).get("sha256")), s["finding"]]
+                    for r in data["development"] for s in r.get("restriction_source_review", {}).get("source_review", [])]),
              "R5/evidence400-r06的float residual元数据读取错误发生在新增参考LP之前；r07修复后的结果单列，旧失败及费用保留。Round1负荷缩放设计门失败原报告不改写。R3/R4是允许跳过的有限范围，不记为容量修订PASS。",
              table(["Run", "错误/原因", "证据"], [[r["id"], r["error"], link(r["result"])] for r in data["development"] if not r["reported_passed"]]),
              "## 三参考政策：固定政策评价，不是全局排名",
@@ -815,6 +1143,9 @@ def render_report(data, *, display_root=None):
                    [[r["name"], r["first_cost"], *[(r["total"] or {}).get(k) for k in ("DET", "SAA", "ARO", "P3-DRO", "P2-DRO")]] for r in data["reference_policy_evaluations"]]),
              "保留全局优化发现的第四种政策。实际DET部署见核心表（已观察到的两车策略也不应被三参考表覆盖）；这些评价规则不同，不能把各自训练目标直接作共同OOS排名。",
              "## 18个核心全局结果（含超时/缺失）", run_table(core),
+             table(["Run", "最后保存master native status", "optimization reason（原文）", "顶层错误"],
+                   [[r["id"], r["last_master_native_status"], r["optimization_reason"], r["raw_error"]] for r in core]),
+             "master native status只描述最后保存的master，不代表全部recourse调用OPTIMAL；终止原因中的oracle状态独立保留。原有完整支持整数候选UB不会因最后一轮未完成而改称不存在，但原审计不完整仍不满足冻结OOS门。",
              table(["Run", "选车", "合同(kWh)", "提前(车·小时，相对16:00)", "站点/有效类型", "平均放电车/AC kWh", "服务口径"],
                 [[r["id"], r["deployment"].get("selected_vehicles"), r["deployment"].get("contract_kwh"),
                   r["deployment"].get("total_advance_vehicle_hours"),
@@ -836,7 +1167,8 @@ def render_report(data, *, display_root=None):
              timing_prose(data["algorithm_timing_evidence"]),
              table(["seed", "prepass/no-prepass", "状态", "值差区间", "秒比no-prepass/prepass"],
                    [[p["seed"], [p["a"], p["b"]], p["status"], p["difference_a_minus_b"], p["controller_time_ratio_b_over_a"]] for p in data["no_prepass_comparisons"]]),
-             "时间比是同问题、同预算条件下单次运行的观测比；已有健康DET任务同机运行，没有CPU绑核或独占服务器保证。后台负载未受实验控制，不能据此给普遍加速结论或受控负载的时间CI。两方未接受、身份不一致或缺计时则null。不能用旧322311行问题作分母归因类型聚合。",
+             "时间比是同问题、同预算条件下单次运行的观测比；旧DET曾在同机并行，最新只读WAIT记录其于18:54 UTC正常结束（返回码0），范围仅FORECAST44_DET_ONLY。该旧结果不属于本轮计算或独立复核。没有CPU绑核或独占服务器保证，后台负载随时间变化且未受实验控制，不能据此给普遍加速结论或受控负载的时间CI。两方未接受、身份不一致或缺计时则null。不能用旧322311行问题作分母归因类型聚合。",
+             "原任务完成观察（与本轮科学结果分开）：" + fmt(data["runtime_environment_scope"]),
              "## P3/P2与无提前的配对值差",
              table(["seed", "P3−对照", "身份范围", "区间($)", "状态"],
                    [[p["seed"], p["methods"], p["scope"], p["difference_a_minus_b"], p["status"]] for p in data["mechanism_intervals"]]),
@@ -958,7 +1290,7 @@ def render_reproduce(data):
     parts += ["## 重新格式化报告（不会重算科学结果）",
         "```bash\n" + shlex.join([str(release / ".venv/bin/python"), data["reporter_source"]["path"], str(root)]) + "\n```",
         "默认拒绝活动账本或未完成campaign；显式`--stopped '原因'`仅生成标注的未完成快照，不意味着活动进程已停止。三个新报告文件采用排他创建，已有输出拒绝覆盖；仅Round2状态页可更新，其旧内容封存在JSON。",
-        "本报告读取RESULT/PROGRESS、账本、FREEZE、RELEASE与VREPORT统计，不打开CASE.pkl，不调用模型/优化器/原矩阵/概率LP/bootstrap。新的科学重跑需要另行授权与新Run，同时保留当前累计账本、失败和冻结来源。"]
+        "本报告读取RESULT/PROGRESS、账本、FREEZE、RELEASE与VREPORT统计；R0历史适配只哈希CASE字节并读取ZIP源码成员，不反序列化CASE、不执行wheel源码，不调用模型/优化器/原矩阵/概率LP/bootstrap。新的科学重跑需要另行授权与新Run，同时保留当前累计账本、失败和冻结来源。"]
     return "\n\n".join(parts) + "\n"
 
 

@@ -1395,7 +1395,15 @@ def main(argv=None):
     status += f"\n\n显式停止原因：{fmt(args.stopped)}；campaign完成：{data['campaign_complete']}。活动claim原样记录在JSON，未推定已死。\n\n"
     status += "冻结job覆盖（expected/attempted/settled/accepted分别统计）：" + fmt(data["frozen_job_coverage"]) + "。全部尝试不等于全部接受。\n\n"
     status += "开发/验证累计秒：" + fmt([data["budget"][k]["spent_seconds"] for k in ("development", "validation")])
-    status += "；上限7200/28800，开发含旧211.08199704252183。\n\n详见CASE_DESIGN_ROUND2_REPORT_CN.md、CASE_DESIGN_ROUND2_RESULTS.json及REPRODUCE_CN.md。原Round1报告/账本未改写。\n"
+    status += "；上限7200/28800，开发含旧211.08199704252183。\n\n余额秒：" + fmt([data["budget"][k]["remaining_seconds"] for k in ("development", "validation")])
+    status += "；当前活动claim：" + fmt({k: data["budget"][k]["active"] for k in ("development", "validation")})
+    status += "。\n\n冻结身份：" + fmt(data["freeze"]["reference"])
+    status += "；科学源码commit：" + fmt(data["release_at_validation_freeze"].get("commit"))
+    status += "；验证seed：" + fmt(data["freeze"]["contents"]["validation_seeds"])
+    status += "。配置位于DESIGN_CONFIG.json及validation/DESIGN_CONFIG.json；实例与支持身份见validation/V0/prepare-r08各MANIFEST，原产物不覆盖。\n\n"
+    status += ("下一步：本轮冻结任务已全部结算，无待续跑solver job；复核报告与证据后决定下一轮独立任务，不能重跑失败job或用余额追加调参。"
+               if data["campaign_complete"] else "下一步：按REPRODUCE_CN.md核对活动身份、停止原因及剩余冻结job后再决定恢复；此报告不授权新的求解。")
+    status += "\n\n详见CASE_DESIGN_ROUND2_REPORT_CN.md、CASE_DESIGN_ROUND2_RESULTS.json及REPRODUCE_CN.md。原Round1报告/账本未改写。\n"
     contents = {OUTPUTS[0]: report, OUTPUTS[1]: json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
                 OUTPUTS[2]: status, OUTPUTS[3]: reproduce}
     # Recheck both chains after potentially slow rendering, before any output.

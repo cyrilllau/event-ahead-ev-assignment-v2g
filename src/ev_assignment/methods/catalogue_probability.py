@@ -66,3 +66,40 @@ def calibrated(identities, features, calibration_features, control, *, marginal=
                            calibration_mean=mean.tolist(), lower=lo.tolist(), upper=hi.tolist(),
                            full_support=len(identities), feature_rows=k, identity=identity,
                            anchor_check=check(anchor), native_feasibility_status=int(lp.status))
+
+
+def finite_domain(identities, *, weights=None):
+    """Simplex for ARO, or a recorded exact-dyadic singleton for SAA/DET.
+
+    Singleton weights retain their input and machine-rounding discrepancy in the
+    returned metadata; the numeric probability domain has an exact unit sum.
+    No calibration or optimization occurs in this constructor.
+    """
+    n = len(identities)
+    if n < 1:
+        raise ValueError("Empty support")
+    anchor = np.zeros(n)
+    anchor[0] = 1
+    original = None
+    if weights is not None:
+        original = np.asarray(weights, float)
+        if original.shape != (n,) or not np.isfinite(original).all() or np.any(original < 0):
+            raise ValueError("Invalid singleton weights")
+        if abs(original.sum() - 1) > 1e-12:
+            raise ValueError("Sampling weights do not sum to one")
+        anchor = dyadic_simplex(original)
+    def check(p):
+        p = np.asarray(p, float)
+        okay = p.shape == (n,) and np.isfinite(p).all() and np.all(p >= 0)
+        exact = okay and sum((Fraction(float(v)) for v in p), Fraction(0)) == 1
+        member = original is None or np.array_equal(p, anchor)
+        return dict(passed=bool(exact and member), exact_simplex=bool(exact), singleton_match=bool(member))
+    phi = sparse.csr_matrix((0, n)) if original is None else sparse.eye(n, format="csr")
+    low = np.zeros(0) if original is None else anchor.copy()
+    kind = "full_simplex_ARO" if original is None else "fixed_sampling_distribution"
+    info = dict(kind=kind, support=list(identities), weights=anchor.tolist() if original is not None else None,
+                input_weights=original.tolist() if original is not None else None,
+                rounding_l1=float(abs(anchor - original).sum()) if original is not None else 0.,
+                moment_rows=phi.shape[0], original_322311=False)
+    identity = hashlib.sha256(json.dumps(info, sort_keys=True).encode()).hexdigest()
+    return AmbiguitySet(tuple(identities), phi, low, low.copy(), identity, check, anchor), info

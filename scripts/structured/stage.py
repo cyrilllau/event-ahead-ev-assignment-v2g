@@ -23,8 +23,9 @@ from ev_assignment_experiments.analysis.diagnostic import read, reference, save
 root, stage, run_id, worker, python, *extra = sys.argv[1:]
 root = Path(root).resolve()
 config = read(root / "DESIGN_CONFIG.json")
-ledger = BudgetLedger(root / "store", "structured-design-development-v1")
-ledger.create("structured-fleet-design-v1", config["development_budget"])
+ledger = BudgetLedger(config.get("ledger_store", str(root / "store")),
+                      config.get("budget_group", "structured-design-development-v1"))
+ledger.create(config.get("study", "structured-fleet-design-v1"), config["development_budget"])
 snapshot = ledger.read()
 claims = {e["payload"]["attempt"]: e["payload"] for e in snapshot["events"]
           if e["payload"]["kind"] == "claim"}
@@ -34,6 +35,9 @@ used = sum(e["payload"]["charged_seconds"] for e in snapshot["events"]
 used += sum(e["payload"]["charged_seconds"] for e in snapshot["events"]
             if e["payload"]["kind"] == "external_charge" and e["payload"]["run"].get("stage") == stage)
 available = min(config["stage_caps"][stage] - used, snapshot["remaining_seconds"])
+available = min(available, config.get("run_caps", {}).get(run_id, available))
+if stage != "R5":
+    available = min(available, snapshot["remaining_seconds"] - config.get("reserve_report_seconds", 0))
 if available < 5:
     raise RuntimeError(f"Stage {stage} has only {available}s remaining; no new admission")
 out = root / stage / run_id

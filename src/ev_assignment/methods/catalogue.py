@@ -31,7 +31,8 @@ def canonical(first, x):
 
 def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                      individual=False, prepass=True, event=lambda row: None,
-                     witness=lambda *args: None):
+                     witness=lambda *args: None, method_name="P3-DRO",
+                     relative_gap=.01, absolute_gap=1., allow_advance=True):
     """Full-DRO for one immutable case; caller owns cumulative budget and IO.
 
     Template and point caches live only within this invocation and representation.
@@ -49,10 +50,13 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
         raise ValueError("Complete case/ambiguity support identity mismatch")
     nx, ns = len(first["cost"]), len(scenes)
     options = SolverOptions(seconds=max(.01, allotted), threads=4, seed=101,
-                            mip_gap=.01, absolute_gap=1, soft_memory_gb=20,
+                            mip_gap=relative_gap, absolute_gap=absolute_gap, soft_memory_gb=20,
                             master_seconds=60)
-    state = dict(method="Full-DRO", science_identity=case["identity"],
+    state = dict(method=method_name, science_identity=case["identity"],
+                 timing=dict(build=0., master=0., recourse=0., probability=0., certificate_and_io=0., audit=0.),
+                 cuts=0, iterations=0, nodes=0., recourse_calls=0, probability_calls=0,
                  first_stage_weights=list(weights), ambiguity_identity=ambiguity.identity,
+                 first_stage_restriction="all_packages" if allow_advance else "latest_departure_only",
                  ordered_support=list(ambiguity.support_ids), probability_rows=[],
                  representation="individual" if individual else "count",
                  LB=None, UB=None, best=None, gap=None, passed=False,
@@ -72,9 +76,13 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
         if gap < 0:
             raise ValueError("Negative external gap")
         state["gap"] = gap
-        return gap <= max(1., .01 * max(1., abs(state["UB"])))
+        return gap <= max(absolute_gap, relative_gap * max(1., abs(state["UB"])))
     with gp.Env(params={"OutputFlag": 0}) as env, gp.Model("CATALOGUE_SPARSE_MASTER", env=env) as model:
-        xx = model.addMVar(nx, lb=first["lo"], ub=first["hi"], vtype="C")
+        model_hi = first["hi"].copy()
+        if not allow_advance:
+            banned = np.asarray([p["departure_choice"] < 2 for p in first["packages"]])
+            model_hi[np.r_[banned, banned]] = 0
+        xx = model.addMVar(nx, lb=first["lo"], ub=model_hi, vtype="C")
         rho = model.addVar(lb=0, obj=1, name="rho")
         model.addMVar(ns, lb=0, name="theta")
         model.addMConstr(first["A"], xx, first["sense"], first["rhs"])
@@ -86,6 +94,7 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
         state["probability_rows"].append(dict(p=ambiguity.feasible_anchor.tolist(), proof=row_proof,
                                               membership=ambiguity.check_original(ambiguity.feasible_anchor)))
         probabilities = {hashlib.sha256(ambiguity.feasible_anchor.tobytes()).hexdigest()}
+        state["timing"]["build"] += time.monotonic() - begun
         def evaluate(x, cc, phase, iteration):
             pid = hashlib.sha256(x.tobytes()).hexdigest()
             if pid in cached:
@@ -94,21 +103,32 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
             for sid, scene in enumerate(scenes):
                 cc.check()
                 if sid not in templates:
+                    t = time.monotonic()
                     templates[sid] = cat.build_recourse(case["network"], case["packages"],
                                                        scene["physical"], scene["route_states"], first)
+                    state["timing"]["build"] += time.monotonic() - t
+                t = time.monotonic()
                 result = recourse.solve(templates[sid], x, options, cc, env=env)
+                state["timing"]["recourse"] += time.monotonic() - t
+                state["recourse_calls"] += 1
+                t = time.monotonic()
                 theta.add_supports(model, variables, nx, tmap[sid],
                                    sparse.csr_matrix(result["beta"][None, :]), [result["alpha"]],
                                    [pid], first["lo"], first["hi"], f"support/{sid}/{phase}/{iteration}")
+                state["cuts"] += 1
                 records.append(dict(qL=result["qL"], qU=result["qU_audited"],
                                     residual=result["residual"], qbar=templates[sid].qbar))
                 ys.append(result["y"])
                 witness("recourse", phase, iteration, sid, x, result)
+                state["timing"]["certificate_and_io"] += time.monotonic() - t
                 if sid % 8 == 0:
                     state["current_evaluation"] = dict(point=pid, phase=phase, completed=sid + 1, total=ns)
                     progress()
+            t = time.monotonic()
             rr = risk.solve(ambiguity, [r["qL"] for r in records], [r["qU"] for r in records],
                             [r["qbar"] for r in records], cc)
+            state["timing"]["probability"] += time.monotonic() - t
+            state["probability_calls"] += 1
             pp = rr["pstar"]
             ph = hashlib.sha256(pp.tobytes()).hexdigest()
             if ph not in probabilities:
@@ -137,7 +157,11 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                 if phase == "continuous":
                     duration = min(duration, max(.01, .25 * allotted - (time.monotonic() - begun)))
                 parameters(model, options, duration)
+                t = time.monotonic()
                 model.optimize(lambda m, where: m.terminate() if control.stop() else None)
+                state["timing"]["master"] += time.monotonic() - t
+                state["iterations"] += 1
+                state["nodes"] += float(model.NodeCount) if model.IsMIP else 0
                 if phase == "continuous" and model.Status == gp.GRB.OPTIMAL:
                     A, a, _ = theta.model_arrays(model)
                     certificate, _ = theta.lagrangian(A, a, np.asarray(model.getAttr("Pi")), nx, nx)
@@ -157,6 +181,10 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                         state["lower_witness"] = ref
                     state["LB"] = max(state["LB"] or 0., float(lower))
                 state["native_status"] = int(model.Status)
+                state.setdefault("master_history", []).append(dict(phase=phase, iteration=rounds,
+                    bound=state["LB"], UB=state["UB"], native_status=int(model.Status),
+                    native_objective=float(model.ObjVal) if model.SolCount else None,
+                    native_nodes=float(model.NodeCount) if model.IsMIP else 0., runtime=float(model.Runtime)))
                 if target():
                     break
                 if not model.SolCount:
@@ -191,6 +219,7 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                 if target():
                     break
             if state["best"] is not None:
+                audit_begin = time.monotonic()
                 # Build every original big-M row; never audit only the new equations.
                 fi = first if individual else cat.build_first(case["packages"], case["type_counts"],
                         len(case["network"]["station_buses"]), weights, ports=case.get("ports", 20), individual=True)
@@ -215,7 +244,14 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                     first_delta = adapter["first"]["cost"] @ zo - first["cost"] @ x
                     if max(np.max(abs(component_delta), initial=0), abs(first_delta)) > 1e-5:
                         raise ValueError("Original expansion changed objective components")
+                    power = yo[original.index["p"]]
+                    shed = yo[original.index["shed"]]
                     audits.append(dict(sid=scene["identity"], residual=original.residual(yo, zo),
+                        discharging_vehicles=int(np.count_nonzero(power.sum(axis=(1, 2)) > 1e-9)),
+                        discharge_AC_kwh=float(.25 * power.sum()),
+                        total_ENS_kwh=float(.25 * shed.sum()),
+                        critical_ENS_kwh=float(.25 * shed[:, np.asarray(case["network"]["shed_cost"]) == 50].sum()),
+                        shortfall_kwh=float(yo[original.index["short"]].sum()),
                         operating_component_delta=component_delta.tolist(), first_cost_delta=float(first_delta),
                         original_tasks=len(adapter["tasks"]), original_shortfall_big_m_rows=sum(
                             name.startswith("incident_capability/") for name in original.row_names["ub"]),
@@ -223,6 +259,7 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                     witness("original_audit", "integer", rounds, sid, zo, dict(y=yo, audit=audits[-1]))
                 state["original_audit"] = audits
                 state["original_expansion_audited"] = True
+                state["timing"]["audit"] += time.monotonic() - audit_begin
             state["passed"] = bool(target() and state["original_expansion_audited"])
             state["status"] = "FULL_SUPPORT_GAP_AND_ORIGINAL_AUDIT_PASS" if state["passed"] else "GATE_NOT_REACHED"
         except (TimeoutError, RuntimeError) as exc:

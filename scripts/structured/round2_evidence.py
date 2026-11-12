@@ -33,7 +33,7 @@ def main():
             nominal_weighted=float(case["weights"] @ np.asarray([a[k] for a in audits])),
             minimum=min(a[k] for a in audits), maximum=max(a[k] for a in audits))
             for k in ["discharging_vehicles", "discharge_AC_kwh", "critical_ENS_kwh", "total_ENS_kwh", "shortfall_kwh"]}
-        result["optimized_original_max_residual"] = max(max(a["residual"].values()) for a in audits)
+        result["optimized_original_max_residual"] = max(float(a["residual"]) for a in audits)
         policies = make_reference_policies(case)
         first = cat.build_first(case["packages"], case["type_counts"], len(case["network"]["station_buses"]))
         domains, metadata = {}, {}
@@ -82,7 +82,8 @@ def main():
                       full_support=len(case["scenarios"]),
                       original_expansion_scope="optimized policy separately audited on every scene; reference policies audited in exact count formulation")
     except Exception as exc:
-        result.update(error=f"{type(exc).__name__}: {exc}")
+        result.update(status="BUDGET_OR_ORACLE_INCOMPLETE" if isinstance(exc, (TimeoutError, RuntimeError, InterruptedError)) else
+                      "IMPLEMENTATION_ERROR", error=f"{type(exc).__name__}: {exc}")
         (out / "ERROR.txt").write_text(traceback.format_exc())
     result["elapsed_seconds"] = time.monotonic() - began
     dump(out / "RESULT.json", result)

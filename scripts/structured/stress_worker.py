@@ -7,7 +7,7 @@ import traceback
 
 from ev_assignment.domain.planning import Control
 from ev_assignment.methods.catalogue import solve_structured
-from ev_assignment.methods.catalogue_probability import calibrated
+from ev_assignment.methods.catalogue_probability import calibrated, ProbabilityDomainInfeasible
 from ev_assignment_experiments.datasets.structured_stress import make_stress_case
 from ev_assignment_experiments.analysis.diagnostic import reference
 from round2_worker import dump, healthy_fallback
@@ -44,8 +44,10 @@ def main():
                 result["deployment"] = deployment(first, view, solved["best"])
             result["service"] = service_summary(case, solved)
     except Exception as exc:
-        result.update(status="STRESS_BUDGET_OR_ORACLE_INCOMPLETE" if isinstance(exc, (TimeoutError, RuntimeError)) else
-                      "IMPLEMENTATION_OR_IDENTITY_ERROR", error=f"{type(exc).__name__}: {exc}")
+        status = ("PROBABILITY_DESIGN_GATE_FAILED" if isinstance(exc, ProbabilityDomainInfeasible) else
+                  "STRESS_BUDGET_OR_ORACLE_INCOMPLETE" if isinstance(exc, (TimeoutError, RuntimeError, InterruptedError)) else
+                  "IMPLEMENTATION_OR_IDENTITY_ERROR")
+        result.update(status=status, error=f"{type(exc).__name__}: {exc}")
         (out / "ERROR.txt").write_text(traceback.format_exc())
     result["total_seconds"] = time.monotonic() - begun
     dump(out / "RESULT.json", result)

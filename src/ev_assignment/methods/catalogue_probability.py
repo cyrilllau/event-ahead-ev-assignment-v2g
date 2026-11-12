@@ -11,6 +11,10 @@ from ev_assignment.l08.certificates import enclosure
 from ev_assignment.l08.probability_certificate import dyadic_simplex
 
 
+class ProbabilityDomainInfeasible(ValueError):
+    """The declared support/moment domain failed its native feasibility LP."""
+
+
 def calibrated(identities, features, calibration_features, control, *, marginal=False,
                lower, upper, calibration_rule):
     """Binary G,B,G*B moments with explicit preregistered CAL-only intervals.
@@ -53,7 +57,11 @@ def calibrated(identities, features, calibration_features, control, *, marginal=
                  options=dict(threads=1, time_limit=max(.01, min(60., control.remaining)),
                               primal_feasibility_tolerance=1e-9, dual_feasibility_tolerance=1e-9))
     if not lp.success:
-        raise ValueError(f"Synthetic moment/support set infeasible or unproved: {lp.message}")
+        if lp.status == 1:
+            raise TimeoutError(f"Probability feasibility LP limit: {lp.message}")
+        if lp.status == 2:
+            raise ProbabilityDomainInfeasible(f"Declared moment/support domain infeasible: {lp.message}")
+        raise RuntimeError(f"Probability feasibility oracle incomplete (status {lp.status}): {lp.message}")
     anchor = dyadic_simplex(lp.x[:-1])
     if not check(anchor)["passed"]:
         raise ValueError("No certified interior anchor on this complete support")

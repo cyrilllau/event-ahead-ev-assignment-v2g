@@ -29,7 +29,7 @@ import numpy as np
 from ev_assignment.domain.planning import Control
 from ev_assignment.l08 import catalogue as cat
 from ev_assignment.methods.catalogue import solve_structured
-from ev_assignment.methods.catalogue_probability import calibrated, finite_domain
+from ev_assignment.methods.catalogue_probability import calibrated, finite_domain, ProbabilityDomainInfeasible
 from ev_assignment_experiments.analysis.diagnostic import reference, save
 from ev_assignment_experiments.datasets.structured import _digest, _jsonable
 
@@ -333,8 +333,10 @@ def main(argv=None):
             result["optimization"] = latest_optimization
             result["optimization"]["passed"] = False
             result["optimization"]["status"] = "INTERRUPTED_BEFORE_FINAL_RETURN"
-        result.update(passed=False, status="BUDGET_OR_ORACLE_INCOMPLETE" if isinstance(exc, (TimeoutError, RuntimeError, InterruptedError))
-                      else "IMPLEMENTATION_OR_IDENTITY_ERROR", error=f"{type(exc).__name__}: {exc}")
+        status = ("PROBABILITY_DESIGN_GATE_FAILED" if isinstance(exc, ProbabilityDomainInfeasible) else
+                  "BUDGET_OR_ORACLE_INCOMPLETE" if isinstance(exc, (TimeoutError, RuntimeError, InterruptedError)) else
+                  "IMPLEMENTATION_OR_IDENTITY_ERROR")
+        result.update(passed=False, status=status, error=f"{type(exc).__name__}: {exc}")
         (out / "ERROR.txt").write_text(traceback.format_exc())
     finally:
         result["total_seconds"] = time.monotonic() - begun

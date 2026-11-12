@@ -55,6 +55,7 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
     state = dict(method=method_name, science_identity=case["identity"],
                  timing=dict(build=0., master=0., recourse=0., probability=0., certificate_and_io=0., audit=0.),
                  cuts=0, iterations=0, nodes=0., recourse_calls=0, probability_calls=0,
+                 recourse_attempts=0, probability_attempts=0,
                  first_stage_weights=list(weights), ambiguity_identity=ambiguity.identity,
                  first_stage_restriction="all_packages" if allow_advance else "latest_departure_only",
                  ordered_support=list(ambiguity.support_ids), probability_rows=[],
@@ -114,8 +115,11 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                     state["recourse_sizes"].append(dict(sid=sid, vars=templates[sid].W.shape[1],
                         rows=templates[sid].W.shape[0], W_nnz=templates[sid].W.nnz, T_nnz=templates[sid].T.nnz))
                 t = time.monotonic()
-                result = recourse.solve(templates[sid], x, options, cc, env=env)
-                state["timing"]["recourse"] += time.monotonic() - t
+                state["recourse_attempts"] += 1
+                try:
+                    result = recourse.solve(templates[sid], x, options, cc, env=env)
+                finally:
+                    state["timing"]["recourse"] += time.monotonic() - t
                 state["recourse_calls"] += 1
                 t = time.monotonic()
                 _, _, support_proof = theta.add_supports(model, variables, nx, tmap[sid],
@@ -132,10 +136,13 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                     state["current_evaluation"] = dict(point=pid, phase=phase, completed=sid + 1, total=ns)
                     progress()
             t = time.monotonic()
-            rr = risk.solve(ambiguity, [r["qL"] for r in records], [r["qU"] for r in records],
-                            [r["qbar"] for r in records], Control(min(60., cc.remaining),
-                            stop=lambda: cc.stop() or cc.remaining <= 0))
-            state["timing"]["probability"] += time.monotonic() - t
+            state["probability_attempts"] += 1
+            try:
+                rr = risk.solve(ambiguity, [r["qL"] for r in records], [r["qU"] for r in records],
+                                [r["qbar"] for r in records], Control(min(60., cc.remaining),
+                                stop=lambda: cc.stop() or cc.remaining <= 0))
+            finally:
+                state["timing"]["probability"] += time.monotonic() - t
             state["probability_calls"] += 1
             pp = rr["pstar"]
             ph = hashlib.sha256(pp.tobytes()).hexdigest()
@@ -152,6 +159,7 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                         Q=records, ambiguity_identity=ambiguity.identity, full_objective_upper=value))
             cached[pid] = value, records, ys, rr
             return cached[pid]
+        audit_begin = None
         try:
             phase = "continuous" if prepass else "integer"
             rounds = 0
@@ -253,7 +261,8 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                         state["individual_recourse_size"] = dict(vars=ti.W.shape[1], rows=ti.W.shape[0],
                                                                   W_nnz=ti.W.nnz, T_nnz=ti.T.nnz)
                         state["original_recourse_size"] = dict(vars=len(original.cost),
-                            rows=original.A.shape[0] + original.H.shape[0], nnz=original.A.nnz + original.H.nnz)
+                            rows=original.A.shape[0] + original.H.shape[0], W_nnz=original.A.nnz + original.H.nnz,
+                            T_nnz=original.B.nnz + original.G.nnz, representative_scenario=scene["identity"])
                     component_delta = original.parts @ yo - templates[sid].data["parts"] @ best_y[sid]
                     first_delta = adapter["first"]["cost"] @ zo - first["cost"] @ x
                     if max(np.max(abs(component_delta), initial=0), abs(first_delta)) > 1e-5:
@@ -276,12 +285,14 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                         progress()
                 state["original_audit"] = audits
                 state["original_expansion_audited"] = True
-                state["timing"]["audit"] += time.monotonic() - audit_begin
+                state["timing"]["audit"] = time.monotonic() - audit_begin
             state["passed"] = bool(target() and state["original_expansion_audited"])
             state["status"] = "FULL_SUPPORT_GAP_AND_ORIGINAL_AUDIT_PASS" if state["passed"] else "GATE_NOT_REACHED"
         except (TimeoutError, RuntimeError) as exc:
             state.update(status="TIME_LIMIT_OR_ORACLE_INCOMPLETE", reason=str(exc))
         finally:
+            if audit_begin is not None:
+                state["timing"]["audit"] = time.monotonic() - audit_begin
             model.update()
             state["master_size"] = dict(vars=model.NumVars, rows=model.NumConstrs, nnz=model.NumNZs,
                                           integer_vars=sum(first["vtype"] != "C"))

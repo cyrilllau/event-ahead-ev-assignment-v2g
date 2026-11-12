@@ -1,7 +1,9 @@
 # Refactor v2 当前真实状态
 
-更新：2026-11-11。D/E/F 已完成工程收尾并通过本地总验收；G 仅剩私有分支CI、
-main合并/push和读回确认。当前仍在 `codex/complete-refactor-defg`，未提前推进main。
+更新：2026-11-11。**D/E/F/G 工程重构已完成并验收。**
+代码提交 `be2965350f5a1e339a9cd734a38603744e740214` 在 Linux/macOS CI 通过后，
+已快进合并并推送私有 `main`，远端读回一致。此状态更新追加实际交付事实，不改旧记录。
+[匹配代码的CI](https://github.com/cyrilllau/event-ahead-ev-assignment-v2g/actions/runs/43145672345)。
 
 此前 `970d937` 的“全部完成”声明撤回并由 `70bc2f4` 先行更正，历史记录保持。
 本次按 [剩余清单](DEFG_REMAINING_CN.md) 完成活动/历史结构隔离、完整冻结域配方、
@@ -15,7 +17,7 @@ main合并/push和读回确认。当前仍在 `codex/complete-refactor-defg`，�
 | D | PASS：两个活动包、一个CLI；历史reference；三个完整冻结域配方/方法验证 |
 | E | PASS：隔离运行/累计费用/恢复；真实只读历史导入；完整同步/离线审计 |
 | F | PASS：锁定配对评价→逐样本证据→统计/图表→干净安装/离线复现 |
-| G | 本地门PASS；私有分支CI及main远端交付待完成 |
+| G | PASS：本地/双平台CI通过；私有main已合并、push并读回确认 |
 
 本地80项（含12真实Gurobi）与111科学回归通过。正式规模完成的是输入/结构核对和
 配方登记，未运行新的30车400支持全规模求解、未打开正式OOS、未替换PowerAI原任务。

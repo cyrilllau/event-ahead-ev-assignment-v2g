@@ -1,8 +1,8 @@
 # D/E/F/G 收尾验收（2026-11-11）
 
 本报告替代此前“全部实现”的结论；`ACCEPTANCE_20261111.md` 保留为原时点、原范围证据。
-当前工程代码完成 D/E/F，本地总验收通过；G 的最终 Git 门以当前分支的 CI 和实际 main
-提交为准，见 IMPLEMENTATION_STATUS。任何正式求解成功都不从工程验收推出。
+当前工程代码完成 D/E/F/G；本地总验收和匹配提交双平台CI通过，私有main已合并/push/
+远端读回一致，见 IMPLEMENTATION_STATUS。任何正式求解成功都不从工程验收推出。
 
 ## 当前来源与证据位置
 
@@ -76,3 +76,12 @@ Git 提交、源码包和历史源的身份分别保留，不把旧运行重新�
 - README、短AGENTS、两命名空间地图、正式配方、评价schema、历史导入和任务skill已一致。
 - 私有分支CI必须通过，确认无研究产物/许可证/凭据进入Git之后才推进main；最终状态见
   IMPLEMENTATION_STATUS。已有研究任务的终态不由本次工程验收改写。
+
+## 实际 Git 交付
+
+代码 `be2965350f5a1e339a9cd734a38603744e740214` 的
+[Linux/macOS CI](https://github.com/cyrilllau/event-ahead-ev-assignment-v2g/actions/runs/43145672345)
+通过之后才快进main并push；远端main读回同SHA，仓库仍PRIVATE。
+`budget-guard/code-to-git.json` 核对73个实际执行Python文件与交付代码字节一致，
+`budget-guard/git-delivery.json` 记录读取时点、CI、远端提交和可见性。
+此报告的后续文档提交不改变已验收执行源码；其Git状态以当前main历史为准。

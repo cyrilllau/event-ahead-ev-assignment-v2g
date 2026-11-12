@@ -57,6 +57,16 @@
       "path": "budget-guard/clean-receipt.json",
       "sha256": "92159c5efde3b0d3da6406fcbfcbd5363884a2bed42f2aad1c22168e14c1f2d0",
       "bytes": 304
+    },
+    {
+      "path": "budget-guard/code-to-git.json",
+      "sha256": "498b66bee371f92fef06558fa7413a3c233b9b12c49ac51e16dfcf6c42f7c328",
+      "bytes": 256
+    },
+    {
+      "path": "budget-guard/git-delivery.json",
+      "sha256": "c4b554375ba9f9804482fe84a8e26b5494e96c25c13189f7bbcf7c38aeb1c8a7",
+      "bytes": 510
     }
   ],
   "scope": "engineering_refactor_and_development_reproduction",

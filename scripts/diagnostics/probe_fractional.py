@@ -37,7 +37,9 @@ def run(root, config, out, deadline):
 
     start = time.monotonic()
     ids = config["scenario_ids"]
-    if len(ids) > 8 or len(set(ids)) != len(ids) or any(s < 0 or s >= 400 for s in ids):
+    expansion = "reuse_probe_result" in config
+    cap = 400 if expansion else 8
+    if len(ids) > cap or len(set(ids)) != len(ids) or any(s < 0 or s >= 400 for s in ids):
         raise ValueError("Initial fractional probe is limited to eight distinct scenarios")
     z = npz(verified(config["point_and_bounds"]))
     x = z["x"]
@@ -76,6 +78,22 @@ def run(root, config, out, deadline):
         ),
     )
     records = []
+    new_calls = 0
+    if expansion:
+        prior = read(verified(config["reuse_probe_result"]))
+        prior_config = read(verified(config["original_probe_config"]))
+        if (
+            prior["point_sha256"] != point_sha
+            or prior_config["point_sha256"] != point_sha
+            or prior_config["point_and_bounds"] != config["point_and_bounds"]
+        ):
+            raise ValueError("Expansion must reuse exactly the original fractional point")
+        records = prior["records"]
+        for row in records:
+            ql[row["sid"]] = max(ql[row["sid"]], row["q_lower"])
+            qu[row["sid"]] = row["q_upper"]
+        save(out / "REUSED_PROBE.json", config["reuse_probe_result"])
+    reused_ids = {r["sid"] for r in records}
     env = gp.Env(empty=True)
     env.setParam("LogFile", str(out / "ENVIRONMENT.log"))
     try:
@@ -87,6 +105,8 @@ def run(root, config, out, deadline):
         return
     with env:
         for sid in ids:
+            if sid in reused_ids:
+                continue
             tick = time.monotonic()
             if time.time() >= deadline - 5:
                 break
@@ -133,6 +153,7 @@ def run(root, config, out, deadline):
                     row["missing_reason"] = "scenario build exhausted 30 second cap"
                 else:
                     m.Params.TimeLimit = remaining
+                    new_calls += 1
                     m.optimize()
                     row.update(native_status=int(m.Status), native_runtime=m.Runtime)
                     raw = {}
@@ -182,7 +203,9 @@ def run(root, config, out, deadline):
     save(
         out / "RESULT.json",
         dict(
-            status="PARTIAL",
+            status="COMPLETE"
+            if len(records) == 400 and all(v is not None for v in qu)
+            else "PARTIAL",
             point_sha256=point_sha,
             records=records,
             first_cost=first_cost,
@@ -194,14 +217,23 @@ def run(root, config, out, deadline):
             bounded_only_count=400 - len(records),
             certified_zero_count=0,
             missing_upper_bound_count=sum(v is None for v in qu),
-            coverage_complete=False,
-            accuracy_met=False,
-            full400_expansion_started=False,
+            coverage_complete=all(v is not None for v in qu),
+            accuracy_met=all(v is not None for v in qu)
+            and max(float(u - l) for l, u in zip(ql, qu)) < 1e-3,
+            full400_expansion_started=expansion,
             global_continuous_lower=None,
             point_lower_is_not_global_lower=True,
             solver_wrapper_seconds=time.monotonic() - start,
-            solver_calls=len(records),
-            missing_reason="Unsolved scenarios have no point-feasible recourse upper witness; no integer zero shortcut used",
+            solver_calls=new_calls,
+            reused_scenario_count=len(reused_ids),
+            max_archive_or_dual_above_primal_upper=max(
+                (float(l - u) for l, u in zip(ql, qu) if u is not None), default=None
+            ),
+            missing_reason=(
+                None
+                if all(v is not None for v in qu)
+                else "Unsolved scenarios have no point-feasible recourse upper witness; no integer zero shortcut used"
+            ),
         ),
     )
 
@@ -211,8 +243,36 @@ if __name__ == "__main__":
     out.mkdir(parents=True, exist_ok=False)
     config = read(config_path)
     ledger = BudgetLedger(store, "diagnostic-round1-20261111")
+    snapshot = ledger.read()
+    claims = {
+        e["payload"]["attempt"]: e["payload"]
+        for e in snapshot["events"]
+        if e["payload"]["kind"] == "claim"
+    }
+    old_e4 = sum(
+        e["payload"]["charged_seconds"]
+        for e in snapshot["events"]
+        if e["payload"]["kind"] == "settlement"
+        and claims[e["payload"]["attempt"]]["run"]["stage"].startswith("E4")
+    )
+    startup = sum(
+        max(0, c["started_epoch"] - c["owner"]["created"])
+        for c in claims.values()
+        if not c["charged_from_process_start"]
+    )
+    limit = min(
+        1800 - old_e4,
+        snapshot["remaining_seconds"] - startup,
+        1800 if "reuse_probe_result" in config else 300,
+    )
     claim = ledger.claim(
-        dict(stage="E4_PROBE", config=reference(config_path), source=reference(__file__)), 300.0
+        dict(
+            stage="E4_EXPAND" if "reuse_probe_result" in config else "E4_PROBE",
+            config=reference(config_path),
+            source=reference(__file__),
+        ),
+        limit,
+        charge_process_start=True,
     )
     save(out / "CLAIM.json", claim)
     signal.signal(

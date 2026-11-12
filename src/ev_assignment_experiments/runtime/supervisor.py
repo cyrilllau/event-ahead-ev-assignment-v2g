@@ -90,7 +90,9 @@ def parent(store, run_ref, token, resume):
             payload = store.read(resume)["payload"]
             if payload["run"] != run_ref.as_dict():
                 raise ValueError("Wrong resume run")
-        claim = ledger.claim(run_ref.as_dict(), recipe.options.seconds, attempt=token)
+        claim = ledger.claim(
+            run_ref.as_dict(), recipe.options.seconds, attempt=token, charge_process_start=True
+        )
         area = store.root / "runtime" / "attempts" / token
         area.mkdir(parents=True, exist_ok=False)
         publish(area / "CLAIM.json", claim)

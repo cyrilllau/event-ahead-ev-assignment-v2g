@@ -129,7 +129,7 @@ class BudgetLedger:
         publish(self.root / "events" / f"{len(snapshot['events']):08d}.json", row)
         return event
 
-    def claim(self, run, requested, attempt=None):
+    def claim(self, run, requested, attempt=None, *, charge_process_start=False):
         if not math.isfinite(requested) or requested <= 0:
             raise ValueError("Invalid requested budget")
         with lock(self.root / "lock"):
@@ -139,6 +139,9 @@ class BudgetLedger:
             available = min(requested, snap["remaining_seconds"])
             if available <= 0:
                 raise ValueError("Cumulative budget exhausted")
+            owner = current()
+            observed_epoch, observed_monotonic = time.time(), time.monotonic()
+            startup = max(0.0, observed_epoch - owner["created"]) if charge_process_start else 0.0
             return self._append(
                 snap,
                 dict(
@@ -146,9 +149,11 @@ class BudgetLedger:
                     attempt=attempt or uuid.uuid4().hex,
                     run=run,
                     reserved_seconds=available,
-                    owner=current(),
-                    started_epoch=time.time(),
-                    started_monotonic=time.monotonic(),
+                    owner=owner,
+                    charged_from_process_start=charge_process_start,
+                    startup_seconds=startup,
+                    started_epoch=observed_epoch - startup,
+                    started_monotonic=observed_monotonic - startup,
                 ),
             )
 

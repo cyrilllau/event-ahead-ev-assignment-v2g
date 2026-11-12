@@ -26,8 +26,9 @@ ev-assignment --store ABS context --study l08-smoke-det --refresh --markdown
 Plan 固定源码、依赖环境、输入、方法、随机种子、顺序和资源参数。源代码有改动时
 不能继续原 Run；新 Run 可沿用同一个 budget_group。继承费用用
 `inherited_seconds` 与 `inherited_evidence`（已封存 Ref 列表）明确登记。
-同 budget_group 的上限/继承定义一经建立不能修改；实际父进程从 claim 至 wait
-的完整单调时钟费用累加，包含构建、审计与子进程启动开销。
+同 budget_group 的上限/继承定义一经建立不能修改；实际父进程从创建至 wait
+的完整费用累加：创建时间与 claim 时的单调时钟对齐，包含父进程导入/启动、构建、审计
+与子进程启动开销，之后按单调时钟结算。
 
 ## 恢复与状态
 

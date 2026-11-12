@@ -50,6 +50,9 @@ def test_real_parent_worker_audit_and_offline_archive(tmp_path, method):
     assert audit["passed"] and audit["solver_calls"] == 0
     ledger = BudgetLedger(store.root, r.budget_group).read()
     assert ledger["active"] is None
+    claim = ledger["events"][0]["payload"]
+    assert claim["charged_from_process_start"] and claim["startup_seconds"] > 0
+    assert claim["started_epoch"] == claim["owner"]["created"]
     assert ledger["spent_seconds"] >= payload["elapsed_seconds"] > 0
     with pytest.raises(ValueError, match="explicit checkpoint"):
         launch(store, run)
@@ -58,12 +61,15 @@ def test_real_parent_worker_audit_and_offline_archive(tmp_path, method):
     assert reaudit(destination, attempt)["passed"]
     assert not payload["accepted_for_comparison"]
     if method == "ARO":
-        checkpoint=Ref(**payload["checkpoint"])
-        second=await_done(store,launch(store,run,resume=checkpoint))
-        assert second["returncode"]==0
-        assert second["attempt"]!=done["attempt"]
-        assert BudgetLedger(store.root,r.budget_group).read()["spent_seconds"]>ledger["spent_seconds"]
-        assert reaudit(store,Ref(**second["attempt"]))["passed"]
+        checkpoint = Ref(**payload["checkpoint"])
+        second = await_done(store, launch(store, run, resume=checkpoint))
+        assert second["returncode"] == 0
+        assert second["attempt"] != done["attempt"]
+        assert (
+            BudgetLedger(store.root, r.budget_group).read()["spent_seconds"]
+            > ledger["spent_seconds"]
+        )
+        assert reaudit(store, Ref(**second["attempt"]))["passed"]
     raw = json.loads(store.object(Ref(**payload["result"])))
     row = raw["audit"]["checks"]["scenarios"][0]
     evidence = json.loads(store.object(Ref(**row["witness"])))

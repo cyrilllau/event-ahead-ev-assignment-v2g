@@ -10,6 +10,15 @@
 !/tests/**/*.py
 !/scripts/**/*.py
 !/powerai_l08/**/*.py
+!/AGENTS.md
+!/uv.lock
+!/docs/**/*.md
+!/docs/architecture/*.json
+!/src/ev_assignment/**/*.py
+!/src/ev_assignment_experiments/**/*.py
+!/experiments/**/*.toml
+!/tests/fixtures/**/*.toml
+!/.github/workflows/*.yml
 
 **/.venv/
 **/__pycache__/
@@ -19,3 +28,6 @@
 **/outputs/
 **/checkpoints/
 **/nodefiles/
+**/.pytest_cache/
+**/.ruff_cache/
+**/*.egg-info/

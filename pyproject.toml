@@ -3,15 +3,34 @@ requires = ["setuptools==75.8.0", "wheel==0.45.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "evcs-experiments"
-version = "0.1.0"
+name = "ev-assignment"
+version = "0.2.0.dev0"
 description = "Reproducible IEEE33 EV assignment experiments"
 requires-python = ">=3.12,<3.13"
 dependencies = ["numpy==2.4.2", "scipy==1.18.1", "networkx==3.6.1"]
 
 [project.scripts]
+ev-assignment = "ev_assignment_experiments.cli:main"
 evcs = "evcs_experiments.cli:main"
 evcs-case0 = "evcs_experiments.case0_campaign:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.9", "build>=1.2"]
+
+[project.optional-dependencies]
+gurobi = ["gurobipy>=12,<14"]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib --strict-markers"
+markers = ["gurobi: requires an explicitly configured commercial solver", "private_data: requires separately managed historical inputs"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+include = ["src/ev_assignment_experiments/**/*.py", "tests/unit/**/*.py", "tests/integration/**/*.py"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

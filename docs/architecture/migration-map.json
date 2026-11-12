@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "migrated_modules": {
+    "random_streams": "ev_assignment.domain.random_streams",
+    "probability": "ev_assignment.methods.probability",
+    "probability_check": "ev_assignment.validation.probability",
+    "probability_phase1": "ev_assignment.methods.probability_phase1",
+    "first_stage": "ev_assignment.models.first_stage",
+    "recourse": "ev_assignment.models.recourse",
+    "zero_presolve": "ev_assignment.models.zero_presolve",
+    "compact_recourses": "ev_assignment.models.compact_recourses",
+    "extensive": "ev_assignment.models.extensive",
+    "native_highs": "ev_assignment.solvers.highs",
+    "native_gurobi": "ev_assignment.solvers.gurobi"
+  },
+  "remaining": "Full DET/DRO/ARO adapters, historical source admission, runtime and publication stages remain pending.",
+  "extracted_functions": {
+    "reactive_support_model": [
+      "capability_facets",
+      "capability_inequalities"
+    ]
+  },
+  "strategy": "Parallel extraction: baseline legacy callers retained byte-identical until workflow-specific source admission is complete."
+}

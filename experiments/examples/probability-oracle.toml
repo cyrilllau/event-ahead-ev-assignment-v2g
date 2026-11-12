@@ -1,0 +1,11 @@
+schema_version = 1
+study = "development-probability"
+title = "Hand-solvable upper moment probability LP; expected objective 5 USD"
+method = "development_probability_oracle"
+support_ids = ["s0", "s1"]
+feature_ids = ["f0"]
+features = [[0.0], [1.0]]
+lower = [0.25]
+upper = [0.5]
+q = [0.0, 10.0]
+seconds = 5.0

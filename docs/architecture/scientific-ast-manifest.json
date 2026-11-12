@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "normalization": "remove import nodes only; all remaining AST preserved",
+  "files": {
+    "src/ev_assignment/domain/random_streams.py": "78196eceedc6f956cc5fa576ab2cfe1df8fd11f86a5bc543fb1a3cf6a94b0640",
+    "src/ev_assignment/methods/probability.py": "e37e4bb1caf206e1d83c44ce6cecee860041ca295cd6770b01c2ddee1ab39c4d",
+    "src/ev_assignment/validation/probability.py": "93b797d8549c7442fb42b55daf9fd534d2c942576ffc4d46e6f57f80ad0550ce",
+    "src/ev_assignment/methods/probability_phase1.py": "048ec8b6a6b760d70e6be6d8f3e2e31c1f183c848a47613065edd98e43a7e3c1",
+    "src/ev_assignment/models/first_stage.py": "dbb8bc6063bdeec743600237097baf4235774cc92504f76799c8d0598eecd8d0",
+    "src/ev_assignment/models/recourse.py": "ff55213b27066398dbf3a854fa0cf1e7001f8c0d748392552db656a6c2012238",
+    "src/ev_assignment/models/zero_presolve.py": "f655b654ed5047c87cfa302a8f2ea065329edce6baea39a3a86f1772d3e0a0a8",
+    "src/ev_assignment/models/compact_recourses.py": "00874f0e1163d2afac24bd6516b9666b9cbee600d4a82127753ff64838e0918a",
+    "src/ev_assignment/models/extensive.py": "5be42afb7d572c6fe2dd8d3169545f8379fd66cb525e17dcdf68bbf66c448bc6",
+    "src/ev_assignment/solvers/highs.py": "66fee4a07a3e26d63a73eecf5c6aac1a682eabf98b51cdb31ef6d9a2db82bb36",
+    "src/ev_assignment/solvers/gurobi.py": "6025e498f606faebf91ee8ac50344de17218564d2485b0c501e1aa8179dcbacd"
+  }
+}

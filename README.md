@@ -1,23 +1,92 @@
 # Event-Ahead EV Assignment and V2G Reserve Procurement
 
-Research code for assigning electric delivery fleet tasks and procuring vehicle-to-grid (V2G) reserve before storm-induced grid and road disruptions. The research combines a coupled IEEE 33-bus distribution and road network with route replay, battery state of charge, and reserve deliverability checks.
+Research software for event-ahead electric-delivery-fleet task assignment and V2G
+reserve procurement under coupled grid/road disruptions (IEEE33 v54-Q1).
 
-| Directory | Contents |
-| --- | --- |
-| `src/evcs_experiments/` | IEEE33 v54-Q1 experiment models, validation, and command-line tools |
-| `scripts/` | Audit, reporting, and experiment-support code |
-| `tests/` | Python test code |
-| `powerai_l08/` | Selected PowerAI L08 code for deterministic, distributionally robust, and adjustable robust optimization |
+**Architecture v2 is being implemented in stages.** Read the
+[implementation status](docs/architecture/IMPLEMENTATION_STATUS.md) and
+[approved complete plan](docs/architecture/REFACTOR_PLAN_V2_CN.md).
+The development probability workflow is executable. Formal L08 DET/DRO/ARO
+execution, automatic remote synchronization and paper publication are not yet
+admitted in v2. Existing PowerAI experiments use their original releases.
 
-## Local setup
+## Install
+
+Use Python 3.12. Numerical dependency versions are preserved.
 
 ```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.lock -e .
-evcs --help
+uv sync --locked --group dev
 ```
 
-Use `configs/local.example.toml` to point the project at separately managed inputs and experiment specifications. Full validation and some tests require those inputs and their evidence fixtures. The PowerAI L08 scripts retain their original server paths. Optimization with Gurobi requires a separately configured environment and license.
+For pip, create/activate a Python 3.12 environment, then:
 
-This repository contains source code and a configuration template. Research datasets, experiment results, checkpoints, logs, archives, manuscripts, and credentials are managed separately.
+```bash
+python -m pip install -r requirements.lock -e .
+```
+
+Gurobi is optional (`uv sync --extra gurobi`) and needs a separately configured
+license. Importing the new packages does not initialize it.
+
+## Executable development workflow
+
+Choose an archive outside the code checkout. This example is a two-support
+probability LP with a hand-computed optimum of 5 USD, not a full planning run.
+
+```bash
+ev-assignment --store /tmp/ev-assignment-example plan --experiment experiments/examples/probability-oracle.toml
+ev-assignment --store /tmp/ev-assignment-example run --id RUN_ID
+ev-assignment --store /tmp/ev-assignment-example audit --id ATTEMPT_ID
+ev-assignment --store /tmp/ev-assignment-example context --study development-probability
+ev-assignment --store /tmp/ev-assignment-example sync --attempt ATTEMPT_ID --destination /tmp/ev-assignment-local-copy
+ev-assignment --store /tmp/ev-assignment-local-copy bundle --attempt ATTEMPT_ID --destination /tmp/ev-assignment-bundle
+ev-assignment --store /tmp/ev-assignment-local-copy verify-bundle --destination /tmp/ev-assignment-bundle
+```
+
+Replace RUN_ID / ATTEMPT_ID with the IDs printed by the preceding commands.
+Planning seals the actual source snapshot and environment. Source changes require
+a new Run. Re-executing a claimed Run is refused: budget-aware recovery belongs
+to the runtime stage. Context labels local snapshots and unsettled claims; it
+does not infer server liveness or scientific adoption.
+The current sync transfers sealed closures between filesystem stores. It is not
+an SSH transfer daemon and reads objects into memory; large-artifact streaming
+and interrupted byte-range transfer remain pending.
+
+## Package boundaries
+
+| Package / directory | Role |
+|---|---|
+| ev_assignment | Migrated models, probability methods, physics and audits |
+| ev_assignment_experiments | Config, immutable records, local transfer, development bundles |
+| evcs_experiments | Transitional legacy callers, not a new formal release |
+| powerai_l08 | Source references; no direct execution during refactoring |
+| experiments | Experiment definitions, no generated outputs |
+
+Eleven numerical modules were extracted; their scientific AST is checked against
+the baseline after removing import nodes only. Legacy sources, scripts and tests
+remain byte-identical to the baseline while entire workflows are migrated. New
+scientific tests exercise the extracted modules. Historical source-bound
+acceptance gates are not changed or treated as new-release admission.
+
+## Validation
+
+```bash
+uv run pytest tests/unit tests/integration -q
+uv run ruff check src/ev_assignment_experiments tests/unit tests/integration
+uv build --wheel
+```
+
+Original scientific tests remain under tests/. Their full suite requires
+separately managed private inputs, source-bound evidence and explicit paths
+(EVCS_CONFIG); see implementation status for current results. CI runs only
+self-contained local checks, never SSH or a commercial solver.
+
+## Development, compute and publication
+
+Local development and private GitHub own code history. PowerAI executes fixed
+versions and temporarily stores artifacts. Completed research is verified and
+archived locally. A separate public repository will be assembled from explicitly
+selected, audited paper results and exact source versions.
+
+Generated data, results, checkpoints, logs, manuscripts and credentials are
+excluded from tracked files. Synthetic definitions and source migration
+manifests are tracked.

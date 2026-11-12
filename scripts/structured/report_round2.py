@@ -980,7 +980,7 @@ def collect(root, stopped=None):
             "Lower bounds are native or finite-box numerical certificates; upper values combine numerically audited recourse with risk-dual certificates, not exact-rational feasibility proofs.",
             "Known local rounding defect: qL/risk_L and qL-derived OOS lower endpoints are not strictly downward certified; no frozen master LB/UB failure has been established by this review. Pending independent-version repair.",
             "Healthy zero-EV/zero-shedding audits use fixed N6 demand. Optional N30 capacity is not large service demand.",
-            "Stress G changes physical types/SOC and seed; it is not a pure representation timing experiment.",
+            "Stress G changes physical types/SOC and seed, and its 600s whole-worker caps differ from 1000s core caps; it is not a pure representation scaling experiment. Timeout alone cannot identify a type-count effect.",
             "R04/r05 historical oracle settings were not all capped at60; later releases cap calls. Do not relabel old execution.",
             "All statistics are copied from VREPORT, conditional on fixed training policies; no probability-set or simultaneous coverage claim."],
         paper_gaps=["高服务规模：按各seed实际选车/合同/站点及放电证据判断；扩充候选池或full400通过不等于容量受限的多区域服务已得到验证。",
@@ -1177,7 +1177,7 @@ def render_report(data, *, display_root=None):
              table(["Run", "顶层错误", "physical_screen.errors / pending_checks / status", "证据"],
                    [[r["id"], r["error"], {k: r["physical_screen"].get(k) for k in ("errors", "pending_checks", "status")},
                      link(r["result"])] for r in data["validation"] if r["stage"] == "VSTRESS"]),
-             "这些运行改变物理类型/SOC，stress seed2101与验证三seed不同；G6参考也不是同seed另一次严格控制试验。不可删除失败或称为纯表示缩放曲线。",
+             "这些运行改变物理类型/SOC，stress seed2101与验证三seed不同；G6参考也不是同seed另一次严格控制试验。压力测试每项600秒包含实例准备，核心P3每项1000秒且共用V0准备；预算和准备口径也不同。不可删除失败或称为纯表示缩放曲线，超时不能单独归因类型数。",
              "## 三组配对OOS与已保存的bootstrap区间",
              "只有完整1000样本及全部六方法时给正式CI。共同前缀仅描述，不把缺失填0。500次四层配对bootstrap，保留层样本数/质量，seed=910000+validationseed；条件于已冻结训练政策，不包含训练不确定性或概率集覆盖，也没有多重比较校正。成本采用F+qU，保存的qL/qU数值端点另列；qL端未获严格向下认证，不能将端点表当作严格包围区间。"]
     for seed, item in data["oos_statistics"].items():

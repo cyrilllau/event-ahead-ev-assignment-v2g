@@ -94,6 +94,7 @@ class BudgetLedger:
         active = None
         spent = definition["inherited_seconds"]
         closed = set()
+        external = set()
         for i, path in enumerate(sorted((self.root / "events").glob("*.json"))):
             row = json.loads(path.read_text())
             if (
@@ -124,6 +125,13 @@ class BudgetLedger:
                 spent += charged
                 closed.add(active["attempt"])
                 active = None
+            elif kind == "external_charge":
+                charged = event["charged_seconds"]
+                if (active is not None or event["charge_id"] in external or
+                        not math.isfinite(charged) or charged <= 0 or not event["evidence"]):
+                    raise ValueError("Invalid or duplicate external compute charge")
+                spent += charged
+                external.add(event["charge_id"])
             else:
                 raise ValueError("Unknown budget event")
             events.append(row)
@@ -221,3 +229,23 @@ class BudgetLedger:
                     observed_epoch=time.time(),
                 ),
             )
+
+    def charge_external(self, charge_id, run, seconds, evidence):
+        """Conservatively debit observed out-of-wrapper work, never erase costs.
+
+        Evidence must describe measurement and any startup reserve separately.
+        A duplicate ID is rejected; charge cannot race an admitted worker. This
+        is accounting, not a fabricated parent wait or retroactive solver success.
+        """
+        if (not isinstance(charge_id, str) or not charge_id.strip() or isinstance(seconds, bool)
+                or not math.isfinite(seconds) or seconds <= 0 or not evidence):
+            raise ValueError("External compute needs positive seconds and explicit evidence")
+        with lock(self.root / "lock"):
+            snap = self.read()
+            if snap["active"] is not None:
+                raise ValueError("Settle active worker before adding external compute")
+            if any(e["payload"].get("charge_id") == charge_id for e in snap["events"]):
+                raise ValueError("External compute already charged")
+            return self._append(snap, dict(kind="external_charge", charge_id=charge_id, run=run,
+                    charged_seconds=float(seconds), evidence=evidence, observed_epoch=time.time(),
+                    actual_parent_wait=False))

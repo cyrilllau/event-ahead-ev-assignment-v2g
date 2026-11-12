@@ -1,0 +1,66 @@
+{
+  "family": "structured_fleet_event_ahead_v1",
+  "version": 1,
+  "synthetic": true,
+  "fleet_size_main": 30,
+  "types_main": 6,
+  "packages_per_type": 12,
+  "periods": 96,
+  "support": 400,
+  "calibration": 2000,
+  "oos": 1000,
+  "development_seeds": [
+    101,
+    202
+  ],
+  "validation_seeds": [
+    1101,
+    1102,
+    1103
+  ],
+  "stress_seeds": [
+    2101
+  ],
+  "candidate_limit": 12,
+  "finalist_limit": 2,
+  "revision_limit": 1,
+  "fallback_limit": 1,
+  "cost_ratio_bounds": [
+    0.8,
+    1.2
+  ],
+  "absolute_gap": 1.0,
+  "relative_gap": 0.01,
+  "threads": 4,
+  "recourse_threads": 1,
+  "concurrency": 1,
+  "stage_caps": {
+    "A0": 600,
+    "A1": 1200,
+    "A2": 1200,
+    "A3": 1800,
+    "A4": 1800,
+    "A5": 600
+  },
+  "development_budget": 7200,
+  "validation_budget": 28800,
+  "prepass_rounds": 10,
+  "prepass_budget_fraction": 0.25,
+  "departure_gaps_h": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "early_gap_durations_h": [
+    0.25,
+    0.5
+  ],
+  "joint_nominal_probabilities": [
+    0.08,
+    0.02
+  ],
+  "fallback": "once only: reduce each type catalogue to 2 destinations x 2 departures x 1 reservation, same seed; charge remaining A4 and development caps",
+  "selection_rule": "physical,exactness,tradeoff,nondegeneracy then largest robust margin and smallest fee change; never DRO-vs-SAA wins",
+  "validation_frozen": false,
+  "playbook_sha256": "c0e12011d6e2d26a9a6106587a259be49bb294b906f21463b9586e77628c8fd1"
+}

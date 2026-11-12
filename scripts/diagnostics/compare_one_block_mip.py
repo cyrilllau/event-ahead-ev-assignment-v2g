@@ -92,7 +92,7 @@ def run(root, round_root, config, variant, out, deadline):
             hi=np.r_[a["hi"], rec["hi"]],
             vtype=np.r_[a["vtype"], ["C"] * ny],
             rhs=np.r_[a["rhs"], rec["h"], 0.0],
-            sense=np.r_[a["sense"], rec["sense"], ">"],
+            sense=np.concatenate([a["sense"], rec["sense"], np.asarray([">"])]),
             objcon=a["objcon"],
         )
         witness = npz(config["warm_start_recourse"]["path"])
@@ -231,9 +231,12 @@ if __name__ == "__main__":
     out.mkdir(parents=True, exist_ok=False)
     config = read(config_path)
     ledger = BudgetLedger(round_root / "store", "diagnostic-round1-20261111")
+    allowance = float(sys.argv[6]) if len(sys.argv) > 6 else 600.0
+    if not 0 < allowance <= 600:
+        raise ValueError("Cumulative arm remainder must be in (0,600]")
     claim = ledger.claim(
         dict(stage="E5_" + variant, config=reference(config_path), source=reference(__file__)),
-        600.0,
+        allowance,
         charge_process_start=True,
     )
     save(out / "CLAIM.json", claim)

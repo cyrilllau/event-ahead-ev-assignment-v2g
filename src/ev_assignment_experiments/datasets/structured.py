@@ -11,9 +11,12 @@ indices g/c/d/k/r are zero-based (time indices are quarters); arrival is hours,
 departure_dc kWh DC, Ebar/contract kWh AC. r is inclusive. Array axes are
 physical time, then source bus/line/arc order. Reference x = concatenate(n,E).
 
-Rules below are frozen before any policy evaluation. Only the three candidate
-keys may change. Same-type vehicles copy the entire normal trajectory, not a
-single SOC: departure energy may vary with d. All methods share one catalogue.
+The original twelve candidates retain their three keys and v0 default behavior.
+The sole authorized development revision adds revision=1 for C11/C12 only;
+``revision_plan`` declares its combined forecast/load/reference-policy change
+before evaluation. It follows failed v0 development trials, not unseen validation.
+Same-type vehicles copy the entire normal trajectory, not a single SOC:
+departure energy may vary with d. All methods share one catalogue.
 """
 
 from __future__ import annotations
@@ -37,6 +40,7 @@ from ev_assignment.physics.route_replay import replay_route
 
 
 FAMILY = "structured_fleet_event_ahead_v1"
+CANDIDATE_KEYS = ("gap_h", "early_duration_h", "joint_nominal")
 SOURCE_FILES = (
     "NETWORK_NEW_CLOCK.json", "ROAD_ARCS.csv", "C__evcs_bus_road_mapping.csv",
     "NORMAL_BUSINESS_DAY_LEDGER.csv", "DRO_FEATURE_REGISTRY.json",
@@ -104,11 +108,61 @@ def preregistered_candidates():
             for g, d, p in itertools.product((.5, 1., 2.), (.25, .5), (.08, .02))]
 
 
+def revision_plan():
+    """Return the sole user-authorized revision, declared before its evaluation.
+
+    This declaration is not a trial ledger or an assertion of a positive margin.
+    The caller owns charged evaluation, immutable Runs, and the one-round budget.
+    """
+    return dict(
+        revision=1, maximum_physical_revision_rounds=1,
+        allowed_candidate_ids=["C11", "C12"],
+        allowed_candidate_configs=[dict(gap_h=2., early_duration_h=.5, joint_nominal=p)
+                                   for p in (.08, .02)],
+        candidate_ids_preserved=True, development_seed=101,
+        reason="After failed v0 A2 development: do not put the low-frequency joint "
+               "marginal outage into every representative forecast; scale affected "
+               "demand with fleet size before testing N30 participation.",
+        forecast=dict(line_id=20, failure_h=17., recovery_h=17.5,
+                      other_line_outages=False, roads_passable=True,
+                      positive_core_no_ev_demand_required=True),
+        affected_load=dict(bus_ids=[21, 22, 24, 25], base_kw_at_16_5=[90., 10., 27., 3.],
+                           scale="fleet_size / 6", applies_to=["TRAIN", "CAL", "forecast"],
+                           unaffected_grid_load_unchanged=True,
+                           depends_on_group_count=False),
+        reference_policy=dict(units_per_protection_target="ceil(fleet_size / 6)",
+                              canonical_type_allocation="original package order, available type counts",
+                              reservation_h=1., per_vehicle_contract_ac="min(45, Ebar)",
+                              v0_reference_units=1),
+        rng=dict(candidate_keys=list(CANDIDATE_KEYS), revision_in_address=False,
+                 fleet_scale_in_address=False, family_namespace_unchanged=True,
+                 rule="Original seed/split/bank/index/count and three-key config addresses retained"),
+        preserved=["normal business trajectories and SOC", "fixed route catalogue",
+                   "original grid, battery, qualification and shedding equations",
+                   "all physical limits and audit tolerances", "CAL2000 Wilson rule",
+                   "full/marginal feature rows", "cost multiplier box [.8,1.2]",
+                   "strict >.25h margin", "prior v0 failures and immutable releases"],
+        acceptance_unchanged=True, prior_bound_reuse_allowed=False,
+        capacity_caveat="Affected demand scaling may fail the unchanged zero-EV "
+                        "network witness; no line-capacity scaling or automatic repair.",
+    )
+
+
 def _config(config):
     value = dict(config)
+    has_revision = "revision" in value
+    revision = value.pop("revision", None)
+    if has_revision and (isinstance(revision, (bool, np.bool_))
+                         or not isinstance(revision, (int, np.integer)) or revision != 1):
+        raise ValueError("Only the sole revision=1 is accepted; omit the flag for v0")
     if value not in preregistered_candidates():
         raise ValueError("Expected exactly gap_h, early_duration_h, joint_nominal from frozen12")
-    return {k: float(value[k]) for k in ("gap_h", "early_duration_h", "joint_nominal")}
+    result = {k: float(value[k]) for k in CANDIDATE_KEYS}
+    if has_revision:
+        if result not in revision_plan()["allowed_candidate_configs"]:
+            raise ValueError("revision1 trials are restricted to original C11/C12")
+        result["revision"] = 1
+    return result
 
 
 def read_source(source_root):
@@ -287,8 +341,10 @@ def _packages(source, config, groups, fleet_size):
 
 
 def _rng(seed, split, bank, index, config, count=None):
+    # Revision/fleet demand scaling changes physics, not the sampled weather.
+    # Preserve the v0 address byte-for-byte for the same original three keys.
     address = dict(family=FAMILY, seed=seed, split=split, bank=bank, index=index,
-                   config=config, count=count)
+                   config={k: config[k] for k in CANDIDATE_KEYS}, count=count)
     key = _digest(address)
     return np.random.Generator(np.random.PCG64(int(key, 16))), dict(address=address, sha256=key, bit_generator="PCG64")
 
@@ -315,7 +371,9 @@ def _physical(source, config, rng, stream, *, stratum=None, forecast=False):
     failure = np.full(32, np.inf)
     recovery = np.full(32, np.inf)
     if forecast:
-        failure[[19, 22]], recovery[[19, 22]] = 17., [17.5, 17.25]
+        failure[19], recovery[19] = 17., 17.5
+        if config.get("revision", 0) == 0:
+            failure[22], recovery[22] = 17., 17.25
     elif grid:
         failure[19], recovery[19] = 16.5, 16.5 + duration
         # A smaller second area suffers only under the shared severe event.
@@ -333,11 +391,13 @@ def _physical(source, config, rng, stream, *, stratum=None, forecast=False):
     load = baseline * .35
     # Preserve source diurnal profiles, declare new area magnitudes (kW at
     # t=16.5): 90+10 core versus 27+3 marginal, ratio 10:3. All other loads
-    # remain positive wherever the source baseline is positive.
+    # remain positive wherever the source baseline is positive. Revision1
+    # multiplies only these four buses by N/6, never the original network limits.
+    scale = source.get("synthetic_load_scale", 1.)
     for bus, kw in ((21, 90.), (22, 10.), (24, 27.), (25, 3.)):
         if baseline[66, bus - 1] <= 0:
             raise ValueError("Missing source demand in declared service area")
-        load[:, bus - 1] = kw * baseline[:, bus - 1] / baseline[66, bus - 1]
+        load[:, bus - 1] = (kw * baseline[:, bus - 1] / baseline[66, bus - 1]) * scale
     load_jitter = np.zeros((96, 33)) if forecast else rng.uniform(-.03, .03, (96, 33))
     load *= 1. + load_jitter
     physical = dict(line_operating_outages=off, load_p_kw=load, load_q_kvar=.33 * load,
@@ -446,13 +506,30 @@ def make_case(config, source_root, split, seed, scenario_count=400, fleet_size=3
         raise ValueError("Explicit development/validation/stress/oos split required")
     if split == "development" and seed not in (101, 202):
         raise ValueError("Development seeds are predeclared as 101 and optional neighbor 202")
+    if split == "development" and config.get("revision") == 1 and seed != 101:
+        raise ValueError("The sole revision1 C11/C12 development trial uses seed101")
     count = _integer(scenario_count, "scenario_count", 4)
     fleet_size, groups = _integer(fleet_size, "fleet_size"), _integer(groups, "groups")
     if groups > min(30, fleet_size):
         raise ValueError("Each of at most 30 exact source types requires a vehicle")
     source = read_source(source_root)
+    revision = config.get("revision", 0)
+    fleet_scale = fleet_size / 6 if revision == 1 else 1.
+    # This is per-call memory only. Neither source input files nor the network
+    # coefficients are changed, and G at fixed N leaves this scale unchanged.
+    source["synthetic_load_scale"] = fleet_scale
     packages, types, type_counts = _packages(source, config, groups, fleet_size)
     scope = _feature_scope(source)
+    plan = revision_plan() if revision else None
+    scope.update(revision=revision, fleet_scale=fleet_scale,
+                 revision_plan_sha256=_digest(plan) if plan else None)
+    if revision:
+        scope["differences"] += [
+            "Sole revision1 after v0 development failures: forecast retains only line20 at 17..17.5; removes forecast line23 outage.",
+            "Revision1 scales only bus21/22/24/25 demand in TRAIN/CAL/forecast by fleet_size/6; no group-count scaling or network-limit change.",
+            "Revision1 references use ceil(fleet_size/6) vehicles per protected target; v0 uses one. No favorable policy ranking is guaranteed.",
+            "Original three-key RNG addresses, weather/road states and binary moment values are paired across revisions; physical load identities change when N differs from 6.",
+        ]
     probabilities = _probabilities(config)
     # Hamilton-style sequential largest deficit with a one-member minimum.
     allocations = np.ones(4, dtype=int)
@@ -470,7 +547,8 @@ def make_case(config, source_root, split, seed, scenario_count=400, fleet_size=3
         scenarios.append(scene)
     rng, address = _rng(0, "forecast", "DETERMINISTIC", 0, config)
     forecast = _scene(source, config, packages, rng, address, forecast=True)
-    forecast["id"] = "structured_forecast_later_internal_outages"
+    forecast["id"] = ("structured_forecast_core_only_revision1" if revision
+                      else "structured_forecast_later_internal_outages")
     calibration = _calibration(source, config, seed, split, 2000)
     weights = np.array([s["weight"] for s in scenarios])
     case = dict(network=source["network"], packages=packages, type_counts=type_counts,
@@ -486,8 +564,12 @@ def make_case(config, source_root, split, seed, scenario_count=400, fleet_size=3
                               natural_iid=False, saa_weights_required=True,
                               unweighted_empirical_weights=np.full(count, 1 / count),
                               unweighted_weights_are_nominal=False),
-                config=config, source_refs=source["source_refs"])
+                config=config, revision=revision, fleet_scale=fleet_scale,
+                revision_plan=plan, source_refs=source["source_refs"])
     scientific = dict(family=FAMILY, config=config, split=split, seed=seed,
+                      revision=revision, fleet_scale=fleet_scale,
+                      candidate_id=f"C{preregistered_candidates().index({k: config[k] for k in CANDIDATE_KEYS}) + 1:02d}",
+                      revision_plan_sha256=_digest(plan) if plan else None,
                       scenario_count=count, calibration_count=2000, fleet_size=fleet_size,
                       groups=groups, source=source["source_refs"]["snapshot_sha256"],
                       catalogue=_digest(packages), calibration=calibration["identity"],
@@ -617,27 +699,33 @@ def audit_physical_case(case):
 def make_reference_policies(case):
     """Three canonical, equal-share count policies; never selected from Q/results.
 
-    z0: one late core vehicle, z1: one early core, z2: that early core plus
-    one early marginal vehicle. Each uses the one-hour reservation and 45kWh
-    AC per vehicle (or its smaller physical cap, always >=15). This is a fixed
+    z0: late core vehicles, z1: early core, z2: early core plus early marginal.
+    V0 uses one vehicle per protection target; revision1 uses ceil(N/6), giving
+    the same counts at N6 and five per target at N30. Allocate vehicles in
+    original package order, respecting the remaining count of each type.
+    Each uses the one-hour reservation and 45kWh AC per vehicle
+    (or its smaller physical cap, always >=15). This is a fixed
     reference comparison, not a claim these are global optima or ordered risks.
     """
     packages = case["packages"]
     count = len(packages)
+    revision = case["config"].get("revision", 0)
+    units = math.ceil(sum(case["type_counts"]) / 6) if revision else 1
     policies = []
     for name, specs in (("z0", [(0, 2)]), ("z1", [(0, 0)]), ("z2", [(0, 0), (2, 0)])):
         n, en = np.zeros(count), np.zeros(count)
         used = np.zeros(len(case["type_counts"]), int)
         for c, choice in specs:
-            eligible = [(h, p) for h, p in enumerate(packages)
-                        if p["c"] == c and p["departure_choice"] == choice
-                        and p["reservation_hours"] == 1 and used[p["g"]] < case["type_counts"][p["g"]]]
-            if not eligible:
-                raise ValueError("Reference policies need at least two available vehicles")
-            h, p = eligible[0]
-            n[h] += 1
-            en[h] += min(45., p["Ebar"])
-            used[p["g"]] += 1
+            for _ in range(units):
+                eligible = [(h, p) for h, p in enumerate(packages)
+                            if p["c"] == c and p["departure_choice"] == choice
+                            and p["reservation_hours"] == 1 and used[p["g"]] < case["type_counts"][p["g"]]]
+                if not eligible:
+                    raise ValueError("Insufficient vehicles for the declared reference targets")
+                h, p = eligible[0]
+                n[h] += 1
+                en[h] += min(45., p["Ebar"])
+                used[p["g"]] += 1
         parts = np.array([25 * n.sum(),
                           sum(30 * (p["r"] + 1 - p["d"]) / 4 * v for p, v in zip(packages, n)),
                           sum((p["r"] - p["k"] + 1) / 4 * v for p, v in zip(packages, n)),
@@ -653,6 +741,7 @@ def make_reference_policies(case):
             raise ValueError("Reference baseline cost mismatch")
         policies.append(dict(name=name, n=n, E=en, x=np.r_[n, en],
                              package_ids=np.flatnonzero(n).tolist(), cost_parts=parts,
+                             units_per_protection_target=units,
                              first_stage_cost=cost, base_cost_rates=[25., 30., 1., .02],
                              canonical_equal_share=True, case_identity=case["identity"]["sha256"]))
     return policies

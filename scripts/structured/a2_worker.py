@@ -91,7 +91,10 @@ def evaluate(case, out, control, env):
                     rows=first["A"].shape[0], nnz=first["A"].nnz),
                 recourse_size=dict(vars=len(templates[1].names), rows=templates[1].W.shape[0],
                                    W_nnz=templates[1].W.nnz, T_nnz=templates[1].T.nnz),
-                complete_support=len(ids), full400=False, solver_calls=3 * len(scenes))
+                complete_support=len(ids), full400=False,
+                solver_calls=3 * len(scenes) + 2 + 2 + 6 + (2 if region.get("second_native_status") is not None else 1),
+                solver_calls_breakdown=dict(recourse=3 * len(scenes), calibration_feasibility=2,
+                    joint_probability=2, policy_risk=6, inverse=2 if region.get("second_native_status") is not None else 1))
 
 
 def main():
@@ -100,9 +103,15 @@ def main():
     root = out.parents[1]
     control = Control(seconds)
     candidates = read(root / "PREREGISTERED_CANDIDATES.json")["candidates"]
+    revision = int(sys.argv[4]) if len(sys.argv) > 4 else 0
+    if revision:
+        if revision != 1:
+            raise ValueError("Only the single frozen revision is authorized")
+        plan = read(root / "REVISION_1_PLAN.json")
+        candidates = [c for c in candidates if c["id"] in plan["candidates"]]
     result = dict(stage="A2", status="RUNNING", passed=False, candidates=[], finalists=[],
                   development_only=True, scenario_count=8, fleet_size=6, types=6,
-                  validation_opened=False, revisions_used=0, inverse_margin_threshold_dollars=1.0)
+                  validation_opened=False, revisions_used=revision, inverse_margin_threshold_dollars=1.0)
     with gp.Env(params={"OutputFlag": 0}) as env:
         for index, candidate in enumerate(candidates):
             if control.remaining < 8:
@@ -118,12 +127,15 @@ def main():
                        seed=101, support_count=8, full400=False)
             try:
                 physical_config = {k: candidate[k] for k in ("gap_h", "early_duration_h", "joint_nominal")}
+                if revision:
+                    physical_config["revision"] = revision
                 case = make_case(physical_config, inputs, "development", 101, scenario_count=8, fleet_size=6, groups=6)
                 # Full raw case is an external replay artifact. Only locally
                 # generated trusted pickles are read by subsequent stage workers.
                 with (path / "CASE.pkl").open("xb") as f:
                     pickle.dump(case, f, protocol=5)
                 row.update(science_identity=case["identity"], physical_audit=case["physical_audit"],
+                           physical_config=physical_config, revision=revision,
                            case_file=reference(path / "CASE.pkl"), feature_scope=case["feature_scope"],
                            nominal=dict(vehicles=6, types=6, periods=96, scenarios=8),
                            effective=dict(packages=len(case["packages"]),

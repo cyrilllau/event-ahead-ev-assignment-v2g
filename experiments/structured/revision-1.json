@@ -1,0 +1,46 @@
+{
+  "revision": 1,
+  "max_revision": 1,
+  "status": "FROZEN_BEFORE_REVISED_EVALUATION",
+  "candidates": [
+    "C11",
+    "C12"
+  ],
+  "seed": 101,
+  "candidate_identity_count": 12,
+  "new_candidate_ids": 0,
+  "changes": [
+    {
+      "field": "forecast_line23_outage",
+      "before": "17..17.25h outage",
+      "after": "no outage; forecast retains coreline20 17..17.5h outage",
+      "reason": "initial DET marginal policy recourse gain351.5502335 USD exceeds largest allowed additional cost; nominal marginal island requiresrare jointregime. Notzerodisasterforecast."
+    },
+    {
+      "field": "affected_area_load_scale",
+      "before": 1,
+      "after": "fleet_size/6",
+      "reason": "preserve affected demand peravailablevehicle when scaling6->12->30; avoidmanufacturingnominalscale withonly2usefulvehicles. Unaffectedloadsunchanged. GstressholdsN30constant."
+    },
+    {
+      "field": "reference_policy_units",
+      "before": 1,
+      "after": "ceil(fleet_size/6)",
+      "reason": "same protection intensity pervehicle; A2N6unchanged"
+    }
+  ],
+  "unchanged": [
+    "TRAIN/CAL weatherstreamaddresses useoriginal3physicalparameterkeys; no seedchange",
+    "originalpower/energy/gridkernel",
+    "fouroriginalfees0.8..1.2multipliers",
+    "originalA1audit1e-9",
+    "globalgap1percent",
+    "candidate/seeds/budgetlimits"
+  ],
+  "science_identity": "new revision/case hashes; no bound/Q reuse without explicit matrix equalityproof",
+  "selection": "strongC11 fromoriginal12: gap2,duration0.5,joint.08; weakneighborC12joint.02; no furtherphysicalrevision evenifbothfail",
+  "development_only": true,
+  "validation_opened": false,
+  "predictions_are_results": false,
+  "next": "re-evaluate3fixedpolicieson8support+forecast, inverseLP, then gateA3ifpass"
+}

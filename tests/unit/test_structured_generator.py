@@ -271,3 +271,156 @@ def test_audit_detects_manually_changed_route_state(case):
     corrupted["scenarios"][0]["route_states"][0]["arrival"] += .1
     audit = s.audit_physical_case(corrupted)
     assert not audit["passed"] and "ROUTE_REPLAY_DIFFERS" in audit["errors"]
+
+
+def test_sole_revision_plan_and_closed_candidate_domain(source_root):
+    plan = s.revision_plan()
+    assert plan["revision"] == plan["maximum_physical_revision_rounds"] == 1
+    assert plan["allowed_candidate_ids"] == ["C11", "C12"]
+    assert plan["acceptance_unchanged"]
+    assert plan["rng"]["candidate_keys"] == list(s.CANDIDATE_KEYS)
+    assert not plan["rng"]["revision_in_address"]
+    for base in s.preregistered_candidates():
+        assert s._config(base) == base
+        if base in plan["allowed_candidate_configs"]:
+            assert s._config(dict(base, revision=1)) == dict(base, revision=1)
+        else:
+            with pytest.raises(ValueError, match="C11/C12"):
+                s._config(dict(base, revision=1))
+    base = plan["allowed_candidate_configs"][0]
+    for invalid in (0, 2, -1, True, "1", 1.):
+        with pytest.raises(ValueError, match="sole revision"):
+            s._config(dict(base, revision=invalid))
+    with pytest.raises(ValueError, match="seed101"):
+        s.make_case(dict(base, revision=1), source_root, "development", 202)
+
+
+@pytest.fixture(scope="module")
+def revision_pairs(source_root):
+    before = {p.name: p.read_bytes() for p in source_root.iterdir()}
+    base = dict(gap_h=2., early_duration_h=.5, joint_nominal=.08)
+    pairs = {}
+    for n in (6, 30):
+        pairs[n] = tuple(s.make_case(config, source_root, "development", 101,
+                                     scenario_count=8, fleet_size=n, groups=6)
+                         for config in (base, dict(base, revision=1)))
+    assert {p.name: p.read_bytes() for p in source_root.iterdir()} == before
+    return pairs
+
+
+def test_revision_preserves_rng_and_changes_only_declared_forecast_at_n6(revision_pairs):
+    old, new = revision_pairs[6]
+    assert old["identity"]["candidate_id"] == new["identity"]["candidate_id"] == "C11"
+    assert old["identity"]["sha256"] != new["identity"]["sha256"]
+    assert old["packages"] == new["packages"]
+    assert old["network"] == new["network"]
+    assert new["identity"]["revision"] == 1 and new["identity"]["fleet_scale"] == 1.
+    assert old["calibration"]["identity"] == new["calibration"]["identity"]
+    for a, b in zip(old["scenarios"], new["scenarios"]):
+        assert a["primitive_identity"] == b["primitive_identity"]
+        assert a["identity"] == b["identity"]
+        assert a["route_states"] == b["route_states"]
+        for k in a["physical"]:
+            np.testing.assert_array_equal(a["physical"][k], b["physical"][k])
+    a, b = old["forecast"]["physical"], new["forecast"]["physical"]
+    expected = np.zeros((96, 32), bool)
+    expected[68:70, 19] = True
+    np.testing.assert_array_equal(b["line_operating_outages"], expected)
+    np.testing.assert_array_equal(a["line_operating_outages"][:, 19], expected[:, 19])
+    assert a["line_operating_outages"][68, 22] and not b["line_operating_outages"][:, 22].any()
+    assert math.isinf(b["line_first_failure_h"][22])
+    assert math.isinf(b["line_recovery_h"][22])
+    for k in a:
+        if k not in {"line_operating_outages", "line_first_failure_h", "line_recovery_h"}:
+            np.testing.assert_array_equal(a[k], b[k])
+    assert new["physical_audit"]["passed"]
+    assert new["physical_audit"]["forecast_no_ev"]["forced_island_ens_kwh"] > 0
+    assert old["forecast"]["identity"] != new["forecast"]["identity"]
+
+
+def test_revision_n30_scaling_preserves_weather_moments_and_grid(revision_pairs):
+    old, new = revision_pairs[30]
+    assert old["network"] == new["network"]
+    assert old["packages"] == new["packages"] and old["types"] == new["types"]
+    assert new["fleet_scale"] == new["identity"]["fleet_scale"] == 5.
+    assert new["identity"]["revision_plan_sha256"] == s._digest(s.revision_plan())
+    affected = [20, 21, 23, 24]
+    unaffected = [j for j in range(33) if j not in affected]
+    for a, b in zip([old["forecast"], *old["scenarios"]], [new["forecast"], *new["scenarios"]]):
+        assert a["primitive_identity"] == b["primitive_identity"]
+        assert a["route_states"] == b["route_states"]
+        assert a["physical_sha256"] != b["physical_sha256"]
+        pa, pb = a["physical"], b["physical"]
+        for k in ("road_blocked", "road_travel_hours", "times_h"):
+            np.testing.assert_array_equal(pa[k], pb[k])
+        for k in ("load_p_kw", "load_q_kvar"):
+            np.testing.assert_array_equal(pa[k][:, unaffected], pb[k][:, unaffected])
+            # Positive products only, no cancellation: scaling before/after
+            # jitter (and .33 for Q) differs by a few rounded multiplications.
+            # 8 eps bounds these alternate orders; this is a unit-test bound,
+            # not a change to physical feasibility or scientific audit tolerance.
+            np.testing.assert_allclose(pb[k][:, affected], 5 * pa[k][:, affected],
+                                       rtol=8 * np.finfo(np.float64).eps, atol=0.)
+        np.testing.assert_array_equal(pb["load_q_kvar"], .33 * pb["load_p_kw"])
+    for a, b in zip(old["scenarios"], new["scenarios"]):
+        for k in ("line_operating_outages", "line_first_failure_h", "line_recovery_h"):
+            np.testing.assert_array_equal(a["physical"][k], b["physical"][k])
+    for k in ("features", "weights", "calibration_features", "calibration_mean",
+              "calibration_lower", "calibration_upper"):
+        np.testing.assert_array_equal(old[k], new[k])
+    assert old["calibration_rule"] == new["calibration_rule"]
+    assert old["calibration"]["primitive_ids"] == new["calibration"]["primitive_ids"]
+    assert old["calibration"]["physical_hashes"] != new["calibration"]["physical_hashes"]
+    assert old["calibration"]["identity"] != new["calibration"]["identity"]
+    assert any("fleet_size/6" in d for d in new["feature_scope"]["differences"])
+
+
+def test_revision_reference_scaling_and_ceil_allocation(revision_pairs):
+    for n, (old, new) in revision_pairs.items():
+        old_policies = s.make_reference_policies(old)
+        policies = s.make_reference_policies(new)
+        units = math.ceil(n / 6)
+        for a, b, targets in zip(old_policies, policies, (1, 1, 2)):
+            assert a["units_per_protection_target"] == 1
+            assert b["units_per_protection_target"] == units
+            assert b["n"].sum() == targets * units
+            assert b["E"].sum() == targets * units * 45.
+            np.testing.assert_allclose(b["cost_parts"], units * a["cost_parts"])
+            np.testing.assert_array_equal(b["x"], np.r_[b["n"], b["E"]])
+            for g, capacity in enumerate(new["type_counts"]):
+                assert sum(v for p, v in zip(new["packages"], b["n"]) if p["g"] == g) <= capacity
+            for p, v, en in zip(new["packages"], b["n"], b["E"]):
+                assert 15 * v <= en <= p["Ebar"] * v
+                if v:
+                    assert en / v == 45.
+            if n == 6:
+                np.testing.assert_array_equal(a["x"], b["x"])
+    # An uneven seven-car count fixture exercises ceil and type spillover.
+    uneven = dict(revision_pairs[6][1], type_counts=[2, 1, 1, 1, 1, 1])
+    broad = s.make_reference_policies(uneven)[2]
+    assert broad["units_per_protection_target"] == 2 and broad["n"].sum() == 4
+    allocations = [sum(v for p, v in zip(uneven["packages"], broad["n"]) if p["g"] == g)
+                   for g in range(6)]
+    assert allocations == [2, 1, 1, 0, 0, 0]
+
+
+def test_revision_fixed_n_stress_does_not_change_demand(source_root, revision_pairs):
+    six_groups = revision_pairs[30][1]
+    three_groups = s.make_case(six_groups["config"], source_root, "development", 101,
+                               scenario_count=8, fleet_size=30, groups=3)
+    assert three_groups["fleet_scale"] == six_groups["fleet_scale"] == 5.
+    assert three_groups["calibration"]["identity"] == six_groups["calibration"]["identity"]
+    for a, b in zip(three_groups["scenarios"], six_groups["scenarios"]):
+        assert a["physical_sha256"] == b["physical_sha256"]
+        assert a["primitive_identity"] == b["primitive_identity"]
+    assert three_groups["identity"]["sha256"] != six_groups["identity"]["sha256"]
+
+
+def test_revision_retains_capacity_failure_instead_of_relaxing_audit(revision_pairs):
+    limited = deepcopy(revision_pairs[30][1])
+    # Tighten a SYNTHETIC test fixture branch. This is not a real-source trial.
+    limited["network"]["p_limit"][19] = 144.9648
+    audit = s.audit_physical_case(limited)
+    assert not audit["passed"]
+    assert "ZERO_EV_NETWORK_WITNESS_FAILED" in audit["errors"]
+    assert limited["network"]["p_limit"][19] == 144.9648

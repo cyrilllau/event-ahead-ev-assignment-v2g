@@ -52,6 +52,8 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                             mip_gap=.01, absolute_gap=1, soft_memory_gb=20,
                             master_seconds=60)
     state = dict(method="Full-DRO", science_identity=case["identity"],
+                 first_stage_weights=list(weights), ambiguity_identity=ambiguity.identity,
+                 ordered_support=list(ambiguity.support_ids), probability_rows=[],
                  representation="individual" if individual else "count",
                  LB=None, UB=None, best=None, gap=None, passed=False,
                  original_expansion_audited=False, history=[], full_support=ns,
@@ -80,7 +82,9 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
         model.update()
         variables = model.getVars()
         tmap = {s: nx + 1 + s for s in range(ns)}
-        theta.add_probability(model, variables, nx, tmap, ambiguity.feasible_anchor, "anchor")
+        row_proof = theta.add_probability(model, variables, nx, tmap, ambiguity.feasible_anchor, "anchor")
+        state["probability_rows"].append(dict(p=ambiguity.feasible_anchor.tolist(), proof=row_proof,
+                                              membership=ambiguity.check_original(ambiguity.feasible_anchor)))
         probabilities = {hashlib.sha256(ambiguity.feasible_anchor.tobytes()).hexdigest()}
         def evaluate(x, cc, phase, iteration):
             pid = hashlib.sha256(x.tobytes()).hexdigest()
@@ -108,10 +112,16 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
             pp = rr["pstar"]
             ph = hashlib.sha256(pp.tobytes()).hexdigest()
             if ph not in probabilities:
-                theta.add_probability(model, variables, nx, tmap, pp, f"risk/{ph}")
+                if not ambiguity.check_original(pp)["passed"]:
+                    raise ValueError("Risk row is outside this original probability domain")
+                proof = theta.add_probability(model, variables, nx, tmap, pp, f"risk/{ph}")
+                state["probability_rows"].append(dict(p=pp.tolist(), proof=proof,
+                                                       membership=ambiguity.check_original(pp)))
                 probabilities.add(ph)
             F = float(enclosure(sparse.csr_matrix(first["cost"][None, :]), x)[1][0])
             value = float(np.nextafter(F + rr["risk_U"], np.inf))
+            witness("risk", phase, iteration, -1, x, dict(certificate=rr, first_cost_upper=F,
+                        Q=records, ambiguity_identity=ambiguity.identity, full_objective_upper=value))
             cached[pid] = value, records, ys, rr
             return cached[pid]
         try:
@@ -134,7 +144,17 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                     lower = certificate.get("LB")
                 else:
                     lower = model.ObjBoundC - 1e-6 if model.IsMIP and abs(model.ObjBoundC) < 1e90 else None
+                    certificate = dict(kind="native_MIP_bound", native_status=int(model.Status),
+                                       native_bound=float(model.ObjBoundC) if lower is not None else None,
+                                       outward_deduction=1e-6, LB=lower)
                 if lower is not None:
+                    if state["LB"] is None or lower > state["LB"]:
+                        A, a, names = theta.model_arrays(model)
+                        ref = witness("master_bound", phase, rounds, -1, np.zeros(0),
+                            dict(A=A, arrays=a, names=names, certificate=certificate,
+                                 raw_pi=np.asarray(model.getAttr("Pi")) if not model.IsMIP else None))
+                        state["lower_certificate"] = certificate
+                        state["lower_witness"] = ref
                     state["LB"] = max(state["LB"] or 0., float(lower))
                 state["native_status"] = int(model.Status)
                 if target():
@@ -159,7 +179,8 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                     state["complete_integer_evaluations"] += 1
                     if state["UB"] is None or value < state["UB"]:
                         state.update(UB=value, best=x.tolist(), best_recourse=records,
-                                     risk_interval=[rr["risk_L"], rr["risk_U"]])
+                                     risk_interval=[rr["risk_L"], rr["risk_U"]],
+                                     best_risk_certificate=rr)
                         best_y = ys
                 else:
                     state["prepass_rounds"] += 1
@@ -175,16 +196,30 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                         len(case["network"]["station_buses"]), weights, ports=case.get("ports", 20), individual=True)
                 x = np.asarray(state["best"])
                 audits = []
+                canonical_contracts = None
                 for sid, scene in enumerate(scenes):
                     control.check()
                     ti = templates[sid] if individual else cat.build_recourse(case["network"], case["packages"],
                                  scene["physical"], scene["route_states"], fi)
                     xi, yi = (x, best_y[sid]) if individual else cat.expand_count(first, fi, x, best_y[sid],
                                  count_recourse=templates[sid], individual_recourse=ti)
+                    if canonical_contracts is None:
+                        canonical_contracts = xi.copy()
+                    elif not np.array_equal(canonical_contracts, xi):
+                        raise ValueError("Canonical first-stage contracts changed across scenarios")
                     adapter = cat.build_original_adapter(case["network"], case["packages"],
                                  scene["physical"], scene["route_states"], fi)
                     zo, yo = cat.to_original(adapter, fi, ti, xi, yi)
-                    audits.append(dict(sid=scene["identity"], residual=adapter["matrix"].residual(yo, zo)))
+                    original = adapter["matrix"]
+                    component_delta = original.parts @ yo - templates[sid].data["parts"] @ best_y[sid]
+                    first_delta = adapter["first"]["cost"] @ zo - first["cost"] @ x
+                    if max(np.max(abs(component_delta), initial=0), abs(first_delta)) > 1e-5:
+                        raise ValueError("Original expansion changed objective components")
+                    audits.append(dict(sid=scene["identity"], residual=original.residual(yo, zo),
+                        operating_component_delta=component_delta.tolist(), first_cost_delta=float(first_delta),
+                        original_tasks=len(adapter["tasks"]), original_shortfall_big_m_rows=sum(
+                            name.startswith("incident_capability/") for name in original.row_names["ub"]),
+                        canonical_contracts_unchanged=True))
                     witness("original_audit", "integer", rounds, sid, zo, dict(y=yo, audit=audits[-1]))
                 state["original_audit"] = audits
                 state["original_expansion_audited"] = True

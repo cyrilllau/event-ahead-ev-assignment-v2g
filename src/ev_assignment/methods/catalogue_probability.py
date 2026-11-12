@@ -2,6 +2,7 @@
 
 from fractions import Fraction
 import hashlib
+import json
 import numpy as np
 from scipy import sparse
 
@@ -56,7 +57,9 @@ def calibrated(identities, features, calibration_features, control, *, marginal=
     anchor = dyadic_simplex(lp.x[:-1])
     if not check(anchor)["passed"]:
         raise ValueError("No certified interior anchor on this complete support")
-    identity = hashlib.sha256(features.tobytes() + cal.tobytes() + str(marginal).encode()).hexdigest()
+    identity = hashlib.sha256(features.tobytes() + cal.tobytes() + lo.tobytes() + hi.tobytes()
+                + json.dumps(dict(marginal=marginal, support=list(identities), rule=calibration_rule),
+                             sort_keys=True).encode()).hexdigest()
     ambiguity = AmbiguitySet(tuple(identities), phi, lo, hi, identity, check, anchor)
     return ambiguity, dict(rule=calibration_rule,
                            original_K4L4_set=False, calibration_n=cal.shape[1],

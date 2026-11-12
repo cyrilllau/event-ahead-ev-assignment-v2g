@@ -1,0 +1,3480 @@
+{
+  "schema_version": 1,
+  "baseline": "pre-refactor-v2-20261111",
+  "files": [
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/amend_control.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/amend_control.py",
+      "sha256": "862862b591165f6eff5bebad4f533c073fdb2f3fe64e3796eee34428aaa85c17"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/aro_core.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/aro_core.py",
+      "sha256": "8f893db97c0f423c26c88832f4f83b3c7a415510e83984f381ebdd86064a9b5c"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/aro_state_policy.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/aro_state_policy.py",
+      "sha256": "c0073d2ff69533d0a325cb4e8bdbc0bbf3ee1cc8e0694ed7fc8e9924ba6487be"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/aro_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/aro_tests.py",
+      "sha256": "3ab8572affc76a7d78be44f5aec4b248db22df2d5e90eedc4c510dad423ab302"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/control.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/control.py",
+      "sha256": "f1dce8b051c9f4c9d577f58a2ddaf79441c5d532c0f7c2bcf05a08b83eeda3fe"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/amend_revision.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/amend_revision.py",
+      "sha256": "f5b4560d56d0e0c851a94b393e9fd65148d5f970dd92ab8f9b4da3240c210872"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/autonomous_controller.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/autonomous_controller.py",
+      "sha256": "88688b0a09a9ed0cf1bfb57805a1a258b8df62f71227682ccfed59deeaff8278"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/base_r44.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/base_r44.py",
+      "sha256": "d5224a11059a069cd39a109c76fdcdf5f39fdc22ff94ac09d1a4a50eb37834ed"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/core.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/core.py",
+      "sha256": "5c557e242c930af1112d0222682ff841eb9cb43468c9df7bf9872d5bea7f5286"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/durable.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/durable.py",
+      "sha256": "fe573a15010f67a87afaf2102c213cf7e48dee05412603985a0ea2704efbb2b6"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/engine.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/engine.py",
+      "sha256": "4adeb787b8b60d95c459a73e3e42791e757c099d658907c2c1d884b5b3173332"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/lifecycle_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/lifecycle_tests.py",
+      "sha256": "a297175b9e29cabdba3b7947cf99ec10d8636fed223b5b84ccc382e7e8a18e45"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/memory_policy.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/memory_policy.py",
+      "sha256": "aa8df6c85e2bf16943382c58ddcc34f410c7b53df3e2906b4d3ab33551a34cd6"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/memory_worker.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/memory_worker.py",
+      "sha256": "3d3a8524f0148b26ca23950ceb3c48591b078b21da0cd1b1e6cceb4b940e8c86"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/preflight.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/preflight.py",
+      "sha256": "d400f54c8b49cf305d95babaf036801c12fd53dfbddc1a7c2c69476557cf177f"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/prepare_sources.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/prepare_sources.py",
+      "sha256": "ad067310044ea7bc18078085b83432f302d04f8cd2cd8175bb2ae20ec4bbf725"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/probability_patch_adapter.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/probability_patch_adapter.py",
+      "sha256": "455df9e8b8d87213171c3ca8d15688a27153e9279f12a9543948e357ec864436"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/replay.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/replay.py",
+      "sha256": "76f7ca8e3639ce4fede9722eb0c6e38e8a1325436e62b4ca72484c229b10f6b3"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/revision_controller.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/revision_controller.py",
+      "sha256": "d97c55708ba4845ecda6f57e188f668dc9edc77ece2188f8d2db14970a24eadc"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/runtime.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/runtime.py",
+      "sha256": "76c5bc7d2f7e7aa8cd4f2816bb24f8ba6f0ab47e59f810f692c0c70d3a632562"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/safe_probability_certificate.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/safe_probability_certificate.py",
+      "sha256": "e70cda2fd9feec2a045b707fd28f73b70db67c4383d313dd45b86b01a4ee0d9f"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/strict_upper.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/strict_upper.py",
+      "sha256": "9fa167f53a5fa777cb972ca3416728fb5fc73a5770072b7db2c5fde7218a7304"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/testfixtures.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/lifecycle/testfixtures.py",
+      "sha256": "fa203ba627b5f5b4e1e55239b627b9c96eb74ceb724f76d7cc0551508e30e979"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/repair_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/repair_tests.py",
+      "sha256": "08130949c63ea4e22673c93c15e592546c10500bb3028fc0e4cd7a773188b12d"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/run_aro400.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_01_SOURCE_AND_CONTROL/EXECUTION_REVISION_02/run_aro400.py",
+      "sha256": "92dd456e3d964a06cbfc4f7f838d11e5340b46e464ebd2da3cff07bd631d264b"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/aro_core.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/aro_core.py",
+      "sha256": "8f893db97c0f423c26c88832f4f83b3c7a415510e83984f381ebdd86064a9b5c"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/aro_state_policy.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/aro_state_policy.py",
+      "sha256": "c0073d2ff69533d0a325cb4e8bdbc0bbf3ee1cc8e0694ed7fc8e9924ba6487be"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/aro_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/aro_tests.py",
+      "sha256": "3ab8572affc76a7d78be44f5aec4b248db22df2d5e90eedc4c510dad423ab302"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/control.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/control.py",
+      "sha256": "f1dce8b051c9f4c9d577f58a2ddaf79441c5d532c0f7c2bcf05a08b83eeda3fe"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/amend_revision.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/amend_revision.py",
+      "sha256": "f5b4560d56d0e0c851a94b393e9fd65148d5f970dd92ab8f9b4da3240c210872"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/autonomous_controller.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/autonomous_controller.py",
+      "sha256": "88688b0a09a9ed0cf1bfb57805a1a258b8df62f71227682ccfed59deeaff8278"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/base_r44.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/base_r44.py",
+      "sha256": "d5224a11059a069cd39a109c76fdcdf5f39fdc22ff94ac09d1a4a50eb37834ed"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/core.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/core.py",
+      "sha256": "5c557e242c930af1112d0222682ff841eb9cb43468c9df7bf9872d5bea7f5286"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/durable.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/durable.py",
+      "sha256": "fe573a15010f67a87afaf2102c213cf7e48dee05412603985a0ea2704efbb2b6"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/engine.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/engine.py",
+      "sha256": "4adeb787b8b60d95c459a73e3e42791e757c099d658907c2c1d884b5b3173332"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/lifecycle_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/lifecycle_tests.py",
+      "sha256": "a297175b9e29cabdba3b7947cf99ec10d8636fed223b5b84ccc382e7e8a18e45"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/memory_policy.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/memory_policy.py",
+      "sha256": "aa8df6c85e2bf16943382c58ddcc34f410c7b53df3e2906b4d3ab33551a34cd6"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/memory_worker.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/memory_worker.py",
+      "sha256": "3d3a8524f0148b26ca23950ceb3c48591b078b21da0cd1b1e6cceb4b940e8c86"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/preflight.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/preflight.py",
+      "sha256": "d400f54c8b49cf305d95babaf036801c12fd53dfbddc1a7c2c69476557cf177f"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/prepare_sources.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/prepare_sources.py",
+      "sha256": "ad067310044ea7bc18078085b83432f302d04f8cd2cd8175bb2ae20ec4bbf725"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/probability_patch_adapter.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/probability_patch_adapter.py",
+      "sha256": "455df9e8b8d87213171c3ca8d15688a27153e9279f12a9543948e357ec864436"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/replay.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/replay.py",
+      "sha256": "76f7ca8e3639ce4fede9722eb0c6e38e8a1325436e62b4ca72484c229b10f6b3"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/revision_controller.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/revision_controller.py",
+      "sha256": "d97c55708ba4845ecda6f57e188f668dc9edc77ece2188f8d2db14970a24eadc"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/runtime.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/runtime.py",
+      "sha256": "76c5bc7d2f7e7aa8cd4f2816bb24f8ba6f0ab47e59f810f692c0c70d3a632562"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/safe_probability_certificate.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/safe_probability_certificate.py",
+      "sha256": "e70cda2fd9feec2a045b707fd28f73b70db67c4383d313dd45b86b01a4ee0d9f"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/strict_upper.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/strict_upper.py",
+      "sha256": "9fa167f53a5fa777cb972ca3416728fb5fc73a5770072b7db2c5fde7218a7304"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/testfixtures.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/lifecycle/testfixtures.py",
+      "sha256": "fa203ba627b5f5b4e1e55239b627b9c96eb74ceb724f76d7cc0551508e30e979"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/prepare_and_test.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/prepare_and_test.py",
+      "sha256": "4d7ce8c62090642c9c9a26ef2a50b6dae663527fa1c53266a159a7b493aa743d"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/repair_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/repair_tests.py",
+      "sha256": "08130949c63ea4e22673c93c15e592546c10500bb3028fc0e4cd7a773188b12d"
+    },
+    {
+      "original": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/run_aro400.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/run_aro400.py",
+      "sha256": "6609c539546c869332dfa3fdec693fe56c6a03ca7d3998ecd9c3c7659cc813b6"
+    },
+    {
+      "original": "powerai_l08/L08_ARO_DRO_GAP1_ACCELERATION_V1/MEMORY_EXIT_REPAIR_V1/CONTINUE_01/tools/gap_policy.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO_DRO_GAP1_ACCELERATION_V1/MEMORY_EXIT_REPAIR_V1/CONTINUE_01/tools/gap_policy.py",
+      "sha256": "3628dbf96ab6bf468adc95fe76e94b6249bdeead7ad86121c214e31e71557821"
+    },
+    {
+      "original": "powerai_l08/L08_ARO_DRO_GAP1_ACCELERATION_V1/MEMORY_EXIT_REPAIR_V1/CONTINUE_01/tools/run_aro_memory_repair.py",
+      "reference": "reference/baseline/powerai_l08/L08_ARO_DRO_GAP1_ACCELERATION_V1/MEMORY_EXIT_REPAIR_V1/CONTINUE_01/tools/run_aro_memory_repair.py",
+      "sha256": "8a17b3b8cbb274ffc5825c980fa275f50152338fd06499a2a7de17acdfbfc6ea"
+    },
+    {
+      "original": "powerai_l08/L08_DET_CAPACITY_CUTS_AND_DRO_RECOVERY_R38/tools/r38_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_DET_CAPACITY_CUTS_AND_DRO_RECOVERY_R38/tools/r38_common.py",
+      "sha256": "42e2ef848f80adec5a89e09b61b94887a2efbcc7ba058e101bdfbb96acaaab83"
+    },
+    {
+      "original": "powerai_l08/L08_DET_CAPACITY_CUTS_AND_DRO_RECOVERY_R38/tools/r38_det.py",
+      "reference": "reference/baseline/powerai_l08/L08_DET_CAPACITY_CUTS_AND_DRO_RECOVERY_R38/tools/r38_det.py",
+      "sha256": "4a30c02ab033e2991f008881487973cea60a9ae0cc2330120ad3c91a8cb573a6"
+    },
+    {
+      "original": "powerai_l08/L08_DET_CAPACITY_CUTS_AND_DRO_RECOVERY_R38/tools/run_det_r38_continuation.py",
+      "reference": "reference/baseline/powerai_l08/L08_DET_CAPACITY_CUTS_AND_DRO_RECOVERY_R38/tools/run_det_r38_continuation.py",
+      "sha256": "4bfcc80ee93435b3de7db0c89b2f614626a25312a20bb6ae627c5a4c91d52a9c"
+    },
+    {
+      "original": "powerai_l08/L08_DET_CERTIFIED_SCREENING_AND_LOCAL_SEARCH_R32/tools/r31_reference_core.py",
+      "reference": "reference/baseline/powerai_l08/L08_DET_CERTIFIED_SCREENING_AND_LOCAL_SEARCH_R32/tools/r31_reference_core.py",
+      "sha256": "ec64d205c1e3208e879048acc4365e1b69588b0d2dde8867c7f2db31311f3fdc"
+    },
+    {
+      "original": "powerai_l08/L08_DET_CERTIFIED_SCREENING_AND_LOCAL_SEARCH_R32/tools/r32_core.py",
+      "reference": "reference/baseline/powerai_l08/L08_DET_CERTIFIED_SCREENING_AND_LOCAL_SEARCH_R32/tools/r32_core.py",
+      "sha256": "5bbbe8ed23e8011386e1fc26a25921c8dbcdbbd9d71a6611ca33490ba5516b37"
+    },
+    {
+      "original": "powerai_l08/L08_DET_CERTIFIED_SCREENING_AND_LOCAL_SEARCH_R32/tools/r32_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_DET_CERTIFIED_SCREENING_AND_LOCAL_SEARCH_R32/tools/r32_tests.py",
+      "sha256": "71ee910d7e1f6c595041553c0ff7c5ce34f60a41ddfed50fe18d45b2fcf87969"
+    },
+    {
+      "original": "powerai_l08/L08_DET_CERTIFIED_SCREENING_AND_LOCAL_SEARCH_R32/tools/run_l08_det_screening_local_search_r32.py",
+      "reference": "reference/baseline/powerai_l08/L08_DET_CERTIFIED_SCREENING_AND_LOCAL_SEARCH_R32/tools/run_l08_det_screening_local_search_r32.py",
+      "sha256": "92eeed1cf54c1a5109ee5409d5cbe6ca1eb37080e44a7fa02ef8a90760080269"
+    },
+    {
+      "original": "powerai_l08/L08_DET_R38_CAPACITY_CONTINUATION_V1/RECOVERY_02/resume_det_memory24.py",
+      "reference": "reference/baseline/powerai_l08/L08_DET_R38_CAPACITY_CONTINUATION_V1/RECOVERY_02/resume_det_memory24.py",
+      "sha256": "8778427bfefd9548e939e6fd17716618b0cd00ea58672c73b0b608321a224fe8"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/actual_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/actual_tests.py",
+      "sha256": "eff181a34df4a16a581044f6ea64a5c3db3417deecaee1af9be094c598215425"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/aggregate_core.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/aggregate_core.py",
+      "sha256": "c5ed44216465ab1b626dc44021172b30b55e2a8726fb3322df93b1aa3fbaa600"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/cache_restore.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/cache_restore.py",
+      "sha256": "ae809b7b7458e9958f34bd7c9ecdecd0251d42d9ae8769c1e549520e1eca1e3c"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/control_policy.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/control_policy.py",
+      "sha256": "d4e1341a3475258f0b184d25a22aa29754a0a624d9855a4e1267898f32b095d1"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/csr_reader.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/csr_reader.py",
+      "sha256": "239e1ce7e44a68a1c88723ba749c64d69fc4f83a4d4c66c42f0a13f76ae58806"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/envelope_sparse.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/envelope_sparse.py",
+      "sha256": "56f1b58e66d3f0cf2a7914742787cd7b83a26292e8f0cb828921f98da8e60b48"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/formal.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/formal.py",
+      "sha256": "2af77254ec70333177c50b0d6d0682809935067cba9d75e99538fbaa4d3a2462"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/gap_phase_reference.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/gap_phase_reference.py",
+      "sha256": "a208ae47917698e2b50d22ef858ea5f60eb1d0ad1c61e1a2b9dbe7f71ddf48ad"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/amend_revision.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/amend_revision.py",
+      "sha256": "f5b4560d56d0e0c851a94b393e9fd65148d5f970dd92ab8f9b4da3240c210872"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/autonomous_controller.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/autonomous_controller.py",
+      "sha256": "88688b0a09a9ed0cf1bfb57805a1a258b8df62f71227682ccfed59deeaff8278"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/base_r44.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/base_r44.py",
+      "sha256": "d5224a11059a069cd39a109c76fdcdf5f39fdc22ff94ac09d1a4a50eb37834ed"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/core.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/core.py",
+      "sha256": "5c557e242c930af1112d0222682ff841eb9cb43468c9df7bf9872d5bea7f5286"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/durable.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/durable.py",
+      "sha256": "fe573a15010f67a87afaf2102c213cf7e48dee05412603985a0ea2704efbb2b6"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/engine.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/engine.py",
+      "sha256": "463369046720f8034d6cb2308ee81df5e1a96d529397559693497ba40791392d"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/lifecycle_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/lifecycle_tests.py",
+      "sha256": "a297175b9e29cabdba3b7947cf99ec10d8636fed223b5b84ccc382e7e8a18e45"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/memory_policy.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/memory_policy.py",
+      "sha256": "aa8df6c85e2bf16943382c58ddcc34f410c7b53df3e2906b4d3ab33551a34cd6"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/memory_worker.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/memory_worker.py",
+      "sha256": "b0b0f3577dc74fa476ce77bba7e9102e65928923eec67b9e912d39cafb29d343"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/preflight.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/preflight.py",
+      "sha256": "d400f54c8b49cf305d95babaf036801c12fd53dfbddc1a7c2c69476557cf177f"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/prepare_sources.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/prepare_sources.py",
+      "sha256": "ad067310044ea7bc18078085b83432f302d04f8cd2cd8175bb2ae20ec4bbf725"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/probability_patch_adapter.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/probability_patch_adapter.py",
+      "sha256": "455df9e8b8d87213171c3ca8d15688a27153e9279f12a9543948e357ec864436"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/replay.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/replay.py",
+      "sha256": "76f7ca8e3639ce4fede9722eb0c6e38e8a1325436e62b4ca72484c229b10f6b3"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/revision_controller.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/revision_controller.py",
+      "sha256": "d97c55708ba4845ecda6f57e188f668dc9edc77ece2188f8d2db14970a24eadc"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/runtime.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/runtime.py",
+      "sha256": "76c5bc7d2f7e7aa8cd4f2816bb24f8ba6f0ab47e59f810f692c0c70d3a632562"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/safe_probability_certificate.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/safe_probability_certificate.py",
+      "sha256": "e70cda2fd9feec2a045b707fd28f73b70db67c4383d313dd45b86b01a4ee0d9f"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/strict_upper.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/strict_upper.py",
+      "sha256": "9fa167f53a5fa777cb972ca3416728fb5fc73a5770072b7db2c5fde7218a7304"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/testfixtures.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/testfixtures.py",
+      "sha256": "fa203ba627b5f5b4e1e55239b627b9c96eb74ceb724f76d7cc0551508e30e979"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/limited_preflight.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/limited_preflight.py",
+      "sha256": "061dbae4a5cf57a320cae3f002789e5200e7a20cb872cb728017864ec4086a31"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/math_preflight.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/math_preflight.py",
+      "sha256": "afbcbc7cf1fc6d31ed579de367a9f6162a877f2090157c2ab04b15f6be3dd7c6"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/native_gate.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/native_gate.py",
+      "sha256": "34a37428307ea0be58a8b312d2df0b0336cf06056ae2817b1c57727878e44fa4"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/native_repair02.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/native_repair02.py",
+      "sha256": "dfe5134c0a0b6cd2e8fd1c300588b2ed4830d47221558d84c33c0c6469674bd6"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/recovery02.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/recovery02.py",
+      "sha256": "2ec65e768032e0bcc2916a48e8719b776201ef63d3f3310ffedf71553be2af3c"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/repair_guard_helpers.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/repair_guard_helpers.py",
+      "sha256": "e111e925052598845e571e8f1212543f9892d7c2725abdb40207fcd94d5f49e4"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/resume_validation.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/resume_validation.py",
+      "sha256": "d296b430e0353e1ce10226cb9dcc24fc1b60508455e032d6b09de6928bee7863"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/run_dro400_aggregate.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/run_dro400_aggregate.py",
+      "sha256": "e54557d117de3f7b5dfcbdc2107e97f8dca814c67f0e134d45b715f958cd6a02"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/run_dro400_aggregate_repair.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/run_dro400_aggregate_repair.py",
+      "sha256": "805f975062be63fc3e017b70a7942f2c55f8d8fe8e3be3d2eb072d5bb8ff5150"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/run_dro400_theta_multicut.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/run_dro400_theta_multicut.py",
+      "sha256": "9cc3464e22833745ebb1a1d940c3cd5ba03f4e54378a40775c771e374e9f49da"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/run_theta_repair02.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/run_theta_repair02.py",
+      "sha256": "c891faf0e97063ed9a8dd613ccc46b64ea8a3966a43c7def3833dd5a7cbd9a3b"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/scheduling_fix.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/scheduling_fix.py",
+      "sha256": "82dd9b4ed717494fcf4daa6111ce5f8cd9c1687ba8b02eedf1725612bc1f7e30"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/source_prepare.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/source_prepare.py",
+      "sha256": "0b7bd5084b7758b62c9fcec7864bb54713e1e9b752c7cded4f8fe25e6bb3285a"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/supervisor.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/supervisor.py",
+      "sha256": "7a408331736ca023076518186eea16e928760081a3d4a285c9a5767a0fd4d467"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/supervisor_repair.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/supervisor_repair.py",
+      "sha256": "e314318a56abfd7303a21fb98e2b2117b1b4bb8dc5432ffe7a86b7511c0cc094"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/supervisor_repair02.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/supervisor_repair02.py",
+      "sha256": "377f60438fbadb5c0cbed7239bfe05cb49beac1aea81dd0636d65c064479e2f6"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/test_gap_phase_reference.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/test_gap_phase_reference.py",
+      "sha256": "d29db8b398bed324f15c231d7a84a48febfff3aec3d46a059c7d9875300a2ed4"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/tests_repair02.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/tests_repair02.py",
+      "sha256": "556c277bae82fa94141d93db9c28bd22d5c36e79b6129d602e0cfb0dd1c2d431"
+    },
+    {
+      "original": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/theta_kernel.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/theta_kernel.py",
+      "sha256": "740a69781590d648c0147fbb351ab43156d9a005ab051fc027476f8d915ca646"
+    },
+    {
+      "original": "powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/envelope_sparse.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/envelope_sparse.py",
+      "sha256": "e6d3c0d5be6762455b902ede17f33b561db0a4af483234634cb66ab9f829506f"
+    },
+    {
+      "original": "powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/proof_core.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/proof_core.py",
+      "sha256": "65c4ea0615f219d7b7c29f6437531db236bcc4aa95d437980a046e7bf8319bf4"
+    },
+    {
+      "original": "powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/replay_certificates.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/replay_certificates.py",
+      "sha256": "87a9028a6b95616a4a53cfc9a1568c9ec8448bdfdfd8c4fc047f8ecccc2364b3"
+    },
+    {
+      "original": "powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/run_proven_redundancy_only.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/run_proven_redundancy_only.py",
+      "sha256": "e2525f0c8f5e365c05ad01e60e8b259243c8ba07fd2f0e27c71a4f1e77debe57"
+    },
+    {
+      "original": "powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/runtime.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/runtime.py",
+      "sha256": "7cdddbe2f720bc5f802db8d3e95d0907914ecc90767d1cd919a1b7b23cd21b9b"
+    },
+    {
+      "original": "powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/supervisor.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/supervisor.py",
+      "sha256": "efd07a531713e38ff861a08454469aa2b23dd3882782c33c878cbdc147679067"
+    },
+    {
+      "original": "powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/theta_kernel.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO_THETA_PROVEN_REDUNDANCY_ONLY_V1/tools/theta_kernel.py",
+      "sha256": "cca3e505f76c91a27414359d11d2bc9de8ae80819422845ba106e928f1f5a139"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/compact_first_stage.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/compact_first_stage.py",
+      "sha256": "5acde6ac6c41a742900256a55fed1fe65defad293ffe75d308f0c7778e02d057"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/compact_recourse_pf.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/compact_recourse_pf.py",
+      "sha256": "257adcb2c25a5a2fb8bc06fcbc937249ee2f21a833bf34e07ab14429cfeb9bd4"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/contract_matrix.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/contract_matrix.py",
+      "sha256": "3622f345768f62ed7a89ae17d1e64edf502c02711ad15b79fa36968af3ab90a6"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/energy_ledger.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/energy_ledger.py",
+      "sha256": "b76fe6ff899ed498a3750f458f8a6dd2767c2b034b08f36f4a679316d5916e9a"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/exact_transform.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/exact_transform.py",
+      "sha256": "2441c10cf9a4cd6d8f2e1cd772239edecaf6e032dbd951c9fda41dc572b016f3"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/frozen_routing/__init__.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/frozen_routing/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/frozen_routing/case_inputs.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/frozen_routing/case_inputs.py",
+      "sha256": "753a675e7f331aad82e40c993d364b35a5c6581627965ca26535747f33cf4aa1"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/frozen_routing/forecast_routes.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/frozen_routing/forecast_routes.py",
+      "sha256": "17ab3a595af2dcca7d45e4f4c6b5df09651e0a9813a6aace4f64c4d33834af76"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/frozen_routing/random_streams.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/frozen_routing/random_streams.py",
+      "sha256": "ea030fe45619bc57c562cde19852d32d68362b4602cad11cdaeed7ee0753bd9f"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/lp_certificate.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/lp_certificate.py",
+      "sha256": "0a59c0de2b69eabca324b16d5cc24b41d7819f31c1154047b6814d4620dbece3"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r10_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r10_common.py",
+      "sha256": "32e91a762d557f2f150208c0f56680cfb256e877789fc7ff7df10db0bb33875f"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r12_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r12_common.py",
+      "sha256": "6d7cc82aaf7dca7b4e67ba67ea415a4040d478f7412c8f25a324eacd27659319"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r12_route_adapter.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r12_route_adapter.py",
+      "sha256": "2075e09cd4dad442471c8fcce0fa6f513edfa70f41f89ba9e4c2a710ac3b16d2"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_audit.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_audit.py",
+      "sha256": "a99c3a28033f0e6cfc3f9603026c8012d2153643816452db9076c589af528530"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_control.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_control.py",
+      "sha256": "aa1cc82cf6ac97c2d9ee58df0890876f90507d1c0a94f737489b923e93375912"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_domain.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_domain.py",
+      "sha256": "a3d6380564cb103da22f0f33b13415c14f1a3c02e9aa9c8545133dd5cae197ca"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_fixed400.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_fixed400.py",
+      "sha256": "88c38d63b986002ccc925f978d22b8f93ef10ec5f41ac5f0e6725c4b637a43a2"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_model.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_model.py",
+      "sha256": "a0a5ac009760148538f46bd68786e9d47ab4f560bb2f86342bae843a687607b5"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_native.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_native.py",
+      "sha256": "50c50f64a55218c0650c2327316d3605a54e9bd4189f19f0915477305dd9c702"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_plots.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_plots.py",
+      "sha256": "2794aeb260e6a47a181d630333c12592a83f270193b0d7219c42a508127d0064"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_reachability.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_reachability.py",
+      "sha256": "e0614b6ea6b47d67a6f16c1d5ca33c0170a527f8912467f3bb9fd0327eba0d60"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_replay.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_replay.py",
+      "sha256": "f7698d1250d5780feca7f9c4180af275dad4fb0b04d8c25895b517afcfb7daae"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_report.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_report.py",
+      "sha256": "84df33b7a06c501f5c4a93b0c38d5953fd82c314ffbda6693a49f4994649f36e"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_routes.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_routes.py",
+      "sha256": "230b79972a07016f665cf56080b65793648e3c772c7c72aee176d4c4223a117e"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r30_tests.py",
+      "sha256": "034ca73c171337fc614a24a7d29361dfe53ebf93a9835f8b83dcdf479a1fa518"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r3_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r3_common.py",
+      "sha256": "337a6df30385f8781e2f105de6bbca0e6b015095a148a18f20925c40583523f4"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r4_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/r4_common.py",
+      "sha256": "7ba92ac5008bab373f6ae25b4c19d14f36cf9dff98e4ae71b42685cee324b4e2"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/restore_and_verify.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/restore_and_verify.py",
+      "sha256": "592ed0c5455c651501a6ff16919894999614e504e27bf9bdf6243f5023f0423f"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/run_l08_k4l4_forecast44_domain_det_r30.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/run_l08_k4l4_forecast44_domain_det_r30.py",
+      "sha256": "4ef18e92c1a2e0a47b5cf95046498a415a2f62a63ab7ec345e07bf1d019655f3"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/run_parent.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/02_SOURCE_AND_CONFIG/DATA_STAGE_SOURCE/run_parent.py",
+      "sha256": "dd3c6172f2782a1fd3356476abf9d528ac1305c1af37cc39f2b16f3b88febb43"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/CODE_REVISIONS/INTEGER_FINAL_V1/r36_integer_control.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/CODE_REVISIONS/INTEGER_FINAL_V1/r36_integer_control.py",
+      "sha256": "169e2b4e3229e2bbca1c8a2756af52c538eed0475346b1eacc4175ef31dc0d76"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/CODE_REVISIONS/INTEGER_FINAL_V1/r36_integer_master.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/CODE_REVISIONS/INTEGER_FINAL_V1/r36_integer_master.py",
+      "sha256": "dcef2d2199bfaa3e6d7c58e962ec28816bc36b5bdca4f2179ed6da9f64ad5c36"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/CODE_REVISIONS/INTEGER_FINAL_V1/run_integer_dro_final_v1.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/CODE_REVISIONS/INTEGER_FINAL_V1/run_integer_dro_final_v1.py",
+      "sha256": "863424cf23e19491bd6a60ac27ebdfc1e8f8386f6ea8ca332c8f56a1ac5326cf"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/compact_first_stage.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/compact_first_stage.py",
+      "sha256": "5acde6ac6c41a742900256a55fed1fe65defad293ffe75d308f0c7778e02d057"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/compact_recourse_pf.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/compact_recourse_pf.py",
+      "sha256": "257adcb2c25a5a2fb8bc06fcbc937249ee2f21a833bf34e07ab14429cfeb9bd4"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/contract_matrix.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/contract_matrix.py",
+      "sha256": "3622f345768f62ed7a89ae17d1e64edf502c02711ad15b79fa36968af3ab90a6"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/energy_ledger.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/energy_ledger.py",
+      "sha256": "b76fe6ff899ed498a3750f458f8a6dd2767c2b034b08f36f4a679316d5916e9a"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/exact_transform.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/exact_transform.py",
+      "sha256": "2441c10cf9a4cd6d8f2e1cd772239edecaf6e032dbd951c9fda41dc572b016f3"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/final_snapshot.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/final_snapshot.py",
+      "sha256": "df6c4a925c712b3e65e1a8f7bd728b4d3702bf0176cf293a4536f6681ff259ce"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/local_delivery_verifier.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/local_delivery_verifier.py",
+      "sha256": "fcedbdccd7385b0fc6185c3220cd771999beadfdd981898c92278fe2c51d1747"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/lp_certificate.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/lp_certificate.py",
+      "sha256": "0a59c0de2b69eabca324b16d5cc24b41d7819f31c1154047b6814d4620dbece3"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/metadata_check.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/metadata_check.py",
+      "sha256": "02cf214789b5bc45972d5ddd38d1395d90f3ee407d30274776effd7684e380b9"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/parent.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/parent.py",
+      "sha256": "e753a0cfb08f4b3be652fc432e689478021e6f7a0c93e26e0a395a48c17a8662"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r10_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r10_common.py",
+      "sha256": "32e91a762d557f2f150208c0f56680cfb256e877789fc7ff7df10db0bb33875f"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r12_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r12_common.py",
+      "sha256": "6d7cc82aaf7dca7b4e67ba67ea415a4040d478f7412c8f25a324eacd27659319"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r12_route_adapter.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r12_route_adapter.py",
+      "sha256": "2075e09cd4dad442471c8fcce0fa6f513edfa70f41f89ba9e4c2a710ac3b16d2"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r30_audit.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r30_audit.py",
+      "sha256": "a99c3a28033f0e6cfc3f9603026c8012d2153643816452db9076c589af528530"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r30_domain.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r30_domain.py",
+      "sha256": "a3d6380564cb103da22f0f33b13415c14f1a3c02e9aa9c8545133dd5cae197ca"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r30_replay.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r30_replay.py",
+      "sha256": "f7698d1250d5780feca7f9c4180af275dad4fb0b04d8c25895b517afcfb7daae"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_common.py",
+      "sha256": "b71ac6b635de633bd99ed7c2036fcea4bf8dd429615176b8230fb3aabdb082fa"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_control.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_control.py",
+      "sha256": "169e2b4e3229e2bbca1c8a2756af52c538eed0475346b1eacc4175ef31dc0d76"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_delivery.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_delivery.py",
+      "sha256": "f5cb91c352ec8c384b99a4b32d52e2b1ee734ee81cebb5e1630077aa1925b4d5"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_incident_test.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_incident_test.py",
+      "sha256": "d6e5c0b1e71ce2d85d99547f8b371fbf38aee549d4d251d858fd4a95363d5480"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_integration.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_integration.py",
+      "sha256": "6b29d752bc50cf3b5c1165e3f8298e27dec7a09f94c242fd10a036c1ace0927e"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_master.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_master.py",
+      "sha256": "20c86cffee65c0cc2f7a5ff56bc4d6eb63674fa7a54f42a8c35ad8aed6184f36"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_model.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_model.py",
+      "sha256": "cfa025f31c455d2f89c925acb71006e926372ea04df8589d6e77e8fa8456f770"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_prepare.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_prepare.py",
+      "sha256": "9ff0f896d20bde5042ea2ca555693c912d05427c3eaadfd08cb40b1fcb97025f"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_probability.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_probability.py",
+      "sha256": "1bdfbeed61129b4113821a66bd57875158d44af78dc60e4ec9d842656e500c59"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_queue.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_queue.py",
+      "sha256": "5285a2dc84c819e281e0319f45f9fab003e954ef707e583e9ef7cdc29408e1f9"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_recourse.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_recourse.py",
+      "sha256": "cad5fcfd1e256d67a9b4f89d2938be20c523d08d77dc6491ae0fede7296b2f91"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_semantics.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_semantics.py",
+      "sha256": "09c6a9237ae283b634d470655edb432e7e59f02b112d0647e86eaf0846905c63"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r36_tests.py",
+      "sha256": "830baef58502195358493065c744f20e05629ff6ed9fafff2f93dee885e930a1"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r3_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r3_common.py",
+      "sha256": "1a0533a11046aba7dcb36a604910cf28222413b9efe9ea9749df15facae2e3ea"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r4_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r4_common.py",
+      "sha256": "7ba92ac5008bab373f6ae25b4c19d14f36cf9dff98e4ae71b42685cee324b4e2"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/run_l08_k4l4_fullst_dro_parallel_r36.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/run_l08_k4l4_fullst_dro_parallel_r36.py",
+      "sha256": "601ccfb720e5dc722624bce4ecfe4d241dfe26804a5e2c15edeb8808e7a1bda2"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/supplemental_audit.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/supplemental_audit.py",
+      "sha256": "46bfcfb14afb3e1552a8f41ff512ef61da5cc30f5f193f4f7f866456d2e2f595"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/compact_first_stage.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/compact_first_stage.py",
+      "sha256": "5acde6ac6c41a742900256a55fed1fe65defad293ffe75d308f0c7778e02d057"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/compact_recourse_pf.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/compact_recourse_pf.py",
+      "sha256": "257adcb2c25a5a2fb8bc06fcbc937249ee2f21a833bf34e07ab14429cfeb9bd4"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/contract_matrix.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/contract_matrix.py",
+      "sha256": "3622f345768f62ed7a89ae17d1e64edf502c02711ad15b79fa36968af3ab90a6"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/energy_ledger.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/energy_ledger.py",
+      "sha256": "b76fe6ff899ed498a3750f458f8a6dd2767c2b034b08f36f4a679316d5916e9a"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/exact_transform.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/exact_transform.py",
+      "sha256": "2441c10cf9a4cd6d8f2e1cd772239edecaf6e032dbd951c9fda41dc572b016f3"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/lp_certificate.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/lp_certificate.py",
+      "sha256": "0a59c0de2b69eabca324b16d5cc24b41d7819f31c1154047b6814d4620dbece3"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r10_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r10_common.py",
+      "sha256": "32e91a762d557f2f150208c0f56680cfb256e877789fc7ff7df10db0bb33875f"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r12_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r12_common.py",
+      "sha256": "6d7cc82aaf7dca7b4e67ba67ea415a4040d478f7412c8f25a324eacd27659319"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r12_route_adapter.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r12_route_adapter.py",
+      "sha256": "2075e09cd4dad442471c8fcce0fa6f513edfa70f41f89ba9e4c2a710ac3b16d2"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_audit.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_audit.py",
+      "sha256": "a99c3a28033f0e6cfc3f9603026c8012d2153643816452db9076c589af528530"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_control.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_control.py",
+      "sha256": "619a515dc51d1e6067fb4fda0a044eeb5775973c0c85d929086a46082ce79404"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_domain.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_domain.py",
+      "sha256": "a3d6380564cb103da22f0f33b13415c14f1a3c02e9aa9c8545133dd5cae197ca"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_fixed400.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_fixed400.py",
+      "sha256": "e1cb624e3d53ced1221c556f3c572f488149419222a732f6d58cb61057fed3dc"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_model.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_model.py",
+      "sha256": "a0a5ac009760148538f46bd68786e9d47ab4f560bb2f86342bae843a687607b5"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_native.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_native.py",
+      "sha256": "50c50f64a55218c0650c2327316d3605a54e9bd4189f19f0915477305dd9c702"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_plots.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_plots.py",
+      "sha256": "2794aeb260e6a47a181d630333c12592a83f270193b0d7219c42a508127d0064"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_reachability.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_reachability.py",
+      "sha256": "e0614b6ea6b47d67a6f16c1d5ca33c0170a527f8912467f3bb9fd0327eba0d60"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_replay.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_replay.py",
+      "sha256": "f7698d1250d5780feca7f9c4180af275dad4fb0b04d8c25895b517afcfb7daae"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_report.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_report.py",
+      "sha256": "84df33b7a06c501f5c4a93b0c38d5953fd82c314ffbda6693a49f4994649f36e"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_routes.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_routes.py",
+      "sha256": "230b79972a07016f665cf56080b65793648e3c772c7c72aee176d4c4223a117e"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_tests.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r30_tests.py",
+      "sha256": "d58b892d03319ddfad0c214b7567e13d0f0887824e221fdb9a087d9154e2ef65"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r3_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r3_common.py",
+      "sha256": "1a0533a11046aba7dcb36a604910cf28222413b9efe9ea9749df15facae2e3ea"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r4_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/r4_common.py",
+      "sha256": "7ba92ac5008bab373f6ae25b4c19d14f36cf9dff98e4ae71b42685cee324b4e2"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/restore_and_verify.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/restore_and_verify.py",
+      "sha256": "592ed0c5455c651501a6ff16919894999614e504e27bf9bdf6243f5023f0423f"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/run_l08_k4l4_forecast44_domain_det_r30.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/run_l08_k4l4_forecast44_domain_det_r30.py",
+      "sha256": "7601fb49749271c46d5d019178e03f2814a62a353f8af8666e3b193ef1fae905"
+    },
+    {
+      "original": "powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/run_parent.py",
+      "reference": "reference/baseline/powerai_l08/L08_K4L4_FORECAST44_DOMAIN_AND_DET_R30/tools/run_parent.py",
+      "sha256": "dd3c6172f2782a1fd3356476abf9d528ac1305c1af37cc39f2b16f3b88febb43"
+    },
+    {
+      "original": "powerai_l08/L08_MARGINAL_DRO_EXACT_ACCELERATION_R23/tools/r23_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_MARGINAL_DRO_EXACT_ACCELERATION_R23/tools/r23_common.py",
+      "sha256": "400f447a0e3062c85bcc9daec6689e519f13cb8d7d66c5e011cded80c1a910fa"
+    },
+    {
+      "original": "powerai_l08/R5_R6_RECOVERY_AND_MEMORY_CONTROL_V2/tools/control_core.py",
+      "reference": "reference/baseline/powerai_l08/R5_R6_RECOVERY_AND_MEMORY_CONTROL_V2/tools/control_core.py",
+      "sha256": "03d3dbf8b5e3e891c8573bc75675d1cefd34deea0d573d756d612ea1a480a676"
+    },
+    {
+      "original": "scripts/audits/audit_case0_compact_candidate.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_compact_candidate.py",
+      "sha256": "d9c779487cce4cb844cfb8bce2cacbeae9fb87c5171f8c78d5dd88e35cdf33da"
+    },
+    {
+      "original": "scripts/audits/audit_case0_extensive_closure.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_extensive_closure.py",
+      "sha256": "bf98f7e32a36e66eeb9e035e70c1269eacfc15b32994f278cec9823bf0d0791b"
+    },
+    {
+      "original": "scripts/audits/audit_case0_partial_candidate.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_partial_candidate.py",
+      "sha256": "569642e6015a2398276707b1332bec17f773a5ca799cd3dae3773e794269f582"
+    },
+    {
+      "original": "scripts/audits/audit_case0_partial_chain_candidate.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_partial_chain_candidate.py",
+      "sha256": "4d83896ee7cea68c3eca59811a7ddac0700adafc5e8e04f7290a47c8b7836255"
+    },
+    {
+      "original": "scripts/audits/audit_case0_partial_chain_master.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_partial_chain_master.py",
+      "sha256": "3136abfe3c305aa22bed66b7a78efb59faf7452a2781ded878229daf0f3c213a"
+    },
+    {
+      "original": "scripts/audits/audit_case0_partial_chain_native.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_partial_chain_native.py",
+      "sha256": "891bb1a0983f4bd65a88d9b699a4bbf1dc275f89b1077baa97232845fa0fad03"
+    },
+    {
+      "original": "scripts/audits/audit_case0_partial_master.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_partial_master.py",
+      "sha256": "61b1ec34b84e0e67aec214c2de87cf279bae645184d41af07fb82b0b88cad1ec"
+    },
+    {
+      "original": "scripts/audits/audit_case0_partial_native.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_partial_native.py",
+      "sha256": "4a7a905ebe4ccaf123fccce547c783ffa2a4a8a6b3324951a29e506b39f9bd2e"
+    },
+    {
+      "original": "scripts/audits/audit_case0_proposed_candidate.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_proposed_candidate.py",
+      "sha256": "105beaec330ac4e8f24d1bf784aab0d5d5d560ff0172d5f1d7c818df6574cc52"
+    },
+    {
+      "original": "scripts/audits/audit_case0_saved_candidate.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_saved_candidate.py",
+      "sha256": "4fecb714e3e0a1faccb4b1c28563296b79d12f53dbf7774258075f1296160904"
+    },
+    {
+      "original": "scripts/audits/audit_case0_saved_dual_bound.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_saved_dual_bound.py",
+      "sha256": "810614b996832454da34f5a3bab425ca9ae058a0f4eb5047b3e53b751303b889"
+    },
+    {
+      "original": "scripts/audits/audit_case0_saved_lp_bound.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_saved_lp_bound.py",
+      "sha256": "7333d02ff1668ad04d75bc73f8b139570401093679a10a6160fd411a0c2c3582"
+    },
+    {
+      "original": "scripts/audits/audit_case0_two_anchor_bound.py",
+      "reference": "reference/baseline/scripts/audits/audit_case0_two_anchor_bound.py",
+      "sha256": "06854c79ec56773f9116167481c86592ce77f1623d93d87ae8dfed6d31c87735"
+    },
+    {
+      "original": "scripts/audits/audit_formal_bank.py",
+      "reference": "reference/baseline/scripts/audits/audit_formal_bank.py",
+      "sha256": "7afde39028ab5c89f83c2e79d30825a6bf930398df110946828f81d5b9179a09"
+    },
+    {
+      "original": "scripts/audits/audit_gurobi_diagnostic.py",
+      "reference": "reference/baseline/scripts/audits/audit_gurobi_diagnostic.py",
+      "sha256": "f53421002dda1527723b515c895fe0ac14bc43289dc7f65f659e36ac3c7e4979"
+    },
+    {
+      "original": "scripts/audits/audit_mip_start.py",
+      "reference": "reference/baseline/scripts/audits/audit_mip_start.py",
+      "sha256": "013b7a20267d016621c5993f12cfe4da559aec725fb28c5351146e25d942bd82"
+    },
+    {
+      "original": "scripts/audits/audit_s01_i03.py",
+      "reference": "reference/baseline/scripts/audits/audit_s01_i03.py",
+      "sha256": "407cd2c5c8802f49792d54b6953f1c19b7843c8ed0fb21a9b285a476eacdc26b"
+    },
+    {
+      "original": "scripts/audits/audit_s01_i04.py",
+      "reference": "reference/baseline/scripts/audits/audit_s01_i04.py",
+      "sha256": "d53e160692165c045f95c0787fdbb4988580c7079609296ca64eb7e6e3e6a224"
+    },
+    {
+      "original": "scripts/audits/audit_s01_i05.py",
+      "reference": "reference/baseline/scripts/audits/audit_s01_i05.py",
+      "sha256": "2ace04b7d45249caf6e100105e64944846a2ea16724c2488df9d0ab0484ecaca"
+    },
+    {
+      "original": "scripts/audits/audit_s01_i06.py",
+      "reference": "reference/baseline/scripts/audits/audit_s01_i06.py",
+      "sha256": "f01e5f223eafb56ee7f9299c82b4481a06592907a5d5d6761b8edea4ca75b3db"
+    },
+    {
+      "original": "scripts/audits/audit_s01_i07.py",
+      "reference": "reference/baseline/scripts/audits/audit_s01_i07.py",
+      "sha256": "6ef1809a94929520deb9de51d28f797be93af63cdbd49c74599e71342c8564a2"
+    },
+    {
+      "original": "scripts/audits/audit_s01_i08_chain.py",
+      "reference": "reference/baseline/scripts/audits/audit_s01_i08_chain.py",
+      "sha256": "951054037b1a8644e72c52b10fb8c27bd5e5b82ce4ba32d4e08c3741109b0e73"
+    },
+    {
+      "original": "scripts/audits/audit_s01_i08_features.py",
+      "reference": "reference/baseline/scripts/audits/audit_s01_i08_features.py",
+      "sha256": "bc039261dc4b73fd7c04920e73bf3eb465d3f193df5f648cca6768845d0e7490"
+    },
+    {
+      "original": "scripts/audits/audit_s01_i08_moments.py",
+      "reference": "reference/baseline/scripts/audits/audit_s01_i08_moments.py",
+      "sha256": "d961abe284bfd4747686ee407386c3fbe517091261efbb5346c175bc8d776732"
+    },
+    {
+      "original": "scripts/audits/audit_s01_pack.py",
+      "reference": "reference/baseline/scripts/audits/audit_s01_pack.py",
+      "sha256": "5ae3383fd05fb33b74316d929ce7bdc34862cbe71928c99bf3a87c42bc3243f8"
+    },
+    {
+      "original": "scripts/audits/audit_s02_i01.py",
+      "reference": "reference/baseline/scripts/audits/audit_s02_i01.py",
+      "sha256": "49141087645951dc64b0dc4382ffb9d8ba1602ba7d6b35f20a76a60ec00bc758"
+    },
+    {
+      "original": "scripts/audits/audit_s02_i02.py",
+      "reference": "reference/baseline/scripts/audits/audit_s02_i02.py",
+      "sha256": "8d512f7c006ff081a08bc5fa24e11db8796803cdb0134154c3150432950ba669"
+    },
+    {
+      "original": "scripts/audits/audit_s02_i03.py",
+      "reference": "reference/baseline/scripts/audits/audit_s02_i03.py",
+      "sha256": "0e5e00b0b45b8f370097917af299ef42fa39fee697e2ecb040a51da136719867"
+    },
+    {
+      "original": "scripts/audits/audit_s03_i01.py",
+      "reference": "reference/baseline/scripts/audits/audit_s03_i01.py",
+      "sha256": "a92523a542f81be00767e723701f89de0263899c061bf05b6bac759e16a59d4a"
+    },
+    {
+      "original": "scripts/audits/audit_s03_i02.py",
+      "reference": "reference/baseline/scripts/audits/audit_s03_i02.py",
+      "sha256": "7ae8876f3ea0bf0bf4caed492c3ec259a7b80b11af27201dc5a48fb0e17f437b"
+    },
+    {
+      "original": "scripts/audits/audit_s03_i03.py",
+      "reference": "reference/baseline/scripts/audits/audit_s03_i03.py",
+      "sha256": "06924a5696083a3d1c9ea3c2be5e0e57d0087f91ccab1f2bb0ae4507235dc521"
+    },
+    {
+      "original": "scripts/audits/audit_s04_integration.py",
+      "reference": "reference/baseline/scripts/audits/audit_s04_integration.py",
+      "sha256": "c475180e3f712c6349589ffcb4134e5af170ed8be276e3350fb54e1273a50e2d"
+    },
+    {
+      "original": "scripts/audits/audit_s05_candidate_recourse.py",
+      "reference": "reference/baseline/scripts/audits/audit_s05_candidate_recourse.py",
+      "sha256": "8f5fcad0058e8d3494ee4367a93f6ec43776817678f1b6fdba12dd8d401ba12d"
+    },
+    {
+      "original": "scripts/audits/audit_s05_pending_recovery.py",
+      "reference": "reference/baseline/scripts/audits/audit_s05_pending_recovery.py",
+      "sha256": "041613210cfd024382f270d8c709ccd0de4586c2a86758a7b20c15739854714d"
+    },
+    {
+      "original": "scripts/audits/audit_saa_affine_native.py",
+      "reference": "reference/baseline/scripts/audits/audit_saa_affine_native.py",
+      "sha256": "ecc5b5ccd3e93c0749be1b06ba9d2743674c15b4e65732a0326bd46667274dcc"
+    },
+    {
+      "original": "scripts/audits/audit_zero_reduction.py",
+      "reference": "reference/baseline/scripts/audits/audit_zero_reduction.py",
+      "sha256": "cc0f4695194e0978685d4a539273ebc0f5b3bc94ea7908831da9777318fdc2d0"
+    },
+    {
+      "original": "scripts/audits/reorg_audit.py",
+      "reference": "reference/baseline/scripts/audits/reorg_audit.py",
+      "sha256": "6540dbb362eadb77753be1ff79363cb46f6b891986398f5b62b52ad3ec1ca9e6"
+    },
+    {
+      "original": "scripts/audits/settle_s05_cached_multi_anchor_bound.py",
+      "reference": "reference/baseline/scripts/audits/settle_s05_cached_multi_anchor_bound.py",
+      "sha256": "429c4fb8b2e7881349a7ae153a6e6f6ecb83bb626472fde29a03513aee575b6c"
+    },
+    {
+      "original": "scripts/audits/settle_s05_multi_anchor_bound.py",
+      "reference": "reference/baseline/scripts/audits/settle_s05_multi_anchor_bound.py",
+      "sha256": "655278569646a9535639c44db811dc6c0759e5d7a68ec77eda6a91e37d7b64d2"
+    },
+    {
+      "original": "scripts/diagnostics/profile_gurobi_rmp.py",
+      "reference": "reference/baseline/scripts/diagnostics/profile_gurobi_rmp.py",
+      "sha256": "e1b99020cc073e7e73496972e18fd6611d68464f7b43333c518c1c276cedf5e4"
+    },
+    {
+      "original": "scripts/diagnostics/profile_root_lp.py",
+      "reference": "reference/baseline/scripts/diagnostics/profile_root_lp.py",
+      "sha256": "64dca30e06db317cbbde9b18d9fe71ec9ea3c22a1da08ae9bde877094c8bd825"
+    },
+    {
+      "original": "scripts/diagnostics/run_s05_candidate_completion.py",
+      "reference": "reference/baseline/scripts/diagnostics/run_s05_candidate_completion.py",
+      "sha256": "e1f5d64b2dc448785c34e7c15999d9be0388a340b0ad0c4b7c595248729ca659"
+    },
+    {
+      "original": "scripts/diagnostics/run_s05_candidate_evaluation.py",
+      "reference": "reference/baseline/scripts/diagnostics/run_s05_candidate_evaluation.py",
+      "sha256": "d4ee6c118265ae2a830646f24dce957ab8fd67247bfcd58c363e7f46e94aa30b"
+    },
+    {
+      "original": "scripts/diagnostics/run_s05_candidate_job.py",
+      "reference": "reference/baseline/scripts/diagnostics/run_s05_candidate_job.py",
+      "sha256": "53eb9915f313017c2c9dca578e30687d8fd0aee2defff3d9bb8228983c01df66"
+    },
+    {
+      "original": "scripts/diagnostics/run_s05_candidate_probability.py",
+      "reference": "reference/baseline/scripts/diagnostics/run_s05_candidate_probability.py",
+      "sha256": "b82fbddb2c65cd08f5a2044ece94ddbcb563bc6760da65dd7771694331fbae98"
+    },
+    {
+      "original": "scripts/diagnostics/run_s05_dual_cut_bound.py",
+      "reference": "reference/baseline/scripts/diagnostics/run_s05_dual_cut_bound.py",
+      "sha256": "094bfb0d9738e41ed1dd93a1118eb93a4b0cfbe08ccc32f4e127b73ffe8a8750"
+    },
+    {
+      "original": "scripts/diagnostics/run_s05_epigraph_master.py",
+      "reference": "reference/baseline/scripts/diagnostics/run_s05_epigraph_master.py",
+      "sha256": "aca7139e37138a690f9340c6c8cc4519d25e5f91f409c97e6925236fc9d5fb14"
+    },
+    {
+      "original": "scripts/diagnostics/run_s05_relaxation_bound.py",
+      "reference": "reference/baseline/scripts/diagnostics/run_s05_relaxation_bound.py",
+      "sha256": "82afa2fb8a67ab3b4cc19abdf420097cd322d571dd8c2c514e8ae03f4048982e"
+    },
+    {
+      "original": "scripts/diagnostics/s05_cached_multi_anchor_bound.py",
+      "reference": "reference/baseline/scripts/diagnostics/s05_cached_multi_anchor_bound.py",
+      "sha256": "ac17f0345395b5b9b41a8a0a926ea4095f51b9a2735b9a8605cb54dc65c22afa"
+    },
+    {
+      "original": "scripts/diagnostics/s05_multi_anchor_bound.py",
+      "reference": "reference/baseline/scripts/diagnostics/s05_multi_anchor_bound.py",
+      "sha256": "0c4230df2c819e9ce6455c714ef0e3abba3afa5907cf7ea5d6a623f491272e73"
+    },
+    {
+      "original": "scripts/diagnostics/s05_saa_saved_dual_bound.py",
+      "reference": "reference/baseline/scripts/diagnostics/s05_saa_saved_dual_bound.py",
+      "sha256": "7f7907464d993708064f3a0e423be1b8176be14c3a58715a2e644629e24d6b39"
+    },
+    {
+      "original": "scripts/recovery/operate_saa_bound.py",
+      "reference": "reference/baseline/scripts/recovery/operate_saa_bound.py",
+      "sha256": "445be8c99f1ecae819aa34f553acc3c470da7f34e4b806d67a76507181e92106"
+    },
+    {
+      "original": "scripts/recovery/prepare_s05_probability_recovery.py",
+      "reference": "reference/baseline/scripts/recovery/prepare_s05_probability_recovery.py",
+      "sha256": "6d178b124feec73078dc788dddfacb0fb3bdf9ece117b92e82adaef03088f40e"
+    },
+    {
+      "original": "scripts/recovery/settle_s05_probability_recovery.py",
+      "reference": "reference/baseline/scripts/recovery/settle_s05_probability_recovery.py",
+      "sha256": "f8015a7a55adbc20eb3bf781caca50103ef118228f22471c83e1e115270ab548"
+    },
+    {
+      "original": "scripts/replay_legacy.py",
+      "reference": "reference/baseline/scripts/replay_legacy.py",
+      "sha256": "83a1665b45ee87b1f2bfe0567d6e928eac673a43aa50de556e198e400ff9bd3d"
+    },
+    {
+      "original": "scripts/reports/case0_figures.py",
+      "reference": "reference/baseline/scripts/reports/case0_figures.py",
+      "sha256": "823582084720a93249437f1085b9f11b73a3670c804e024febfd836a0ccb755f"
+    },
+    {
+      "original": "scripts/reports/case0_report_job.py",
+      "reference": "reference/baseline/scripts/reports/case0_report_job.py",
+      "sha256": "f25fb0714bf0ecb1f83cb1e746d1b4018072db837fb83856858dc83bf9cc966b"
+    },
+    {
+      "original": "scripts/reports/case0_summary.py",
+      "reference": "reference/baseline/scripts/reports/case0_summary.py",
+      "sha256": "40d39fb04498bb179bf1452f232d7326e019ded20ad34da89bf950da91afc1a2"
+    },
+    {
+      "original": "scripts/verification/compare_relocation.py",
+      "reference": "reference/baseline/scripts/verification/compare_relocation.py",
+      "sha256": "d2fa9a73096fa44424f8cffb830825c1edc6e5e113abed66d6d161bb9c23b69d"
+    },
+    {
+      "original": "scripts/verification/prepare_formal_template_index.py",
+      "reference": "reference/baseline/scripts/verification/prepare_formal_template_index.py",
+      "sha256": "3052cc71f826c36cb829ee4b4619e43ec66a9fe0dd4c8f21c98a4ffcbb9e2490"
+    },
+    {
+      "original": "scripts/verification/validate_formal_adapter.py",
+      "reference": "reference/baseline/scripts/verification/validate_formal_adapter.py",
+      "sha256": "489a937251b0ba19468d304690b0abbe376dfe99b34ce2b0e3cd25ac4a1a861e"
+    },
+    {
+      "original": "scripts/verification/validate_gurobi_ccg.py",
+      "reference": "reference/baseline/scripts/verification/validate_gurobi_ccg.py",
+      "sha256": "b8acab7f12553e483a75055f1a687ad6559eae790db956d67ed84a384cfb81a8"
+    },
+    {
+      "original": "scripts/verification/validate_recourse_store.py",
+      "reference": "reference/baseline/scripts/verification/validate_recourse_store.py",
+      "sha256": "30dace799ba6c791145262f7c78f22eef545800eecddff6519e32e28ef590110"
+    },
+    {
+      "original": "src/evcs_experiments/__init__.py",
+      "reference": "reference/baseline/src/evcs_experiments/__init__.py",
+      "sha256": "03e71a3865897ab13a9ddbeb9931666208f55378f4a265a789979c5691a54eb7"
+    },
+    {
+      "original": "src/evcs_experiments/ablation_bank.py",
+      "reference": "reference/baseline/src/evcs_experiments/ablation_bank.py",
+      "sha256": "15a1067652ca6a3963307b726fcd22af76a8cdfb955372e7f12ac97505b6a1d7"
+    },
+    {
+      "original": "src/evcs_experiments/auxiliary_record_revision.py",
+      "reference": "reference/baseline/src/evcs_experiments/auxiliary_record_revision.py",
+      "sha256": "a3177ab7f8fd158eb998153ab736dc4d1e0bfc923b3d33596f8cc87fb0a2a9cb"
+    },
+    {
+      "original": "src/evcs_experiments/bounded_row_relaxation.py",
+      "reference": "reference/baseline/src/evcs_experiments/bounded_row_relaxation.py",
+      "sha256": "b74c16263d25b2196c244ab770e4823fe4724411013a20f2e2491892fa51934e"
+    },
+    {
+      "original": "src/evcs_experiments/bounded_row_relaxation_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/bounded_row_relaxation_audit.py",
+      "sha256": "74714ac7d198a082654632f5960858309d5d560a3ed6d387ce703eee69a09262"
+    },
+    {
+      "original": "src/evcs_experiments/cached_bound_model.py",
+      "reference": "reference/baseline/src/evcs_experiments/cached_bound_model.py",
+      "sha256": "a4ac2865d82008f3491c171b0be1863ea1244116da484a529208c4436c5cb07b"
+    },
+    {
+      "original": "src/evcs_experiments/campaign_batch.py",
+      "reference": "reference/baseline/src/evcs_experiments/campaign_batch.py",
+      "sha256": "2b6acfa34c26d67cc6accaaaf61428d757f19a9b9b6409beea0bdba3da602b35"
+    },
+    {
+      "original": "src/evcs_experiments/candidate_dual_adapter.py",
+      "reference": "reference/baseline/src/evcs_experiments/candidate_dual_adapter.py",
+      "sha256": "affe9ceb7bdab3d8f6a1a414b9a6fa1d218bc7b6c9ea6f975a38afd4f1ccdc8f"
+    },
+    {
+      "original": "src/evcs_experiments/candidate_dual_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/candidate_dual_audit.py",
+      "sha256": "dd2abe98d7bcb39de93d2f0b1ec47e455b2f97357531b93ac71bf4c3a8cd5925"
+    },
+    {
+      "original": "src/evcs_experiments/canonical_in_attempt.py",
+      "reference": "reference/baseline/src/evcs_experiments/canonical_in_attempt.py",
+      "sha256": "ea27cc5641e930f06ed6409ebecd78caa727b1881c09e675e1b70dc1b3257346"
+    },
+    {
+      "original": "src/evcs_experiments/case0_accepted_evaluation.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_accepted_evaluation.py",
+      "sha256": "c413094757f0b16a187330d379a962f7a3b0735688286ba8c7632c6b65b3bbef"
+    },
+    {
+      "original": "src/evcs_experiments/case0_accepted_group.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_accepted_group.py",
+      "sha256": "9cce6845fe3779f265e42e7acddf3f59b56f404a4bbfaf94595eebfc6027496d"
+    },
+    {
+      "original": "src/evcs_experiments/case0_accepted_oos_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_accepted_oos_audit.py",
+      "sha256": "e02166520c24758bad7729777af237b614c24b26f179cc604d9bc3a4ffc3e1c0"
+    },
+    {
+      "original": "src/evcs_experiments/case0_accepted_plan.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_accepted_plan.py",
+      "sha256": "7a10636d988b3ec8a065e9b0c63fa973b144d6c83bbbb0dba707a175d0f46bc2"
+    },
+    {
+      "original": "src/evcs_experiments/case0_anchor_refinement.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_anchor_refinement.py",
+      "sha256": "b4dc7215ad2efb2e877474ab2147e0466e34c18eba3436e1f21baf857a101058"
+    },
+    {
+      "original": "src/evcs_experiments/case0_aro_methods.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_aro_methods.py",
+      "sha256": "bd7ae8dfbc7587b016edfe37597e6a6f6c28467cec91f7c3b06398850e411be8"
+    },
+    {
+      "original": "src/evcs_experiments/case0_aro_saved_arrays.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_aro_saved_arrays.py",
+      "sha256": "45cc1bfe4dfa5727a1a2b60cd0b27665494625c5d50d3c5f73eb5a74e0185391"
+    },
+    {
+      "original": "src/evcs_experiments/case0_aro_settlement.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_aro_settlement.py",
+      "sha256": "37d084235167666da7efa70297be25106e887d009bfd36c8d62215043b8992f8"
+    },
+    {
+      "original": "src/evcs_experiments/case0_audit_job.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_audit_job.py",
+      "sha256": "9b314a94eb4227595815082604d19688a58698e80b0a84ff62eec2b192a4b7cc"
+    },
+    {
+      "original": "src/evcs_experiments/case0_campaign.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_campaign.py",
+      "sha256": "ecdea7470f91b475388121b8ada1dfed99d642e15cb6d929b1d95aa5e7c429bf"
+    },
+    {
+      "original": "src/evcs_experiments/case0_evaluation.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_evaluation.py",
+      "sha256": "da8ca528e7b90f249434d982a0547c6db5503d7e0d7813a7a178b764e9c7d4a2"
+    },
+    {
+      "original": "src/evcs_experiments/case0_evaluation_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_evaluation_audit.py",
+      "sha256": "df944064d1a87a4e4543ce0efc35cea879ae24d087d4734e1cde04120b4b1e01"
+    },
+    {
+      "original": "src/evcs_experiments/case0_evaluation_runner.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_evaluation_runner.py",
+      "sha256": "8519dca4fd9dd3164435fcaca8bcb5650670c3c2bebd6cd5f3318d3b555c4140"
+    },
+    {
+      "original": "src/evcs_experiments/case0_inputs.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_inputs.py",
+      "sha256": "f6cac57eaa33cbb12b4fbe253db6edafc5f4fb99ba4387cc3c1b3351a073c9c1"
+    },
+    {
+      "original": "src/evcs_experiments/case0_interruption.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_interruption.py",
+      "sha256": "d3f2453289153875f189b5dc13c55ad27cf96709414a3130f1bc4d3b5e3790fc"
+    },
+    {
+      "original": "src/evcs_experiments/case0_isolation.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_isolation.py",
+      "sha256": "f341c14f8841884c4c89874c2c6bd54d69963d940f5b7bda1afa036159c830ad"
+    },
+    {
+      "original": "src/evcs_experiments/case0_memory_repair.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_memory_repair.py",
+      "sha256": "6c67a955dac21ced13a84aa30402089db80aedfafc0a9ff296b0b543c8b4e275"
+    },
+    {
+      "original": "src/evcs_experiments/case0_partial_chain.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_partial_chain.py",
+      "sha256": "26cf650d6cd79f0d7d2d838f17d1c19b6ce5408b9d5979804eb7d8dc53d4df0b"
+    },
+    {
+      "original": "src/evcs_experiments/case0_partial_cut.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_partial_cut.py",
+      "sha256": "ddcda48136c56f250ceee63bc2c284db96c26d172f24fd591ae37c5cb8dba2cd"
+    },
+    {
+      "original": "src/evcs_experiments/case0_partial_exact.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_partial_exact.py",
+      "sha256": "d0b7fc844ec31553c251779fd6a893d05742ea8d67581ebfd8f3dfc95de9ee8f"
+    },
+    {
+      "original": "src/evcs_experiments/case0_planning.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_planning.py",
+      "sha256": "3ac61aad8c54d3c92581801ed925e418e71ee914954d865333d3c9277d0d0ebd"
+    },
+    {
+      "original": "src/evcs_experiments/case0_planning_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_planning_audit.py",
+      "sha256": "683bbdc4ceca62122e0b287b8fd8ee38ab8e3e6871ecc5668ebdff2c331f2b11"
+    },
+    {
+      "original": "src/evcs_experiments/case0_profiles.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_profiles.py",
+      "sha256": "57cf31b80e960817074a47c55fb425c8d676ebe441deef36bf9fef8f7e1b001b"
+    },
+    {
+      "original": "src/evcs_experiments/case0_refinement.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_refinement.py",
+      "sha256": "a3395349ab8976d6f09fe9ad8219c926f0a51601b67eb8e822eb58f3cf495dd6"
+    },
+    {
+      "original": "src/evcs_experiments/case0_remaining_methods.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_remaining_methods.py",
+      "sha256": "ac19206413330852fdf921261c754ccabbaa77f9ce058e0ae1b291c82a5777bf"
+    },
+    {
+      "original": "src/evcs_experiments/case0_remaining_settlement.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_remaining_settlement.py",
+      "sha256": "b83e6b7ed04116584d9846bc1db08f0300ac2e3f248039cb7685207c51b72a03"
+    },
+    {
+      "original": "src/evcs_experiments/case0_saa_aro_methods.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_saa_aro_methods.py",
+      "sha256": "2046e7313015804d2eeb3554100718a7b06c359bbd5ba4ac22c3f4a86c75b1fb"
+    },
+    {
+      "original": "src/evcs_experiments/case0_saa_aro_settlement.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_saa_aro_settlement.py",
+      "sha256": "b7c9bae5b4fca9daffe7c31f11ab500c28c72fa1a074b2907c5f9922e347f57c"
+    },
+    {
+      "original": "src/evcs_experiments/case0_saa_saved_arrays.py",
+      "reference": "reference/baseline/src/evcs_experiments/case0_saa_saved_arrays.py",
+      "sha256": "ac9837f9ae789e4d198c0b55f29b8f4aad5179e20177fe8b15cae9a521131ec8"
+    },
+    {
+      "original": "src/evcs_experiments/case_inputs.py",
+      "reference": "reference/baseline/src/evcs_experiments/case_inputs.py",
+      "sha256": "753a675e7f331aad82e40c993d364b35a5c6581627965ca26535747f33cf4aa1"
+    },
+    {
+      "original": "src/evcs_experiments/ccg.py",
+      "reference": "reference/baseline/src/evcs_experiments/ccg.py",
+      "sha256": "f0edd89f5be01ef12114b983c0b58fde5e73983d4281fe0c701e0de7bf0ac55c"
+    },
+    {
+      "original": "src/evcs_experiments/checkpoint_closure.py",
+      "reference": "reference/baseline/src/evcs_experiments/checkpoint_closure.py",
+      "sha256": "f49ac95b15c1d45b58ee51ab852f863beb4c11096848550c6c4f05f8d394b20a"
+    },
+    {
+      "original": "src/evcs_experiments/checkpoint_recovery.py",
+      "reference": "reference/baseline/src/evcs_experiments/checkpoint_recovery.py",
+      "sha256": "21abcc83bb5605a68dccb30bac58343509fbf02c350af8f9bd9f1d3391f3f7c9"
+    },
+    {
+      "original": "src/evcs_experiments/cli.py",
+      "reference": "reference/baseline/src/evcs_experiments/cli.py",
+      "sha256": "6bcde4002af77b95cd5310f5fb9e936c223b7aa307d5e3d5e18a3fab28e5cfb4"
+    },
+    {
+      "original": "src/evcs_experiments/compact_recourses.py",
+      "reference": "reference/baseline/src/evcs_experiments/compact_recourses.py",
+      "sha256": "891653d3f1631c852c3a3b05cf08ed007e081f462df14854116eac0c5c128ee0"
+    },
+    {
+      "original": "src/evcs_experiments/config.py",
+      "reference": "reference/baseline/src/evcs_experiments/config.py",
+      "sha256": "d3112a5809caa11dfea09119d0ba2e8bb25370a970688d925c6bdd95ee812254"
+    },
+    {
+      "original": "src/evcs_experiments/core_method_registry.py",
+      "reference": "reference/baseline/src/evcs_experiments/core_method_registry.py",
+      "sha256": "e126f24383e338529416aed50ac08515a33d6d97893a2adfb748f82b76506494"
+    },
+    {
+      "original": "src/evcs_experiments/core_request_adapter.py",
+      "reference": "reference/baseline/src/evcs_experiments/core_request_adapter.py",
+      "sha256": "fb57081520a985928f21214aeabdabe0eb6eb5261b9b75c22554daf41562c6c1"
+    },
+    {
+      "original": "src/evcs_experiments/dual_cut_bound.py",
+      "reference": "reference/baseline/src/evcs_experiments/dual_cut_bound.py",
+      "sha256": "0cf681c7e01e7bff91a6dd1cfca9b011a2834ec3b63259557a5adf8af9d80d72"
+    },
+    {
+      "original": "src/evcs_experiments/epigraph_master.py",
+      "reference": "reference/baseline/src/evcs_experiments/epigraph_master.py",
+      "sha256": "a9de79960ad2c5b734a6216af9f2053489dbfc255856f7305cde642d2570d1d0"
+    },
+    {
+      "original": "src/evcs_experiments/evaluation_access.py",
+      "reference": "reference/baseline/src/evcs_experiments/evaluation_access.py",
+      "sha256": "f8e1b17b9f927d864e533c64a59d59f02ee2d0849e470eecc5e39f21db721946"
+    },
+    {
+      "original": "src/evcs_experiments/evaluation_batch.py",
+      "reference": "reference/baseline/src/evcs_experiments/evaluation_batch.py",
+      "sha256": "671243860fdad2956e8c3acfdcdfa9d68d4315355e79b03da5a48bab497b38f5"
+    },
+    {
+      "original": "src/evcs_experiments/evaluation_lock.py",
+      "reference": "reference/baseline/src/evcs_experiments/evaluation_lock.py",
+      "sha256": "4e8826994ad3f893340d642296a953ecfe0c9346b5d39385c7492487398a107b"
+    },
+    {
+      "original": "src/evcs_experiments/evaluation_mechanisms.py",
+      "reference": "reference/baseline/src/evcs_experiments/evaluation_mechanisms.py",
+      "sha256": "fb64be281f6d149a1f675d7092b1e6c44af3fb957f38c13d4eb4fa95d7cbbe2d"
+    },
+    {
+      "original": "src/evcs_experiments/evaluation_metrics.py",
+      "reference": "reference/baseline/src/evcs_experiments/evaluation_metrics.py",
+      "sha256": "996aa6c0525d5a7e1feab7cafc3d45e67279b47df5ecb0e571440f586e96de88"
+    },
+    {
+      "original": "src/evcs_experiments/evaluation_physical.py",
+      "reference": "reference/baseline/src/evcs_experiments/evaluation_physical.py",
+      "sha256": "b9b7f211ed39c4011e1e8cf26fb6716a96b0a39581c79df6989c6a7ce1ee89e3"
+    },
+    {
+      "original": "src/evcs_experiments/evaluation_statistics.py",
+      "reference": "reference/baseline/src/evcs_experiments/evaluation_statistics.py",
+      "sha256": "73b9be9419c80456a32bbb7049b8342c0d06f6ef9a6734cb78f5d6a5d50c8cf0"
+    },
+    {
+      "original": "src/evcs_experiments/evidence.py",
+      "reference": "reference/baseline/src/evcs_experiments/evidence.py",
+      "sha256": "dcb8ef622b63994a806c1c4384341a90e27c625bba4038cd1fa62265b422c040"
+    },
+    {
+      "original": "src/evcs_experiments/extensive.py",
+      "reference": "reference/baseline/src/evcs_experiments/extensive.py",
+      "sha256": "92aa746c362f438e7e2bbc0aa3e99cdfad8c3353ff82adbf03aa1313018e0ec4"
+    },
+    {
+      "original": "src/evcs_experiments/failure_carryover.py",
+      "reference": "reference/baseline/src/evcs_experiments/failure_carryover.py",
+      "sha256": "7e0590f9ce7b70c84b78a31e5d58d64c95578fb732a415a10537f01718c49035"
+    },
+    {
+      "original": "src/evcs_experiments/first_stage.py",
+      "reference": "reference/baseline/src/evcs_experiments/first_stage.py",
+      "sha256": "ab48ec4bd06a8ca97e514f6d12f3f726759ef692492e119a295eb2f687415aed"
+    },
+    {
+      "original": "src/evcs_experiments/first_stage_check.py",
+      "reference": "reference/baseline/src/evcs_experiments/first_stage_check.py",
+      "sha256": "c1c6ba36e2df224235201215daed273ac1c6d0b9bafc1efa13fdbbca4b7b4468"
+    },
+    {
+      "original": "src/evcs_experiments/forecast_routes.py",
+      "reference": "reference/baseline/src/evcs_experiments/forecast_routes.py",
+      "sha256": "17ab3a595af2dcca7d45e4f4c6b5df09651e0a9813a6aace4f64c4d33834af76"
+    },
+    {
+      "original": "src/evcs_experiments/forecast_tasks.py",
+      "reference": "reference/baseline/src/evcs_experiments/forecast_tasks.py",
+      "sha256": "3e9585b3497b1d960d1f3ebca68d8c4da76938f8461b8cf395bbf151f76a1b55"
+    },
+    {
+      "original": "src/evcs_experiments/formal_bank.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_bank.py",
+      "sha256": "ecb0124c8fe6a082a7c87d22b5f1aedfbf77d87558f3a3629112f58edacd6b0a"
+    },
+    {
+      "original": "src/evcs_experiments/formal_onset.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_onset.py",
+      "sha256": "95efb788faddb6247aa9067385afcc799eeb9807684d778492de18680e74e181"
+    },
+    {
+      "original": "src/evcs_experiments/formal_physical_inputs.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_physical_inputs.py",
+      "sha256": "c179b09603df00c5f7afd1ed6756c8e49c2a555261500ea9793181bc88372828"
+    },
+    {
+      "original": "src/evcs_experiments/formal_planning.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_planning.py",
+      "sha256": "d03c621e71f9f900d0b4b5f31b770d62217c3c0b0fd5a3280dcac65809c85ad7"
+    },
+    {
+      "original": "src/evcs_experiments/formal_planning_worker.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_planning_worker.py",
+      "sha256": "398bdd43075501ac52ffb45a2994921bec98b1fa8443893dcc2e866d3c5c73c5"
+    },
+    {
+      "original": "src/evcs_experiments/formal_protocol.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_protocol.py",
+      "sha256": "1bd140456082b691689eb1e1c7411717dd385202163fdfbd3cfa02c10cfaa220"
+    },
+    {
+      "original": "src/evcs_experiments/formal_record_settlement.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_record_settlement.py",
+      "sha256": "e22be05ddc06cacd95c5fd40749e284f0fed18736a44e2b207eb997cd0f4c872"
+    },
+    {
+      "original": "src/evcs_experiments/formal_result_bridge.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_result_bridge.py",
+      "sha256": "4578dfabf7721e495489d7c8832235e1d924db2f5ec43fa210afc12328aa56c7"
+    },
+    {
+      "original": "src/evcs_experiments/formal_saa.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_saa.py",
+      "sha256": "c31eab7334a57dc37211033f7f90cfe1418cf67b7c771d835ebae8afe0775be6"
+    },
+    {
+      "original": "src/evcs_experiments/formal_scenarios.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_scenarios.py",
+      "sha256": "1cb6cc14c4a33e244b915b1205d2c77299503d353ef47e1ab506552552804b27"
+    },
+    {
+      "original": "src/evcs_experiments/formal_validator_recovery.py",
+      "reference": "reference/baseline/src/evcs_experiments/formal_validator_recovery.py",
+      "sha256": "7c2c1bf5dad2b07dd1bd51873819dc9860709a2c5f8bdaab07bcce047ee68c6c"
+    },
+    {
+      "original": "src/evcs_experiments/joint_scenarios.py",
+      "reference": "reference/baseline/src/evcs_experiments/joint_scenarios.py",
+      "sha256": "580792f0e82aa62306f2e7f92fa46ec0d302fba924cfa92c34083b516d369f9f"
+    },
+    {
+      "original": "src/evcs_experiments/lazy_recourses.py",
+      "reference": "reference/baseline/src/evcs_experiments/lazy_recourses.py",
+      "sha256": "ddab8fb3464537aaa16f9da1c79d6b74c3930001a607ebad077d594d19da35b4"
+    },
+    {
+      "original": "src/evcs_experiments/line_outages.py",
+      "reference": "reference/baseline/src/evcs_experiments/line_outages.py",
+      "sha256": "0afaf402ffc901f728114b3a7d63b54d0d8c414b024f4df56d6a7a02912e2b60"
+    },
+    {
+      "original": "src/evcs_experiments/load_scenarios.py",
+      "reference": "reference/baseline/src/evcs_experiments/load_scenarios.py",
+      "sha256": "a396376266e3d81e6b5fa14481312bac8ccd24d0f4fe7d0a7002cbed0bf611e7"
+    },
+    {
+      "original": "src/evcs_experiments/moment_calibration.py",
+      "reference": "reference/baseline/src/evcs_experiments/moment_calibration.py",
+      "sha256": "71920849054ed0e022c426719c745ae7a5d6aceaff8ebb35ff4d4a84f9fc6c8e"
+    },
+    {
+      "original": "src/evcs_experiments/multi_anchor_bound_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/multi_anchor_bound_audit.py",
+      "sha256": "6f21cb3f21a8e4403e870aef56b8b6c5d108784b3e89f4b5055279a8a401a70c"
+    },
+    {
+      "original": "src/evcs_experiments/multi_anchor_epigraph.py",
+      "reference": "reference/baseline/src/evcs_experiments/multi_anchor_epigraph.py",
+      "sha256": "6de35e00138c602d5772d35b8337868b403072e6b7ce28e4643a382ebfb6c489"
+    },
+    {
+      "original": "src/evcs_experiments/native_gurobi.py",
+      "reference": "reference/baseline/src/evcs_experiments/native_gurobi.py",
+      "sha256": "2d31de30548c673bfed8929e714a4a398f0931dbddbca0c9f6e3b0ee6a8bdd55"
+    },
+    {
+      "original": "src/evcs_experiments/native_highs.py",
+      "reference": "reference/baseline/src/evcs_experiments/native_highs.py",
+      "sha256": "fe1849effb58bf68e9d73ad2b251159e1e9e307f4ac30981bfb9bd05e18e49e1"
+    },
+    {
+      "original": "src/evcs_experiments/onset_bank.py",
+      "reference": "reference/baseline/src/evcs_experiments/onset_bank.py",
+      "sha256": "102b2b880f50cb973c1600f9ba45b866dc1e750bc24099ef75836620e683891c"
+    },
+    {
+      "original": "src/evcs_experiments/onset_physical_inputs.py",
+      "reference": "reference/baseline/src/evcs_experiments/onset_physical_inputs.py",
+      "sha256": "513cc94211554ebca4e14f27103c750a0f1cde2729c1ad7ba32f8d2ea33399de"
+    },
+    {
+      "original": "src/evcs_experiments/onset_planning.py",
+      "reference": "reference/baseline/src/evcs_experiments/onset_planning.py",
+      "sha256": "947f9e632f37a3e01b1294b465318eb2528a00cc028d5222d4c37cdee26284c6"
+    },
+    {
+      "original": "src/evcs_experiments/physical_ablations.py",
+      "reference": "reference/baseline/src/evcs_experiments/physical_ablations.py",
+      "sha256": "9fa7963efe669d8f515795cb5fbcb3e6ea4ac5a8ed675250e55d7ab5c0290fe0"
+    },
+    {
+      "original": "src/evcs_experiments/physical_inputs.py",
+      "reference": "reference/baseline/src/evcs_experiments/physical_inputs.py",
+      "sha256": "f78f31ad08fab44da4fa3d468f2a794966b799f72bd44e9aa26ba1aafacef65c"
+    },
+    {
+      "original": "src/evcs_experiments/planning_audit_pipeline.py",
+      "reference": "reference/baseline/src/evcs_experiments/planning_audit_pipeline.py",
+      "sha256": "982dc1a256c91e56f7c21c6d273f42ea39ebc6d36db2fd03e5ba32592fdd006a"
+    },
+    {
+      "original": "src/evcs_experiments/planning_budget.py",
+      "reference": "reference/baseline/src/evcs_experiments/planning_budget.py",
+      "sha256": "19a28a44898732455d0d30c674f5be8807be9b834d6e3a67e1a3d4f7a7356b0b"
+    },
+    {
+      "original": "src/evcs_experiments/probability.py",
+      "reference": "reference/baseline/src/evcs_experiments/probability.py",
+      "sha256": "39a33c1dab694a65113eeb9424c2eaf7e056d4e3478ec4d0f3c84b454754d68c"
+    },
+    {
+      "original": "src/evcs_experiments/probability_check.py",
+      "reference": "reference/baseline/src/evcs_experiments/probability_check.py",
+      "sha256": "9c0aa4e6088342ccdb0793436debd018f95e4728530eeec65395418b21faa773"
+    },
+    {
+      "original": "src/evcs_experiments/probability_phase1.py",
+      "reference": "reference/baseline/src/evcs_experiments/probability_phase1.py",
+      "sha256": "3c007f45403c4f11483fee52ba4cd1dc78c6c2e761857d15f2ad27884dc5b0e6"
+    },
+    {
+      "original": "src/evcs_experiments/queue_attempt_allocation.py",
+      "reference": "reference/baseline/src/evcs_experiments/queue_attempt_allocation.py",
+      "sha256": "1a0a58db99676ed7dee1b38de09062a77192330aca43e5317af3ed748b4f1589"
+    },
+    {
+      "original": "src/evcs_experiments/random_streams.py",
+      "reference": "reference/baseline/src/evcs_experiments/random_streams.py",
+      "sha256": "ea030fe45619bc57c562cde19852d32d68362b4602cad11cdaeed7ee0753bd9f"
+    },
+    {
+      "original": "src/evcs_experiments/raw_master_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/raw_master_audit.py",
+      "sha256": "6effd3de670e9368146b034b9e9342347f629aef26740967e64f0dde5394d896"
+    },
+    {
+      "original": "src/evcs_experiments/raw_plan_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/raw_plan_audit.py",
+      "sha256": "07a05422480c1df23572fc4fe94768e327184ae27f040f9c7152ac3262db6bce"
+    },
+    {
+      "original": "src/evcs_experiments/raw_template_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/raw_template_audit.py",
+      "sha256": "2bb4e7b7691ed5069af244b062230ab2605c248c2d72030b4d0566fc85193ce9"
+    },
+    {
+      "original": "src/evcs_experiments/reactive_support_model.py",
+      "reference": "reference/baseline/src/evcs_experiments/reactive_support_model.py",
+      "sha256": "6f415d3d112c1331bcea0faa3b91e13bf9ec06d7a135a7763c18b3cbf2886609"
+    },
+    {
+      "original": "src/evcs_experiments/recourse.py",
+      "reference": "reference/baseline/src/evcs_experiments/recourse.py",
+      "sha256": "84c2a9ad686bf0caeee6b1bc708236421ec4c354d7504611212367f724fe3ba5"
+    },
+    {
+      "original": "src/evcs_experiments/recourse_check.py",
+      "reference": "reference/baseline/src/evcs_experiments/recourse_check.py",
+      "sha256": "b453885bf50bf5798d7be51cc1731293df1d6f29514f2a8d9a9d24a0bd5b76fa"
+    },
+    {
+      "original": "src/evcs_experiments/recourse_store.py",
+      "reference": "reference/baseline/src/evcs_experiments/recourse_store.py",
+      "sha256": "33dc70b866966722a5b08181618c431212befb08a99441f948e0f68bab987705"
+    },
+    {
+      "original": "src/evcs_experiments/recourse_template_index.py",
+      "reference": "reference/baseline/src/evcs_experiments/recourse_template_index.py",
+      "sha256": "0b0c0dc9873c02363a4fd7d6d52560fe634cd972a2bde359fc9370d1999f966b"
+    },
+    {
+      "original": "src/evcs_experiments/relaxation_bound.py",
+      "reference": "reference/baseline/src/evcs_experiments/relaxation_bound.py",
+      "sha256": "cdef367db7beab2b654e022e32d2bd295144c9587878b0b14d1c40bd618c9078"
+    },
+    {
+      "original": "src/evcs_experiments/road_connectors.py",
+      "reference": "reference/baseline/src/evcs_experiments/road_connectors.py",
+      "sha256": "7240ab42253a2b9d3ae6b0ddaf23eeb0c3934b9d456ebafe7d1762997c3a425a"
+    },
+    {
+      "original": "src/evcs_experiments/road_disruptions.py",
+      "reference": "reference/baseline/src/evcs_experiments/road_disruptions.py",
+      "sha256": "53a5c5272a51fdad1cccc95abafd426a4d3f9476744cd367651f65db6263e86f"
+    },
+    {
+      "original": "src/evcs_experiments/runtime/__init__.py",
+      "reference": "reference/baseline/src/evcs_experiments/runtime/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "src/evcs_experiments/runtime/jobctl.py",
+      "reference": "reference/baseline/src/evcs_experiments/runtime/jobctl.py",
+      "sha256": "a8aac6131eb3e9768028b25251c5a48d01f425890cc9086306d043a1dead2bb4"
+    },
+    {
+      "original": "src/evcs_experiments/saa_bound_authority.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_bound_authority.py",
+      "sha256": "08e7fc2764e0e19a0b8756e2ba8b84912b474ba3f51851724a880097378c54a8"
+    },
+    {
+      "original": "src/evcs_experiments/saa_candidate_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_candidate_audit.py",
+      "sha256": "1ccff5031a9809b08bc83d3dd0a104ee7a78497700dcc4a8b961922c3d01147e"
+    },
+    {
+      "original": "src/evcs_experiments/saa_candidate_warm_start.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_candidate_warm_start.py",
+      "sha256": "f1c3fc67e34f03e2a659e5fcbd9cc13f21d75f5ddd1ead3e3e1a5b194dd31694"
+    },
+    {
+      "original": "src/evcs_experiments/saa_completed_phase_recovery.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_completed_phase_recovery.py",
+      "sha256": "397313c96cfda7725ace88ca0af0fd2cd24f768e84da69ae48f234f735e1fb69"
+    },
+    {
+      "original": "src/evcs_experiments/saa_composite_record.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_composite_record.py",
+      "sha256": "0e98e7c94b9ec96cd4cea2b487eb17b9a138701ac2ada21f1bff5d16f97dd163"
+    },
+    {
+      "original": "src/evcs_experiments/saa_dual_bound.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_dual_bound.py",
+      "sha256": "034dd17d999d66b23dfe69cfd016ce6e47e912d848707e13743a75164e796265"
+    },
+    {
+      "original": "src/evcs_experiments/saa_failure_carryover.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_failure_carryover.py",
+      "sha256": "3f42784b2b50eae775632180bb77a66b8c2c2ccbfed6f2edd904311e72b552c5"
+    },
+    {
+      "original": "src/evcs_experiments/saa_fixed_plan.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_fixed_plan.py",
+      "sha256": "4100be43a570b0ef8ba7d507674b06dabbc1a481326f9e949cfff6891f6e09cc"
+    },
+    {
+      "original": "src/evcs_experiments/saa_fixed_plan_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_fixed_plan_audit.py",
+      "sha256": "e11367820620df0663501ebab45fa6c171b1a5e638380ac9075282caf89052ef"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped.py",
+      "sha256": "8851f3754ca4ff676047c9aecb95b0c85d962422edcf93c011fa1105bcea9cde"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped_audit_bridge.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped_audit_bridge.py",
+      "sha256": "61d4e56d8fb13913030ba8d5df0c17ea696f085ae0d618385de8770f62e0ba38"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped_candidate.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped_candidate.py",
+      "sha256": "339d3822f46b01ae6b9c9a21a23947012f2788bc620bfadf48d3cb12c2fb4844"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped_failure_debt.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped_failure_debt.py",
+      "sha256": "2ed40f3ca83a24a57f1377e113960f67ceeea27f90d65a1787732b32fefc1cd6"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped_formal.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped_formal.py",
+      "sha256": "6dcba0426835dcf6d5e785b6606d94f374b37ffd3af1e8ae43fde3e560f87ab5"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped_master_evidence.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped_master_evidence.py",
+      "sha256": "b969a66ca3a207adfe7f12dbf86f878c0d197aa2bef63002ad55d451f4434724"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped_native.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped_native.py",
+      "sha256": "aa27e5f56f106815821ad1873a4513596d322e62279a19b3c66d152421f5d8b2"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped_parent.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped_parent.py",
+      "sha256": "b01de3a03594516c4ed7106d1acd13e8fcc80119662b5ca7d02af80de558accd"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped_provider.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped_provider.py",
+      "sha256": "808a186619a580a3b3e066eac423029e5d7e7a4a5aa269e2ce9fb91b257a6894"
+    },
+    {
+      "original": "src/evcs_experiments/saa_l_shaped_worker.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_l_shaped_worker.py",
+      "sha256": "c37ad21d0c274cb61853d185f300a93cf821987dd48aa7dc011fd5468b554c74"
+    },
+    {
+      "original": "src/evcs_experiments/saa_master_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_master_audit.py",
+      "sha256": "30f5abae04bed1b3da94485bdf42cd9625378e8157b1758d16d31967a107133c"
+    },
+    {
+      "original": "src/evcs_experiments/saa_memory_recovery.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_memory_recovery.py",
+      "sha256": "98f5a80d8d2c65d3c5e84828534bf20b40bce0f84be60439d6dfa782c235bb7e"
+    },
+    {
+      "original": "src/evcs_experiments/saa_planning_pipeline.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_planning_pipeline.py",
+      "sha256": "652fe1420832b695c12bdbf2be780ffa23ab7aa65537e63c531613e0cfc7e61c"
+    },
+    {
+      "original": "src/evcs_experiments/saa_planning_worker.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_planning_worker.py",
+      "sha256": "9a7a0f2012646c44caf52d46d7ac2c07fdcc1d500a8cf9e57180fa541e6462e4"
+    },
+    {
+      "original": "src/evcs_experiments/saa_record_bridge.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_record_bridge.py",
+      "sha256": "283b6db1822855ce53a5ed380365b0c8ff48cd529a29d9e158763bc0f3d4e85a"
+    },
+    {
+      "original": "src/evcs_experiments/saa_recovery_ledger.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_recovery_ledger.py",
+      "sha256": "7d2bedec3a031274a8aa18f87e8e10fbdb2101c2ce12133ec3219a2c72f8d6f5"
+    },
+    {
+      "original": "src/evcs_experiments/saa_saved_dual_adapter.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_saved_dual_adapter.py",
+      "sha256": "93e04d8ce5da4e0b9bcea97c9633b2dfe87d9335f879eefd86ca4b2c0719b735"
+    },
+    {
+      "original": "src/evcs_experiments/saa_saved_model_expense.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_saved_model_expense.py",
+      "sha256": "12578b41dfbc67282b920fab92e287e773dee611bd8090ecdae75bbe03a7915a"
+    },
+    {
+      "original": "src/evcs_experiments/saa_saved_model_recovery.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_saved_model_recovery.py",
+      "sha256": "2c12009a691cbf80bfcec6dbe54615f0328950fc2a7276078f96b5b492adddd7"
+    },
+    {
+      "original": "src/evcs_experiments/saa_streaming.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_streaming.py",
+      "sha256": "c6b16206c66d5d5997fd902080937be24376aff28495c5e86fe1455024edb845"
+    },
+    {
+      "original": "src/evcs_experiments/saa_streaming_audit.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_streaming_audit.py",
+      "sha256": "eaeb80606a651c123f4b32a788b2613d06e53cbc7e1b0f1418f85f55f2276164"
+    },
+    {
+      "original": "src/evcs_experiments/saa_streaming_solve.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_streaming_solve.py",
+      "sha256": "58a0bf1c02748a0a8adfce5d1790a0c782d1c367a3a345599aa78cfad82c9284"
+    },
+    {
+      "original": "src/evcs_experiments/saa_streaming_store.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_streaming_store.py",
+      "sha256": "47b97cb7dee8ae81eac3785f47286a76e76f2596b8be4f4a7ebd39ead4b55c86"
+    },
+    {
+      "original": "src/evcs_experiments/saa_validator_recovery.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_validator_recovery.py",
+      "sha256": "94aab0dc330421ea55c8a4b5e62b85a49dcbde806b0e506cfc2c3895fc413dec"
+    },
+    {
+      "original": "src/evcs_experiments/saa_warm_start_recovery.py",
+      "reference": "reference/baseline/src/evcs_experiments/saa_warm_start_recovery.py",
+      "sha256": "7943308d5707e1f60d8e8927e147e099ac3b1840b576a289bc4b19586856fc46"
+    },
+    {
+      "original": "src/evcs_experiments/scenario_features.py",
+      "reference": "reference/baseline/src/evcs_experiments/scenario_features.py",
+      "sha256": "f4717ed27b5eb6411791ab5beb6d0f6b5b571b5cabd3c075a0861959d9d29f7a"
+    },
+    {
+      "original": "src/evcs_experiments/sealed_plan_record.py",
+      "reference": "reference/baseline/src/evcs_experiments/sealed_plan_record.py",
+      "sha256": "46c67b3b27bead4e7c1a27bd748f7ada576a37f2d670dc1bd56932d8dee2fd6e"
+    },
+    {
+      "original": "src/evcs_experiments/task_replay.py",
+      "reference": "reference/baseline/src/evcs_experiments/task_replay.py",
+      "sha256": "63019d8424ddaf77e5a00f4539c57b3317c55696f97440d3fb04fa7c7c1c2e3c"
+    },
+    {
+      "original": "src/evcs_experiments/validation/__init__.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original": "src/evcs_experiments/validation/export_s01_pack.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/export_s01_pack.py",
+      "sha256": "d6921c5ae38f8edf05e8615d4bfbf01084d56f5bf63ffc839884fef78cb90f3f"
+    },
+    {
+      "original": "src/evcs_experiments/validation/profile_s03_scale.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/profile_s03_scale.py",
+      "sha256": "8454821c8035de4fa05013d121489dd7d7af3fa1b4c9c45bce27fc18705c8efc"
+    },
+    {
+      "original": "src/evcs_experiments/validation/s02_toys.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/s02_toys.py",
+      "sha256": "89a2d57d38d099a8bb77205a4138244838407d11679e0d19ae350b4c1dd7fc29"
+    },
+    {
+      "original": "src/evcs_experiments/validation/s03_toys.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/s03_toys.py",
+      "sha256": "70908f17f39b9d4af6fb97f2922a56c79e4092482b1485e8e84d8e8b0cd5ee4d"
+    },
+    {
+      "original": "src/evcs_experiments/validation/s04_raw_fixture.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/s04_raw_fixture.py",
+      "sha256": "ad292e8d40dd41c1ea7b8b4e350449e4888443bef3faeaedc0f0da631401567e"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s01_inputs.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s01_inputs.py",
+      "sha256": "cd190aa0521104c3759af8ef2e225cd53925ae5c566c512d4f1d66339d6dd158"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s01_joint.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s01_joint.py",
+      "sha256": "3dce99e69cfcfc9a31977b08af639bd4726134a7c288e7da05933f7a474dc55c"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s01_lines.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s01_lines.py",
+      "sha256": "b1be48cbd41e3002a88587b860c5455550f7a383f5e3fc309aa823c5f081c4e7"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s01_load.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s01_load.py",
+      "sha256": "5a2cc317cee7fe12fed8b7a53f2fe7866419cebda460d7e7e0d609bc4340cc4e"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s01_replay.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s01_replay.py",
+      "sha256": "ae07087b29e8e7693c21b9135044c35e6cdb8342f9c110e92b40edaa3613582a"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s01_roads.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s01_roads.py",
+      "sha256": "a5ca6e9959acaf5324ae1617cbc79d2d6105c30736774b4ac3410f695e19cee0"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s01_routes.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s01_routes.py",
+      "sha256": "2ce96bacf3b1368218c9ebfa5c7fc13884c4530da7ccebaff74810dbaa4122d0"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s01_wind.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s01_wind.py",
+      "sha256": "a4a652fd918878e46544e86417a915aa22c178914dc879a04b0c5a30c627cec0"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s02_completion.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s02_completion.py",
+      "sha256": "bb8e4628accdc2a7d9706258d3ea26c37246e7177fbc324583ac15a5f115f2ec"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s02_first_stage.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s02_first_stage.py",
+      "sha256": "ba7f2ff7abb0be25e5d9aec56427b301f32a9fe49cd7aba9b51c3d942e934f8f"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s02_recourse.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s02_recourse.py",
+      "sha256": "89a019f7836ee41838756d84368c91a2249e555157872a0d5dda21a8d05be49f"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s03_ccg.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s03_ccg.py",
+      "sha256": "5d922b5ab9c7349bb653057875c66bfd379bb12eb009ef576b1e5f86ff1376e8"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s03_extensive.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s03_extensive.py",
+      "sha256": "ae888c0b8edee9bd108b7b94505e0053f1010a92480d701094ddd2b996fbf02f"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s03_probability.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s03_probability.py",
+      "sha256": "55cbd3c52f0a50b4174b4caa9cfb5464dd9d0caf9f7e25c53c957f61a3db0fb4"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s03_scale_ccg.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s03_scale_ccg.py",
+      "sha256": "1c4328446d84f9e006ea3ed6d5d524f3d7ed9cebd7ae22e2f23d6e1d0a60bdc2"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s04_foundation.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s04_foundation.py",
+      "sha256": "70cb5ba53c66f5409be2fa7145565b67876fe818e10554aa78e83accbd57e3b4"
+    },
+    {
+      "original": "src/evcs_experiments/validation/validate_s04_integration.py",
+      "reference": "reference/baseline/src/evcs_experiments/validation/validate_s04_integration.py",
+      "sha256": "e90f28dbaed65dc1df31ff3a06641ecd66aaef0e01165f9cbab69bae05104bac"
+    },
+    {
+      "original": "src/evcs_experiments/wind_field.py",
+      "reference": "reference/baseline/src/evcs_experiments/wind_field.py",
+      "sha256": "94037a716b93ff1311a0fecd28315108ee76af9c059a4cf68a0c697cd36d6304"
+    },
+    {
+      "original": "src/evcs_experiments/wind_scenarios.py",
+      "reference": "reference/baseline/src/evcs_experiments/wind_scenarios.py",
+      "sha256": "c04d48884755f02a397c1c8bf022d15faea7f0de42424683ceaddae8c15f9d27"
+    },
+    {
+      "original": "src/evcs_experiments/zero_presolve.py",
+      "reference": "reference/baseline/src/evcs_experiments/zero_presolve.py",
+      "sha256": "1912f414c8eff10a04f8050b8c7a8367b64f0b4e51a861beee7b00e757d21a15"
+    },
+    {
+      "original": "tests/fixtures/saa_l_shaped_queue_worker.py",
+      "reference": "reference/baseline/tests/fixtures/saa_l_shaped_queue_worker.py",
+      "sha256": "bb7c10401ceb1ea7fbfe46790a55cf56a1e070fe1918c6fbe968bea9f0f5530b"
+    },
+    {
+      "original": "tests/recourse_fixtures.py",
+      "reference": "reference/baseline/tests/recourse_fixtures.py",
+      "sha256": "6cff477a8289dac92c71ed703c26972229b299342763425891504b15781227fb"
+    },
+    {
+      "original": "tests/test_ablation_bank.py",
+      "reference": "reference/baseline/tests/test_ablation_bank.py",
+      "sha256": "2e29b3bcc97fb0c24d7d28242ff5903302900a77edab52e10758f2ac504909b1"
+    },
+    {
+      "original": "tests/test_auxiliary_record_revision.py",
+      "reference": "reference/baseline/tests/test_auxiliary_record_revision.py",
+      "sha256": "483f652ac9a98591b0f9fb5086639f02f537fa28f748034639c161ed12920c59"
+    },
+    {
+      "original": "tests/test_bank_worker_deadline.py",
+      "reference": "reference/baseline/tests/test_bank_worker_deadline.py",
+      "sha256": "2d830eec7b76db79fd3555de026972ba728f18b92e7de29286e0a5dfb43961d7"
+    },
+    {
+      "original": "tests/test_bounded_row_relaxation.py",
+      "reference": "reference/baseline/tests/test_bounded_row_relaxation.py",
+      "sha256": "a45c164b0b916ef44e0f591434a4e91fa535879d84c0a2cd7fcbc583ecb7e3b4"
+    },
+    {
+      "original": "tests/test_bounded_row_relaxation_audit.py",
+      "reference": "reference/baseline/tests/test_bounded_row_relaxation_audit.py",
+      "sha256": "af6b5c445a5e782276eec8ec1888a78122e3c864af51ca5fbf6d843757e59139"
+    },
+    {
+      "original": "tests/test_cached_bound_model.py",
+      "reference": "reference/baseline/tests/test_cached_bound_model.py",
+      "sha256": "f1dd91138032743c93287cde993c60d1b6d7c8a5c0581c21fb76ddbc1ca4290a"
+    },
+    {
+      "original": "tests/test_cached_multi_anchor_bound_settlement.py",
+      "reference": "reference/baseline/tests/test_cached_multi_anchor_bound_settlement.py",
+      "sha256": "3f7143b50b0f6eec341ea841ea457b1b2bf1b4842709b0f2e1fe13233293e5e5"
+    },
+    {
+      "original": "tests/test_cached_multi_anchor_supervised.py",
+      "reference": "reference/baseline/tests/test_cached_multi_anchor_supervised.py",
+      "sha256": "b08c0ccd31d291380f427a0ed383e3b74757e2d0e4f4e04d9ccd2dff5e193687"
+    },
+    {
+      "original": "tests/test_campaign_batch.py",
+      "reference": "reference/baseline/tests/test_campaign_batch.py",
+      "sha256": "c285259fd1bcccd171f0111fc0c70ed488b6f31ad968b9be569f595d6ec38542"
+    },
+    {
+      "original": "tests/test_candidate_dual_adapter.py",
+      "reference": "reference/baseline/tests/test_candidate_dual_adapter.py",
+      "sha256": "c224f32ff1410d38e8dbc5e10a1428ae1b0b83cb05f3526336878246265324fd"
+    },
+    {
+      "original": "tests/test_candidate_dual_audit.py",
+      "reference": "reference/baseline/tests/test_candidate_dual_audit.py",
+      "sha256": "eb0191be9569a3cb2152a7285d8be5800f078ef09f6f73cd792f019a0771dd51"
+    },
+    {
+      "original": "tests/test_canonical_in_attempt.py",
+      "reference": "reference/baseline/tests/test_canonical_in_attempt.py",
+      "sha256": "a3b7cd89c188c5ac8f68592ff99d8d57e2bc08493dc5ffdeadf31550a6704a20"
+    },
+    {
+      "original": "tests/test_canonical_publication_gate.py",
+      "reference": "reference/baseline/tests/test_canonical_publication_gate.py",
+      "sha256": "0799c64c9957b90801c9f3f77a6c030813d2f8b0efeaeeed1b2985297477fa1c"
+    },
+    {
+      "original": "tests/test_case0_accepted_evaluation.py",
+      "reference": "reference/baseline/tests/test_case0_accepted_evaluation.py",
+      "sha256": "86452f2176b1432241893db87086d7973e21a801466a0f50eee5e95512c48ff9"
+    },
+    {
+      "original": "tests/test_case0_accepted_oos_audit.py",
+      "reference": "reference/baseline/tests/test_case0_accepted_oos_audit.py",
+      "sha256": "bf37fee83bb6848a2213470b11cabc8859075ff2a2561a7d528efd78fea4be55"
+    },
+    {
+      "original": "tests/test_case0_accepted_plan.py",
+      "reference": "reference/baseline/tests/test_case0_accepted_plan.py",
+      "sha256": "3bdb1820379ba6db2a6ac8fa8319abc1b6e91516e75b1ac9acfde79f7b434d7e"
+    },
+    {
+      "original": "tests/test_case0_accepted_plan_independent.py",
+      "reference": "reference/baseline/tests/test_case0_accepted_plan_independent.py",
+      "sha256": "276ebb68c263a3f50bb2657d2d003b276e619172c4258d005160d27bd1b00805"
+    },
+    {
+      "original": "tests/test_case0_anchor_refinement.py",
+      "reference": "reference/baseline/tests/test_case0_anchor_refinement.py",
+      "sha256": "03ef7b269bae8f6e955a06dc2a4c767fd0187e6b1e87d8e33c96e6fa272f6d53"
+    },
+    {
+      "original": "tests/test_case0_aro_methods.py",
+      "reference": "reference/baseline/tests/test_case0_aro_methods.py",
+      "sha256": "9643eb0716c5b310bd450d687592f5048ccf88272095cd7bba97669348924391"
+    },
+    {
+      "original": "tests/test_case0_aro_saved_arrays.py",
+      "reference": "reference/baseline/tests/test_case0_aro_saved_arrays.py",
+      "sha256": "a8c177108cf07410bbc98846f63d5aa775cb4e7fe5882bd8382db346be4006cb"
+    },
+    {
+      "original": "tests/test_case0_audit_job.py",
+      "reference": "reference/baseline/tests/test_case0_audit_job.py",
+      "sha256": "8dffa643fd442981ba9c927ca0a655193e5a2003e5ad4581212af8c877c5936a"
+    },
+    {
+      "original": "tests/test_case0_campaign.py",
+      "reference": "reference/baseline/tests/test_case0_campaign.py",
+      "sha256": "3b4c7585a5c28805c90463057fc59aa762f5a04eca88501509f7f4dd330dd894"
+    },
+    {
+      "original": "tests/test_case0_compact_candidate.py",
+      "reference": "reference/baseline/tests/test_case0_compact_candidate.py",
+      "sha256": "e6f52a87531d5224871a59b573836305b43fe0e3c2b8192163e56912205dfe6d"
+    },
+    {
+      "original": "tests/test_case0_compact_candidate_independent.py",
+      "reference": "reference/baseline/tests/test_case0_compact_candidate_independent.py",
+      "sha256": "1dc31e74addce4c8405f82306fb8cf59f6f20b411a51dc0f249eae87ff70e94c"
+    },
+    {
+      "original": "tests/test_case0_evaluation.py",
+      "reference": "reference/baseline/tests/test_case0_evaluation.py",
+      "sha256": "1bde4d4db73c6d9581836ed691316db471ecd811a6471d5184e7e4809bd915fb"
+    },
+    {
+      "original": "tests/test_case0_evaluation_accounting.py",
+      "reference": "reference/baseline/tests/test_case0_evaluation_accounting.py",
+      "sha256": "04fd01d39d0490b3c6e0df24f585f7e1361dbf7c4b8aa24bfe4608712acd02f6"
+    },
+    {
+      "original": "tests/test_case0_evaluation_audit.py",
+      "reference": "reference/baseline/tests/test_case0_evaluation_audit.py",
+      "sha256": "3e5b54ee1e4e3486d3334dc6515ec310fa1725a3c8a7519d956cb0c6cc73225c"
+    },
+    {
+      "original": "tests/test_case0_evaluation_audit_independent.py",
+      "reference": "reference/baseline/tests/test_case0_evaluation_audit_independent.py",
+      "sha256": "01244e6ccc6d3122eeccce058c88a8b108c81a51a3768b732a080c9277c3abfa"
+    },
+    {
+      "original": "tests/test_case0_evaluation_runner.py",
+      "reference": "reference/baseline/tests/test_case0_evaluation_runner.py",
+      "sha256": "20e0084a2e8423b4732a7f44b10b4070f5efa8b4ec12c759fbb5b7ff9e2aabeb"
+    },
+    {
+      "original": "tests/test_case0_expanded_independent.py",
+      "reference": "reference/baseline/tests/test_case0_expanded_independent.py",
+      "sha256": "4157e2a2a469beaaa9da5c3d50dba701974ca89a06a414b485a6da9be2298de7"
+    },
+    {
+      "original": "tests/test_case0_extensive_closure.py",
+      "reference": "reference/baseline/tests/test_case0_extensive_closure.py",
+      "sha256": "5ed04161a98376a68842f739fda957707a7edc3c886cacf7d9b0679abd7aca38"
+    },
+    {
+      "original": "tests/test_case0_extensive_closure_independent.py",
+      "reference": "reference/baseline/tests/test_case0_extensive_closure_independent.py",
+      "sha256": "fb0913b7d8bbe1cb693924620e1f24e7954075e712b8188a6307629eb5a3a725"
+    },
+    {
+      "original": "tests/test_case0_inputs.py",
+      "reference": "reference/baseline/tests/test_case0_inputs.py",
+      "sha256": "3a0307e8adc533ae96b2ac2ea0e8298ce9e027e0dc5a6f60f2e167b5fd275043"
+    },
+    {
+      "original": "tests/test_case0_interruption.py",
+      "reference": "reference/baseline/tests/test_case0_interruption.py",
+      "sha256": "797f9bf8c0b50eac2be40ff007601062f062efe429932cc90218ea6b6413aad9"
+    },
+    {
+      "original": "tests/test_case0_interruption_independent.py",
+      "reference": "reference/baseline/tests/test_case0_interruption_independent.py",
+      "sha256": "4ef5843387b525f7bed2f845747665643858ec5428119599a4942fe37f01bd46"
+    },
+    {
+      "original": "tests/test_case0_isolation.py",
+      "reference": "reference/baseline/tests/test_case0_isolation.py",
+      "sha256": "0933cfd2261de7d81a01fe7f345649eb65716f763f70639362b900b0b83113b2"
+    },
+    {
+      "original": "tests/test_case0_memory_repair.py",
+      "reference": "reference/baseline/tests/test_case0_memory_repair.py",
+      "sha256": "c49f914f4e1fb96a581e7c75f0ff64a54f0bce08ddb3cd9b556ac098a527cb4c"
+    },
+    {
+      "original": "tests/test_case0_memory_repair_independent.py",
+      "reference": "reference/baseline/tests/test_case0_memory_repair_independent.py",
+      "sha256": "c9a63bea3151d89ea4614ff0e71c3a506a36076b2281665735d37b3cec16bad1"
+    },
+    {
+      "original": "tests/test_case0_or_saved_candidate.py",
+      "reference": "reference/baseline/tests/test_case0_or_saved_candidate.py",
+      "sha256": "90d4d686a07f89cfdcb600f6392745c3a62d00b5885d4e67b7a2ea557d24ab44"
+    },
+    {
+      "original": "tests/test_case0_partial_candidate.py",
+      "reference": "reference/baseline/tests/test_case0_partial_candidate.py",
+      "sha256": "df8be2e35bd46307d0f95c32d7dbefbe9866879d6b58f4c204815eb35a14036b"
+    },
+    {
+      "original": "tests/test_case0_partial_candidate_independent.py",
+      "reference": "reference/baseline/tests/test_case0_partial_candidate_independent.py",
+      "sha256": "0c332ebff99a34043c8ff05fe6f6732f2eae8a07e944ac5c40c5854518f49165"
+    },
+    {
+      "original": "tests/test_case0_partial_chain.py",
+      "reference": "reference/baseline/tests/test_case0_partial_chain.py",
+      "sha256": "19a2c5d4e3aa76d95d58a7982476b7930094bda853f78f9b0c1e7c9f05084323"
+    },
+    {
+      "original": "tests/test_case0_partial_chain_candidate.py",
+      "reference": "reference/baseline/tests/test_case0_partial_chain_candidate.py",
+      "sha256": "ed81a64e93d9f30e7bf3d27b65d4ac4bd98fae444f33e71ba2ebf3e539b39902"
+    },
+    {
+      "original": "tests/test_case0_partial_chain_candidate_independent.py",
+      "reference": "reference/baseline/tests/test_case0_partial_chain_candidate_independent.py",
+      "sha256": "0d9bad3394add3750ae54b4d1323bf06fd8046dc55dcadd7158f7a0f6d273661"
+    },
+    {
+      "original": "tests/test_case0_partial_chain_independent.py",
+      "reference": "reference/baseline/tests/test_case0_partial_chain_independent.py",
+      "sha256": "eda2802b29f064c68a7aa0fb479ea8319f74e998179cbd3e4a7f5e088019ede4"
+    },
+    {
+      "original": "tests/test_case0_partial_chain_master.py",
+      "reference": "reference/baseline/tests/test_case0_partial_chain_master.py",
+      "sha256": "f86090d7d235b30c1c4865f9ae5c051e7b6c87c6a084e299798c68412b968880"
+    },
+    {
+      "original": "tests/test_case0_partial_cut.py",
+      "reference": "reference/baseline/tests/test_case0_partial_cut.py",
+      "sha256": "9665524419a6aa80b710dd7a0b8a8bf5c9395e8fb3125097cc60f9bf5cd3a061"
+    },
+    {
+      "original": "tests/test_case0_partial_exact.py",
+      "reference": "reference/baseline/tests/test_case0_partial_exact.py",
+      "sha256": "9c2e4e9f026111541462ac34ad38fae819b90eb7408c6a702fcb2cef161fe403"
+    },
+    {
+      "original": "tests/test_case0_partial_master.py",
+      "reference": "reference/baseline/tests/test_case0_partial_master.py",
+      "sha256": "72df50fcecef57a160ce453a8e1e281f1315cdf6e85b54c7dccce853dd88abf0"
+    },
+    {
+      "original": "tests/test_case0_planning.py",
+      "reference": "reference/baseline/tests/test_case0_planning.py",
+      "sha256": "d41332d61388b11711143fc46175cad3b52ffdffc20bd6cf010ba8abcf55e771"
+    },
+    {
+      "original": "tests/test_case0_planning_audit.py",
+      "reference": "reference/baseline/tests/test_case0_planning_audit.py",
+      "sha256": "d41c780fbecb1a2d2e219e0ead6af6d365cd2546d19f462c4903a42ed82e51ab"
+    },
+    {
+      "original": "tests/test_case0_planning_audit_independent.py",
+      "reference": "reference/baseline/tests/test_case0_planning_audit_independent.py",
+      "sha256": "f1cbe6943ebbc85152f0f4b37daac874bc48569f319eb7b08b1daf147471b601"
+    },
+    {
+      "original": "tests/test_case0_profiles.py",
+      "reference": "reference/baseline/tests/test_case0_profiles.py",
+      "sha256": "a49c2265693d9d4c80df296044970f0c48d8c149497560663e72db7a054f7331"
+    },
+    {
+      "original": "tests/test_case0_proposed_candidate_audit.py",
+      "reference": "reference/baseline/tests/test_case0_proposed_candidate_audit.py",
+      "sha256": "210d3e279a1381e0e669841ee6d6aabbb75d900d02f86b7127a40bf50b62c6ce"
+    },
+    {
+      "original": "tests/test_case0_refinement.py",
+      "reference": "reference/baseline/tests/test_case0_refinement.py",
+      "sha256": "f1d635785cfd51d46091493938630e245fe1143f3774c1072dd0c157d7d4e51e"
+    },
+    {
+      "original": "tests/test_case0_remaining_methods.py",
+      "reference": "reference/baseline/tests/test_case0_remaining_methods.py",
+      "sha256": "27ec15e6215c2c327dda08b0994151d945dbea60ba7791a6a2b965149f35af54"
+    },
+    {
+      "original": "tests/test_case0_remaining_methods_independent.py",
+      "reference": "reference/baseline/tests/test_case0_remaining_methods_independent.py",
+      "sha256": "74dcf692baba2deb83f625724cde294c116b404d50be01da819518780843dab9"
+    },
+    {
+      "original": "tests/test_case0_remaining_settlement.py",
+      "reference": "reference/baseline/tests/test_case0_remaining_settlement.py",
+      "sha256": "c3e40a3bd6cf3144ec79b4aa5433af1bd3bcc029ec8dc9a4b43c86f8770f0813"
+    },
+    {
+      "original": "tests/test_case0_remaining_settlement_independent.py",
+      "reference": "reference/baseline/tests/test_case0_remaining_settlement_independent.py",
+      "sha256": "b13ed8f9aeb03b78ec93b27392a2f04beb141ad60a9bfc2aad29d120ecfd2752"
+    },
+    {
+      "original": "tests/test_case0_report_job.py",
+      "reference": "reference/baseline/tests/test_case0_report_job.py",
+      "sha256": "92e129bb57b2a8d7aa95ff6b012283f4a07543f67f3be71d7da774d2a5c30577"
+    },
+    {
+      "original": "tests/test_case0_representation.py",
+      "reference": "reference/baseline/tests/test_case0_representation.py",
+      "sha256": "918f5e7457f8976f1ef82fbd721bf007df0336505c6005a8a3f447e4db754930"
+    },
+    {
+      "original": "tests/test_case0_representation_continuation.py",
+      "reference": "reference/baseline/tests/test_case0_representation_continuation.py",
+      "sha256": "9cb12cdc62c34575d4541f846fd1c543427ef97e0d5fb46b923f8dd76ef18c9a"
+    },
+    {
+      "original": "tests/test_case0_representation_continuation_independent.py",
+      "reference": "reference/baseline/tests/test_case0_representation_continuation_independent.py",
+      "sha256": "c15bbfcf241609f3314f46e18e374c815a6fa78242fc6cc0c684c94dc89215f9"
+    },
+    {
+      "original": "tests/test_case0_representation_independent.py",
+      "reference": "reference/baseline/tests/test_case0_representation_independent.py",
+      "sha256": "791bf8f1982b3b1fc587f9a713e014fe82cbc0cac2f91d2732c8b544f5425011"
+    },
+    {
+      "original": "tests/test_case0_saa_aro_methods.py",
+      "reference": "reference/baseline/tests/test_case0_saa_aro_methods.py",
+      "sha256": "2d9e67c1e8bfb0597dacdd0bf3ee73e1fb8eb5c04c27e450da6a72975fab4045"
+    },
+    {
+      "original": "tests/test_case0_saa_saved_arrays.py",
+      "reference": "reference/baseline/tests/test_case0_saa_saved_arrays.py",
+      "sha256": "a15c98b63d9bb8ecd9f81d2464b633779b38134e25b2a0120740b78cb63e2150"
+    },
+    {
+      "original": "tests/test_case0_saved_candidate_audit.py",
+      "reference": "reference/baseline/tests/test_case0_saved_candidate_audit.py",
+      "sha256": "88566d404e7aeb7bc9e2d6c4377cfbd87c1091122b5cec2a0be3348dfbbe46c2"
+    },
+    {
+      "original": "tests/test_case0_saved_candidate_independent.py",
+      "reference": "reference/baseline/tests/test_case0_saved_candidate_independent.py",
+      "sha256": "4e9e15655499b9550ea98b98ebf5e3fa654c46b87df533e7f105b34174aac222"
+    },
+    {
+      "original": "tests/test_case0_saved_dual_bound.py",
+      "reference": "reference/baseline/tests/test_case0_saved_dual_bound.py",
+      "sha256": "40368ae55513f7b2bf9f9ecd82e954c3b6f0bed607b367c4807c9978ee024372"
+    },
+    {
+      "original": "tests/test_case0_saved_dual_bound_independent.py",
+      "reference": "reference/baseline/tests/test_case0_saved_dual_bound_independent.py",
+      "sha256": "934f01490dd434e5be92dc770ed9170d57ef164cea2bafc7ca06369a851def08"
+    },
+    {
+      "original": "tests/test_case0_saved_lp_bound.py",
+      "reference": "reference/baseline/tests/test_case0_saved_lp_bound.py",
+      "sha256": "79aa823e7bc71da3eb8494dc4e67969ed7abe112ab0cd50674960052d435178c"
+    },
+    {
+      "original": "tests/test_case0_saved_lp_bound_independent.py",
+      "reference": "reference/baseline/tests/test_case0_saved_lp_bound_independent.py",
+      "sha256": "621552e3b8a3b3c671aaabf6d5509518e0f120d004ce6ebcdc02aa9432d2f12c"
+    },
+    {
+      "original": "tests/test_case0_summary.py",
+      "reference": "reference/baseline/tests/test_case0_summary.py",
+      "sha256": "06987b5142b092a38f4ee4dd3404f156cf48bc344ab5d0b913e1753caf53c7ef"
+    },
+    {
+      "original": "tests/test_case0_two_anchor_bound.py",
+      "reference": "reference/baseline/tests/test_case0_two_anchor_bound.py",
+      "sha256": "31956917ce914e03dc37ce253dfd48f4bc4f9515fb5c04171e1ab11f4ea72b4b"
+    },
+    {
+      "original": "tests/test_case0_zero_presolve.py",
+      "reference": "reference/baseline/tests/test_case0_zero_presolve.py",
+      "sha256": "dd3fcbcaf310e4d1ac03e15f858e796acaefe2534131efcc47abefc417939a3c"
+    },
+    {
+      "original": "tests/test_case0_zero_presolve_independent.py",
+      "reference": "reference/baseline/tests/test_case0_zero_presolve_independent.py",
+      "sha256": "92a52669517f0ae15b396588d24ede45cf3a9fbf1455fbf4058ddad0ed7fcc92"
+    },
+    {
+      "original": "tests/test_case_inputs.py",
+      "reference": "reference/baseline/tests/test_case_inputs.py",
+      "sha256": "e927b4617b39c62ede2683785346d6a0a837d1118910aa68c44f54574cc74294"
+    },
+    {
+      "original": "tests/test_ccg.py",
+      "reference": "reference/baseline/tests/test_ccg.py",
+      "sha256": "547752fac9f952cab26c0185d4a32863e63c10ae40233000200487f587b3e550"
+    },
+    {
+      "original": "tests/test_ccg_budget_recovery.py",
+      "reference": "reference/baseline/tests/test_ccg_budget_recovery.py",
+      "sha256": "856bb49c0c566c34c0349539dc05e2c00f8c970aad30a39deb749e3b28c41501"
+    },
+    {
+      "original": "tests/test_checkpoint_association_history.py",
+      "reference": "reference/baseline/tests/test_checkpoint_association_history.py",
+      "sha256": "a09943c9e10ce0bbc82365cf3561f94b3c563fc8afb53a4271ccd338aad3c008"
+    },
+    {
+      "original": "tests/test_checkpoint_association_history_independent.py",
+      "reference": "reference/baseline/tests/test_checkpoint_association_history_independent.py",
+      "sha256": "046bfab6560708ed977b96b38d1fad79e3b4f95140575beea58e7595124280ba"
+    },
+    {
+      "original": "tests/test_checkpoint_current_proof_roles.py",
+      "reference": "reference/baseline/tests/test_checkpoint_current_proof_roles.py",
+      "sha256": "7955dbe32719b7b15b4c3b28eb45cf28c61f9f45e010fcc92664ab8982380b77"
+    },
+    {
+      "original": "tests/test_checkpoint_operation_inventory.py",
+      "reference": "reference/baseline/tests/test_checkpoint_operation_inventory.py",
+      "sha256": "bb634d1382a8049515d8fa84f212e0e83bb2fb8cabbed9fffe0246ca74c36c07"
+    },
+    {
+      "original": "tests/test_checkpoint_pipeline_review.py",
+      "reference": "reference/baseline/tests/test_checkpoint_pipeline_review.py",
+      "sha256": "48f918b6469845ba45c03f13c6d4ac55820679a713d560d51161f2511f955340"
+    },
+    {
+      "original": "tests/test_checkpoint_preflight_inventory.py",
+      "reference": "reference/baseline/tests/test_checkpoint_preflight_inventory.py",
+      "sha256": "c2b3a8c307935a4ced3960bfcf2f1eb812a08561a97557cd4a3f519f96faeb2a"
+    },
+    {
+      "original": "tests/test_checkpoint_release_manifest_closure.py",
+      "reference": "reference/baseline/tests/test_checkpoint_release_manifest_closure.py",
+      "sha256": "b89227ea5be88bd3e7bde4eecd35549bf61c0e85c8e5e15b1d3dd5a2eba79927"
+    },
+    {
+      "original": "tests/test_checkpoint_saa_phase_proof.py",
+      "reference": "reference/baseline/tests/test_checkpoint_saa_phase_proof.py",
+      "sha256": "dbb9ddd35eb14a1648a0130cedd143e0a5799c821fe0b02b51d8f2db18e25b41"
+    },
+    {
+      "original": "tests/test_checkpoint_streaming_proof_roles.py",
+      "reference": "reference/baseline/tests/test_checkpoint_streaming_proof_roles.py",
+      "sha256": "b0e0454aa9cd5204da0e74691c8ca12ffda6ecf73f357ee72c9576b69fce8118"
+    },
+    {
+      "original": "tests/test_checkpoint_streaming_proof_roles_independent.py",
+      "reference": "reference/baseline/tests/test_checkpoint_streaming_proof_roles_independent.py",
+      "sha256": "b722fad1301d81a1569ed425ba8fcac99924dd178ac78e0446e4a679016e3328"
+    },
+    {
+      "original": "tests/test_compact_recourses.py",
+      "reference": "reference/baseline/tests/test_compact_recourses.py",
+      "sha256": "a8c911d34e0272d5848ff573b2917c7509d97b40e4aec9b4b6ee9967d84edf65"
+    },
+    {
+      "original": "tests/test_compact_recourses_independent.py",
+      "reference": "reference/baseline/tests/test_compact_recourses_independent.py",
+      "sha256": "4ea346e4dc47a8a418043ed2d2eaf65c5283ab7cd9dbbd6dfd64b470fbd3e292"
+    },
+    {
+      "original": "tests/test_core_method_registry.py",
+      "reference": "reference/baseline/tests/test_core_method_registry.py",
+      "sha256": "ce04414d17078e6696e8bb39bcfae0387b0eb8c2038f3d187a52074c172612f3"
+    },
+    {
+      "original": "tests/test_core_production_wiring.py",
+      "reference": "reference/baseline/tests/test_core_production_wiring.py",
+      "sha256": "47b4a8054e39e5fe68130e0b5042e9bb84b0321034edfc3abe1f49313974ec97"
+    },
+    {
+      "original": "tests/test_core_request_adapter.py",
+      "reference": "reference/baseline/tests/test_core_request_adapter.py",
+      "sha256": "2dba1e7a877b9d21d724325ca521293080defdaf101866871d13d8c76b6ed3de"
+    },
+    {
+      "original": "tests/test_dual_cut_bound.py",
+      "reference": "reference/baseline/tests/test_dual_cut_bound.py",
+      "sha256": "6f7b7654db0077bbb184b8de46174e53e96f7518a48b5f26c2b7e68fbf1e360e"
+    },
+    {
+      "original": "tests/test_epigraph_master.py",
+      "reference": "reference/baseline/tests/test_epigraph_master.py",
+      "sha256": "a4dccde87d3a8d00b1941c633890857572efba483f8ab84815c16ad6c9a1aaaf"
+    },
+    {
+      "original": "tests/test_evaluation_access.py",
+      "reference": "reference/baseline/tests/test_evaluation_access.py",
+      "sha256": "60601c8d562c433dd7b6ac08a3dee2ecf5e16cdd292a49dee5206e82e0f66dae"
+    },
+    {
+      "original": "tests/test_evaluation_batch.py",
+      "reference": "reference/baseline/tests/test_evaluation_batch.py",
+      "sha256": "d09e7b7107542f3e52baeaea6da614c1bb858f7325ddd6a6b061697ee026a66d"
+    },
+    {
+      "original": "tests/test_evaluation_lock.py",
+      "reference": "reference/baseline/tests/test_evaluation_lock.py",
+      "sha256": "aaaaeced3e6a71215affdb8bd5ac0068cc1e0bd5ac1015af73a547cca8bb1eae"
+    },
+    {
+      "original": "tests/test_evaluation_mechanisms.py",
+      "reference": "reference/baseline/tests/test_evaluation_mechanisms.py",
+      "sha256": "5244e10e967b339ec71240edc017a2d7579cdb7bd2918c7a198942fcc6469a76"
+    },
+    {
+      "original": "tests/test_evaluation_metrics.py",
+      "reference": "reference/baseline/tests/test_evaluation_metrics.py",
+      "sha256": "bbe17eb2c4f74bd702dcb224cd6fdfba8e75d739a39779dc029a4454bb171b91"
+    },
+    {
+      "original": "tests/test_evaluation_statistics.py",
+      "reference": "reference/baseline/tests/test_evaluation_statistics.py",
+      "sha256": "152445836369077ec15f19104d4ac7e7c1e7d69998c86160ea2d7b5783bfabaa"
+    },
+    {
+      "original": "tests/test_extensive.py",
+      "reference": "reference/baseline/tests/test_extensive.py",
+      "sha256": "2508486644fbdf8f311c07aa99ac0bda2b7624610bde8c5b10de4350449825c2"
+    },
+    {
+      "original": "tests/test_failure_carryover.py",
+      "reference": "reference/baseline/tests/test_failure_carryover.py",
+      "sha256": "71118985eb8c31ffa4f9008cbf9b14c2feefc2520f0d3e1766a7e99fca2f950b"
+    },
+    {
+      "original": "tests/test_first_stage.py",
+      "reference": "reference/baseline/tests/test_first_stage.py",
+      "sha256": "fa9a4c41654f6d0d9504e872c258f20840e91dda2ea00cf628333a23701483e3"
+    },
+    {
+      "original": "tests/test_first_stage_check.py",
+      "reference": "reference/baseline/tests/test_first_stage_check.py",
+      "sha256": "c4d277b12bf59154fd5429a5f3c4c3a8172509d5ac77a5882bd687bd7e5bcb28"
+    },
+    {
+      "original": "tests/test_forecast_routes.py",
+      "reference": "reference/baseline/tests/test_forecast_routes.py",
+      "sha256": "e48e6f1c53b631e31b6a758f773b2e76f2287b65710dd43af865908be58e1b20"
+    },
+    {
+      "original": "tests/test_forecast_tasks.py",
+      "reference": "reference/baseline/tests/test_forecast_tasks.py",
+      "sha256": "09e5357dfd473299983f28c39f6bbc94aef72e17b76fca311a4d57c5577da86a"
+    },
+    {
+      "original": "tests/test_formal_bank.py",
+      "reference": "reference/baseline/tests/test_formal_bank.py",
+      "sha256": "47c9e827c89fa98e765b346a00d44dbc9992500ac7221951e54bcc8e3472dbe0"
+    },
+    {
+      "original": "tests/test_formal_bank_audit.py",
+      "reference": "reference/baseline/tests/test_formal_bank_audit.py",
+      "sha256": "9d2fa34fa5b518bdd76d2aa3a1876462de0367eff45c2c34190da6a66d290205"
+    },
+    {
+      "original": "tests/test_formal_onset.py",
+      "reference": "reference/baseline/tests/test_formal_onset.py",
+      "sha256": "dbca741f806d49bb6c4ab31538cf926edf80e224dc7e6d3f95f26224ce5267b3"
+    },
+    {
+      "original": "tests/test_formal_physical_inputs.py",
+      "reference": "reference/baseline/tests/test_formal_physical_inputs.py",
+      "sha256": "288388fb1551315a88128f51bfbffb3a6664ce19253a7eb4c95eaa6fb8273c98"
+    },
+    {
+      "original": "tests/test_formal_planning.py",
+      "reference": "reference/baseline/tests/test_formal_planning.py",
+      "sha256": "bdbe3c04995aa30673f66ef7d9a1473607256bd74c03a3c465cf701bfc13b359"
+    },
+    {
+      "original": "tests/test_formal_planning_worker.py",
+      "reference": "reference/baseline/tests/test_formal_planning_worker.py",
+      "sha256": "8b58f78e4643e0d02f61fb99c5ce19fb9ec4eeb7d0530359e6f496731c20f795"
+    },
+    {
+      "original": "tests/test_formal_protocol.py",
+      "reference": "reference/baseline/tests/test_formal_protocol.py",
+      "sha256": "7e8917b1e5aee1bae25054f6cd9ae84782e9e90d93ec9298260762ca2aee1399"
+    },
+    {
+      "original": "tests/test_formal_record_settlement.py",
+      "reference": "reference/baseline/tests/test_formal_record_settlement.py",
+      "sha256": "37d7b2277140f663047780eb4bc075d9000690c8243c8e3de425d7a265d24213"
+    },
+    {
+      "original": "tests/test_formal_result_bridge.py",
+      "reference": "reference/baseline/tests/test_formal_result_bridge.py",
+      "sha256": "4629dfaa545f77ba6b348e63f20723882f8ad227ce3438aa8f2fea7030ff104f"
+    },
+    {
+      "original": "tests/test_formal_saa.py",
+      "reference": "reference/baseline/tests/test_formal_saa.py",
+      "sha256": "0d1afa6f75ac7b00807ae2b8bfea6c3d5546ec39acf5fb799d973c10c118cc0d"
+    },
+    {
+      "original": "tests/test_formal_scenarios.py",
+      "reference": "reference/baseline/tests/test_formal_scenarios.py",
+      "sha256": "59cbd8cde9cb625329e50f71cda18474f89b945950ccbbdabcd0de45d381a5cd"
+    },
+    {
+      "original": "tests/test_formal_validator_recovery.py",
+      "reference": "reference/baseline/tests/test_formal_validator_recovery.py",
+      "sha256": "fcbf0ae57d35966fc70e2b1137ac08afcc228f96e3d079378a091e1d84cd51e9"
+    },
+    {
+      "original": "tests/test_generic_accounting_gate.py",
+      "reference": "reference/baseline/tests/test_generic_accounting_gate.py",
+      "sha256": "f1a7718cff00d2c8c46c677465015daaa13cbdb6879e4281f4b2a233693bf2f3"
+    },
+    {
+      "original": "tests/test_generic_planning_batch.py",
+      "reference": "reference/baseline/tests/test_generic_planning_batch.py",
+      "sha256": "d12314905bffc89c49d1c0439a7210979aada71531481986a8344281f001fd5f"
+    },
+    {
+      "original": "tests/test_gurobi_diagnostic.py",
+      "reference": "reference/baseline/tests/test_gurobi_diagnostic.py",
+      "sha256": "2e93a6cbc9f6635e9ba793494d97899853265816de14dfab8c6bbdb4e52d0e27"
+    },
+    {
+      "original": "tests/test_jobctl.py",
+      "reference": "reference/baseline/tests/test_jobctl.py",
+      "sha256": "f56770d20d59b2d061cdcd8f7f44a194ca3df38e5faef0756aec14692d2f7b68"
+    },
+    {
+      "original": "tests/test_kernel_revisions.py",
+      "reference": "reference/baseline/tests/test_kernel_revisions.py",
+      "sha256": "455db69ae0c2a2405cc89d3503cf37ba4bd76f57bf5af0dc497cd118e7b1fa65"
+    },
+    {
+      "original": "tests/test_lazy_recourses.py",
+      "reference": "reference/baseline/tests/test_lazy_recourses.py",
+      "sha256": "977468bf9eb2bb67475e1e504065ecfc56cd542615ae65a5698f769fc1672d9f"
+    },
+    {
+      "original": "tests/test_line_outages.py",
+      "reference": "reference/baseline/tests/test_line_outages.py",
+      "sha256": "53d868b37dd74cc1a9bd20ec50a8d398c90a01c3adf90e0807e87e5aa726a38f"
+    },
+    {
+      "original": "tests/test_load_scenarios.py",
+      "reference": "reference/baseline/tests/test_load_scenarios.py",
+      "sha256": "698fbfea720c449787b1c0f0ab0546738422c61ebd291fbc0fa61079f4af3fcc"
+    },
+    {
+      "original": "tests/test_method_factory_review.py",
+      "reference": "reference/baseline/tests/test_method_factory_review.py",
+      "sha256": "c05e8984a2b2571d0afa678417ad2cd6dcc9bad3825dee76c3f6ab5a6e8b6bbf"
+    },
+    {
+      "original": "tests/test_mip_start_audit.py",
+      "reference": "reference/baseline/tests/test_mip_start_audit.py",
+      "sha256": "594a38e358d222d38c258bed12c36d9317fc34c360cfbc28706624fb97f10774"
+    },
+    {
+      "original": "tests/test_moment_calibration.py",
+      "reference": "reference/baseline/tests/test_moment_calibration.py",
+      "sha256": "25d3795f8b24baa892a9565c70259d23e27c8f36a4177437484a0829b7c0f384"
+    },
+    {
+      "original": "tests/test_multi_anchor_bound_audit.py",
+      "reference": "reference/baseline/tests/test_multi_anchor_bound_audit.py",
+      "sha256": "35bc31a191f80d3b44a276f7c956821bc0f406841853ea070b2147e96f93678a"
+    },
+    {
+      "original": "tests/test_multi_anchor_bound_settlement.py",
+      "reference": "reference/baseline/tests/test_multi_anchor_bound_settlement.py",
+      "sha256": "3231666f1653169c69e1d6aba14e666b903cc73a344156b46a0f0e0ec09b9f59"
+    },
+    {
+      "original": "tests/test_multi_anchor_epigraph.py",
+      "reference": "reference/baseline/tests/test_multi_anchor_epigraph.py",
+      "sha256": "0766bb2ec25e9265b92e699ba831163e2d86c14723df2ee546664822eaaa075d"
+    },
+    {
+      "original": "tests/test_native_gurobi.py",
+      "reference": "reference/baseline/tests/test_native_gurobi.py",
+      "sha256": "99808cbf0c5dde4e7c83bb3864d9b63da6ec28114d09d483af645e7e5715a66a"
+    },
+    {
+      "original": "tests/test_native_highs.py",
+      "reference": "reference/baseline/tests/test_native_highs.py",
+      "sha256": "d71b74d3f571b93cddddc534fd8f398fbe4e925ebbd49d42d027fc64bf3d84a9"
+    },
+    {
+      "original": "tests/test_onset_bank.py",
+      "reference": "reference/baseline/tests/test_onset_bank.py",
+      "sha256": "2fafb7a85f8cb30f644fb1b488ec8b796dfa66635b4e8d69a572d3a8f498326a"
+    },
+    {
+      "original": "tests/test_onset_bank_audit.py",
+      "reference": "reference/baseline/tests/test_onset_bank_audit.py",
+      "sha256": "d2b469876a35bc977a9b42df830f3cfdca058acd3ba9b4d91f9101a03ba7093b"
+    },
+    {
+      "original": "tests/test_onset_physical_inputs.py",
+      "reference": "reference/baseline/tests/test_onset_physical_inputs.py",
+      "sha256": "1e797df597c10d313b4e2c7681a7985c6272e2da072b8e6b59a373378bb9838b"
+    },
+    {
+      "original": "tests/test_onset_planning.py",
+      "reference": "reference/baseline/tests/test_onset_planning.py",
+      "sha256": "beb09224207a46cbd6f3cfae587c472fd88a432a704b900109eb29996e7a999d"
+    },
+    {
+      "original": "tests/test_physical_ablations.py",
+      "reference": "reference/baseline/tests/test_physical_ablations.py",
+      "sha256": "c12ae55bd963ed1e88dc14b54e628f69f824184653682dc801a3a0558b9b0be4"
+    },
+    {
+      "original": "tests/test_physical_inputs.py",
+      "reference": "reference/baseline/tests/test_physical_inputs.py",
+      "sha256": "67da23cd771080bb164e236062f374bc03ceed45a964db7d0716f7c34f5f388b"
+    },
+    {
+      "original": "tests/test_plan_reference_contract.py",
+      "reference": "reference/baseline/tests/test_plan_reference_contract.py",
+      "sha256": "7f2acda894a30b079cb9fa73aed5df8996be480c74532cb456c852d8abf95723"
+    },
+    {
+      "original": "tests/test_planning_audit_pipeline.py",
+      "reference": "reference/baseline/tests/test_planning_audit_pipeline.py",
+      "sha256": "76c5f2e032e4f19331e47f1c910c461036a3c6d0c26e1d04375be52ac58e1f1a"
+    },
+    {
+      "original": "tests/test_planning_budget.py",
+      "reference": "reference/baseline/tests/test_planning_budget.py",
+      "sha256": "36c565380b005ded9841c1c3e94d2165877ba210c38e329a0e9f8bec0963ca42"
+    },
+    {
+      "original": "tests/test_probability.py",
+      "reference": "reference/baseline/tests/test_probability.py",
+      "sha256": "5de54d22261a42ca147303a8697c989ae2d15a2824d1611e299f5b83ac3503dd"
+    },
+    {
+      "original": "tests/test_probability_audit.py",
+      "reference": "reference/baseline/tests/test_probability_audit.py",
+      "sha256": "dedea10c66783e5c33aab6fc566bb457ea97bf922acee4be91230dcbcefd6525"
+    },
+    {
+      "original": "tests/test_probability_check.py",
+      "reference": "reference/baseline/tests/test_probability_check.py",
+      "sha256": "39c6ee99de5cbbdc940126ce564f99f6b034dca5b304272a2ebaab3057c160b5"
+    },
+    {
+      "original": "tests/test_probability_phase1.py",
+      "reference": "reference/baseline/tests/test_probability_phase1.py",
+      "sha256": "8fb4824baaa1c41d2a8decb788ee513b0ea110f1816d47e272a3e30545df312b"
+    },
+    {
+      "original": "tests/test_queue_attempt_allocation.py",
+      "reference": "reference/baseline/tests/test_queue_attempt_allocation.py",
+      "sha256": "c2336e815def40a4860c5c677cf9ca5c87a34e7d1f08e869e08b4408a2aa84b2"
+    },
+    {
+      "original": "tests/test_random_streams.py",
+      "reference": "reference/baseline/tests/test_random_streams.py",
+      "sha256": "4098abc87c82aa21575f33f9b121a9218bf9f9a1937aad243d20db6810118b74"
+    },
+    {
+      "original": "tests/test_raw_master_audit.py",
+      "reference": "reference/baseline/tests/test_raw_master_audit.py",
+      "sha256": "4c5e30186c051ec4ad65d193ba27552c938e5b7b8a47706b635b0a590a7fd8c2"
+    },
+    {
+      "original": "tests/test_raw_plan_audit.py",
+      "reference": "reference/baseline/tests/test_raw_plan_audit.py",
+      "sha256": "b88758c278f6be6a6ddf6fd98b865ef99180ccf7b4621a8ca3630850cc67a362"
+    },
+    {
+      "original": "tests/test_raw_template_audit.py",
+      "reference": "reference/baseline/tests/test_raw_template_audit.py",
+      "sha256": "18eaef7143ff245fc34a3303628c4c54f39e1eb705ce1b2da1eec579d4cbfc96"
+    },
+    {
+      "original": "tests/test_recourse.py",
+      "reference": "reference/baseline/tests/test_recourse.py",
+      "sha256": "f1a2b68e82f357ec7d2f5ac91f8644c2c06c28c87fe0b43b1cdc76162a5b6cd1"
+    },
+    {
+      "original": "tests/test_recourse_check.py",
+      "reference": "reference/baseline/tests/test_recourse_check.py",
+      "sha256": "1e4564445234eda42382528dbbd9a3d5eba586db62b3b0f17e47888e6bf7437c"
+    },
+    {
+      "original": "tests/test_recourse_physics.py",
+      "reference": "reference/baseline/tests/test_recourse_physics.py",
+      "sha256": "98342c892ed32f5b807a06585b43538f7deca9b95db0f0aec037c79f7393dc35"
+    },
+    {
+      "original": "tests/test_recourse_store.py",
+      "reference": "reference/baseline/tests/test_recourse_store.py",
+      "sha256": "b392fcc87c97e62a76f8af49463c6107b430f66007f0a34e3ba68705cf9fd316"
+    },
+    {
+      "original": "tests/test_recourse_template_index.py",
+      "reference": "reference/baseline/tests/test_recourse_template_index.py",
+      "sha256": "f285eb1e8ec4123b739ec6cba3d6e29c976a799c42e479d7c4cb0cd5c8112dbc"
+    },
+    {
+      "original": "tests/test_relaxation_bound.py",
+      "reference": "reference/baseline/tests/test_relaxation_bound.py",
+      "sha256": "a320e01124f80edb76b28ebd004cbda1eef4f9652781c71d751e9c7045a5c4b7"
+    },
+    {
+      "original": "tests/test_road_connectors.py",
+      "reference": "reference/baseline/tests/test_road_connectors.py",
+      "sha256": "adccb6df90e6380e53e3552d185bef2106b346d48385ccc2f8aa0217d9a5602b"
+    },
+    {
+      "original": "tests/test_road_disruptions.py",
+      "reference": "reference/baseline/tests/test_road_disruptions.py",
+      "sha256": "c85c8dd0a01d94bc90f9506ccc29b18e665098070a9fc415e64a0dd9afd0123a"
+    },
+    {
+      "original": "tests/test_root_lp_diagnostic.py",
+      "reference": "reference/baseline/tests/test_root_lp_diagnostic.py",
+      "sha256": "2165d0f6759e14cd65cf1b5fd99cae8c8a83e647f4ba3dd40e0ab3ff5a681d75"
+    },
+    {
+      "original": "tests/test_s02_closure.py",
+      "reference": "reference/baseline/tests/test_s02_closure.py",
+      "sha256": "a76355d3fdaa70e8c4e801c40d968747e594d907fe3e9ceccf1f6f02d43fde8d"
+    },
+    {
+      "original": "tests/test_s03_i02_audit.py",
+      "reference": "reference/baseline/tests/test_s03_i02_audit.py",
+      "sha256": "550df835fb0530d6ddb52c6dd08d5f7170530e318f9ce381360b6813a224b422"
+    },
+    {
+      "original": "tests/test_s03_i03_audit.py",
+      "reference": "reference/baseline/tests/test_s03_i03_audit.py",
+      "sha256": "c3ffec44ab08fb69074a752ee9fbaf847d5bd5c5274b9a6a2f2d352435601145"
+    },
+    {
+      "original": "tests/test_s05_candidate_completion.py",
+      "reference": "reference/baseline/tests/test_s05_candidate_completion.py",
+      "sha256": "edcb1e4562e1674183ae8b98f5b31cfa58fc15b7a5c7935cf475a2fea225c18c"
+    },
+    {
+      "original": "tests/test_s05_candidate_evaluation.py",
+      "reference": "reference/baseline/tests/test_s05_candidate_evaluation.py",
+      "sha256": "a6b7b43d2813a6baf9a9f3bef2140340780e1d5a8637629c6f35947c82bd0136"
+    },
+    {
+      "original": "tests/test_s05_candidate_evaluation_integration.py",
+      "reference": "reference/baseline/tests/test_s05_candidate_evaluation_integration.py",
+      "sha256": "3ff320969e1b649bbb6057b1050c5df344699bbb24b8712ba15ae140220aa97e"
+    },
+    {
+      "original": "tests/test_s05_candidate_job.py",
+      "reference": "reference/baseline/tests/test_s05_candidate_job.py",
+      "sha256": "867f6362c295adf07536fe1ed07b785dedad81f4486910b2eefe37b53c297194"
+    },
+    {
+      "original": "tests/test_s05_candidate_probability.py",
+      "reference": "reference/baseline/tests/test_s05_candidate_probability.py",
+      "sha256": "b40be833cb74238207e526e3d70569c02ff9564ae34898755231d07bec0c3a5a"
+    },
+    {
+      "original": "tests/test_s05_candidate_recourse_audit.py",
+      "reference": "reference/baseline/tests/test_s05_candidate_recourse_audit.py",
+      "sha256": "e8cbaf6f00e1c16827852b0a9e98397d3a642eb5ff67ddd9400bd0a9d1ee47e9"
+    },
+    {
+      "original": "tests/test_s05_dual_cut_bound_driver.py",
+      "reference": "reference/baseline/tests/test_s05_dual_cut_bound_driver.py",
+      "sha256": "1598a053c223470ad90cf11e8b5422bd68aa33bb78a1110f819c63a9bd95076e"
+    },
+    {
+      "original": "tests/test_s05_epigraph_master_driver.py",
+      "reference": "reference/baseline/tests/test_s05_epigraph_master_driver.py",
+      "sha256": "32bacf73739fbb5c9f41e1b7a44778aac5fc5136bba573a17a669dc8f91a585b"
+    },
+    {
+      "original": "tests/test_s05_multi_anchor_bound_driver.py",
+      "reference": "reference/baseline/tests/test_s05_multi_anchor_bound_driver.py",
+      "sha256": "f5d9d9353822b81f777461b003a37638956214df5ad527cf1014947d1a3d5f5a"
+    },
+    {
+      "original": "tests/test_s05_multi_anchor_supervised.py",
+      "reference": "reference/baseline/tests/test_s05_multi_anchor_supervised.py",
+      "sha256": "07c4c4a993e6f4470fcdc17274e5822994a2015261a6e8cf5d34396852c7d3c6"
+    },
+    {
+      "original": "tests/test_s05_pending_recovery_audit.py",
+      "reference": "reference/baseline/tests/test_s05_pending_recovery_audit.py",
+      "sha256": "b372c440cbeb57bd8ad64c1011d1dfa00f32a4eeb05988c39a4e2eb794d3f1dd"
+    },
+    {
+      "original": "tests/test_s05_probability_recovery.py",
+      "reference": "reference/baseline/tests/test_s05_probability_recovery.py",
+      "sha256": "96449313823609c7c0e2810bc8d7aefd142f789977dca323d73d39bfd3b0c0df"
+    },
+    {
+      "original": "tests/test_s05_probability_recovery_integration.py",
+      "reference": "reference/baseline/tests/test_s05_probability_recovery_integration.py",
+      "sha256": "76ffd9284baf4a8df530005b832f35431422cda96e9cb5da1af2c2217168ebb3"
+    },
+    {
+      "original": "tests/test_s05_probability_recovery_settlement.py",
+      "reference": "reference/baseline/tests/test_s05_probability_recovery_settlement.py",
+      "sha256": "05eecd8606d5e2a614d8d4e59e4ba63d66e75bf2ad6e4d56f11662591be8942e"
+    },
+    {
+      "original": "tests/test_s05_relaxation_bound_driver.py",
+      "reference": "reference/baseline/tests/test_s05_relaxation_bound_driver.py",
+      "sha256": "3fde097a33aa3c7a3dbe97f8266677ffa713f70a1685a7a8795f8c85fdce0215"
+    },
+    {
+      "original": "tests/test_saa_assembly_checkpoint.py",
+      "reference": "reference/baseline/tests/test_saa_assembly_checkpoint.py",
+      "sha256": "e34831daaae4679a6a6f73842642aa2e6c0054692b81220a51e9c9053689e34a"
+    },
+    {
+      "original": "tests/test_saa_bound_authority.py",
+      "reference": "reference/baseline/tests/test_saa_bound_authority.py",
+      "sha256": "4427d6992b73db1a3a20ed0e0781718c5fb056862c26f2165071e1f23cd89b83"
+    },
+    {
+      "original": "tests/test_saa_bound_failure_continuation.py",
+      "reference": "reference/baseline/tests/test_saa_bound_failure_continuation.py",
+      "sha256": "c93810677573122707d430be3c9da79b47bfb338553caf2a597161e49c05a9fe"
+    },
+    {
+      "original": "tests/test_saa_bound_parent_ledger.py",
+      "reference": "reference/baseline/tests/test_saa_bound_parent_ledger.py",
+      "sha256": "abbd276c4c274155347d9202ea37fc5a6970bede3f3126238fc9f068db1b5c24"
+    },
+    {
+      "original": "tests/test_saa_candidate_audit.py",
+      "reference": "reference/baseline/tests/test_saa_candidate_audit.py",
+      "sha256": "6d4737912d8bc0561b7d77a902edff6377725f2f68894c7e00982e6229668a8b"
+    },
+    {
+      "original": "tests/test_saa_candidate_warm_start.py",
+      "reference": "reference/baseline/tests/test_saa_candidate_warm_start.py",
+      "sha256": "549b0218dd2a97ab0b1d930635b61b93e2b73ebeea60bf7140f81f079892b8a9"
+    },
+    {
+      "original": "tests/test_saa_carryover_wiring.py",
+      "reference": "reference/baseline/tests/test_saa_carryover_wiring.py",
+      "sha256": "316bdc5bd768e40f54054e4af4c38521b47ad5437c0da9e039619e671c4d88b4"
+    },
+    {
+      "original": "tests/test_saa_completed_phase_recovery.py",
+      "reference": "reference/baseline/tests/test_saa_completed_phase_recovery.py",
+      "sha256": "2ce614284b776e5304d749dd39ef888e5ecce61d521387e10a2e1f2825dfd0f8"
+    },
+    {
+      "original": "tests/test_saa_composite_gateway.py",
+      "reference": "reference/baseline/tests/test_saa_composite_gateway.py",
+      "sha256": "caa2bf47f87cb02602d94ae3ef53385ac7022893cec10ba81f17f98061bca064"
+    },
+    {
+      "original": "tests/test_saa_composite_independent.py",
+      "reference": "reference/baseline/tests/test_saa_composite_independent.py",
+      "sha256": "59557e4a5aff2bb9174d6e71ad945e725d136a167fed9733ef4825236d44636c"
+    },
+    {
+      "original": "tests/test_saa_composite_record.py",
+      "reference": "reference/baseline/tests/test_saa_composite_record.py",
+      "sha256": "a375ea4f77c7448133af88ecce824f4755c186623a2fec0ba313325d2f8f1bfa"
+    },
+    {
+      "original": "tests/test_saa_dual_bound.py",
+      "reference": "reference/baseline/tests/test_saa_dual_bound.py",
+      "sha256": "0bbee95078594dea83189f15c5e7d9662033f9b533047a3b306c61a1409e58e1"
+    },
+    {
+      "original": "tests/test_saa_failure_carryover.py",
+      "reference": "reference/baseline/tests/test_saa_failure_carryover.py",
+      "sha256": "608e845401d08b6b417558079a4b1b9d84e7b425a9a3b83c402ab2b9bcde2d79"
+    },
+    {
+      "original": "tests/test_saa_failure_carryover_independent.py",
+      "reference": "reference/baseline/tests/test_saa_failure_carryover_independent.py",
+      "sha256": "290ee8979ec5a400e82e9a9e78f966ee65f4de241da745f33755152bd6468164"
+    },
+    {
+      "original": "tests/test_saa_fixed_plan.py",
+      "reference": "reference/baseline/tests/test_saa_fixed_plan.py",
+      "sha256": "6863ff922a410a3276d0533c4493fe6f6552f5c94bfe58156f91b41d5ed3f160"
+    },
+    {
+      "original": "tests/test_saa_fixed_plan_audit.py",
+      "reference": "reference/baseline/tests/test_saa_fixed_plan_audit.py",
+      "sha256": "a04316b499e00ff6d9fde8cd0c44574a4a826e5a873ee3f740f25c081a86f9b1"
+    },
+    {
+      "original": "tests/test_saa_l_shaped.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped.py",
+      "sha256": "d730672d4cf70c8b3085cd4673ac8badfe104e0f95d8814f0a0f886c18039795"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_audit_bridge.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_audit_bridge.py",
+      "sha256": "882bf5ff93cb8f76e10f01e09f5a34a0c69ac5086491ccb826d9ec9eac638acd"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_audit_resume.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_audit_resume.py",
+      "sha256": "d89b9e0014f40818e0018085a5387afab1a0ee500f16a6ab86c3fcadca2007da"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_candidate.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_candidate.py",
+      "sha256": "199a2643e18d39b90fda6baa0d06acfeb6d27499c15f2a9c7c784094ba10dbb5"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_failure_debt.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_failure_debt.py",
+      "sha256": "5f80c7d5b47a894c4c904c706f54442575e283dcaa4111dadd3a7280e5a6b527"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_formal.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_formal.py",
+      "sha256": "934efa8ed524708a2f36274282dd8f43256946488ba04f3d9b61c1bda9511808"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_formal_candidate.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_formal_candidate.py",
+      "sha256": "26dd9364297d3427724abc6a3532f9f7dc1691d90c39b76dd18126a03a2d02d2"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_master_evidence.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_master_evidence.py",
+      "sha256": "1643909a1d4c3b0ece8fdee5c6ed9dec216323d67928733df10230f3950a1c5d"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_native.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_native.py",
+      "sha256": "d79f879095fe7d969a793a551c3bd3ee14bf7cca3147183f4a752c0106a3d1a4"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_native_caller.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_native_caller.py",
+      "sha256": "fd4d46432a75a7848b0989da70758d23a25fba7f061007cfdc80079e56d6ff14"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_parent.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_parent.py",
+      "sha256": "2d1b8b9de6656ba981a0addf3200b91211a0d239ae8204d0fc216a683ca69641"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_provider.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_provider.py",
+      "sha256": "e12173792a3f17f7b15ce9a976cbaf0217d84c7bce9ab527f137f25f577cdefa"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_provider_independent.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_provider_independent.py",
+      "sha256": "fcc3f6d5e2c8af3696e5b4f3772ca5b5ebd4871d45b3c0683b98185b0af1279c"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_queue.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_queue.py",
+      "sha256": "5d578cb62979ca3263b46b994e2efd17fdb021a897488480fbd25a1e8d30d1a6"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_resume.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_resume.py",
+      "sha256": "1cb2b94fa1969dffc58346732231af3e1de1bc098b354afb7780b8c8a16e94bd"
+    },
+    {
+      "original": "tests/test_saa_l_shaped_terminal_exit.py",
+      "reference": "reference/baseline/tests/test_saa_l_shaped_terminal_exit.py",
+      "sha256": "5792f014adf1294f5f097fc5bae5924f6d529763db2f53c2b8be928770dbf975"
+    },
+    {
+      "original": "tests/test_saa_master_audit.py",
+      "reference": "reference/baseline/tests/test_saa_master_audit.py",
+      "sha256": "b72849d52bda86ec8c3b3870d290359eb7a1d408e2b87dcef05dc6f7ba8ff162"
+    },
+    {
+      "original": "tests/test_saa_memory_recovery.py",
+      "reference": "reference/baseline/tests/test_saa_memory_recovery.py",
+      "sha256": "2ce3cde784d78125dfbbf5d0836d360b2246142ca227741c1fde5a94be13cbe5"
+    },
+    {
+      "original": "tests/test_saa_memory_recovery_independent.py",
+      "reference": "reference/baseline/tests/test_saa_memory_recovery_independent.py",
+      "sha256": "97f91c236b07e57b87999a9957756ed9f1a6a62c7582b2c50fe8fe65633ee5d4"
+    },
+    {
+      "original": "tests/test_saa_planning_pipeline.py",
+      "reference": "reference/baseline/tests/test_saa_planning_pipeline.py",
+      "sha256": "347e40568432e0ffc3d7214ea760e7b9f3117d7575205b32975840352b56d1e9"
+    },
+    {
+      "original": "tests/test_saa_planning_worker.py",
+      "reference": "reference/baseline/tests/test_saa_planning_worker.py",
+      "sha256": "5ea877b43233d89b88b3fc24f53d59f70bbe909513636e178c4e6d3b97e4520f"
+    },
+    {
+      "original": "tests/test_saa_queue_allocation_recovery.py",
+      "reference": "reference/baseline/tests/test_saa_queue_allocation_recovery.py",
+      "sha256": "2097869591cb0d6353417c51bef1144093eeacaaf184d35e7c5a4f1f3a15241b"
+    },
+    {
+      "original": "tests/test_saa_queue_prelude.py",
+      "reference": "reference/baseline/tests/test_saa_queue_prelude.py",
+      "sha256": "68e3cc9cbc2998e2c7c763f85d40acb69152fc965bd8116e6c34c1ffdf271bbb"
+    },
+    {
+      "original": "tests/test_saa_queue_rearm.py",
+      "reference": "reference/baseline/tests/test_saa_queue_rearm.py",
+      "sha256": "72c5d88c572a5a176be8d4a870f02121e1f27d2de6e5b0928bc37bb26a36b65c"
+    },
+    {
+      "original": "tests/test_saa_record_bridge.py",
+      "reference": "reference/baseline/tests/test_saa_record_bridge.py",
+      "sha256": "caefe4fe58d06ed58e4bdaf129b0d9216a09cd2d78370aaa7f52ae51cb796710"
+    },
+    {
+      "original": "tests/test_saa_recovery_ledger.py",
+      "reference": "reference/baseline/tests/test_saa_recovery_ledger.py",
+      "sha256": "ff3a30fe808701e17277625199bb24056fe9b58dcdae170f75a93e7d8cd49ae2"
+    },
+    {
+      "original": "tests/test_saa_recovery_ledger_independent.py",
+      "reference": "reference/baseline/tests/test_saa_recovery_ledger_independent.py",
+      "sha256": "956ddec9ef5f1e06d5d5f84d690fc1e5483f33dc34220d97540ef870ec136e34"
+    },
+    {
+      "original": "tests/test_saa_saved_dual_adapter.py",
+      "reference": "reference/baseline/tests/test_saa_saved_dual_adapter.py",
+      "sha256": "daef203f24d7af23648f42b24bebbee794a71da953877131bbb6c1e8fe6010d3"
+    },
+    {
+      "original": "tests/test_saa_saved_dual_bound_controller.py",
+      "reference": "reference/baseline/tests/test_saa_saved_dual_bound_controller.py",
+      "sha256": "c3c9487243d4167c5fdf9df19ebf8f9bebf2e8b8ded9f4cd10e8c3a82b4e524e"
+    },
+    {
+      "original": "tests/test_saa_saved_dual_bound_independent.py",
+      "reference": "reference/baseline/tests/test_saa_saved_dual_bound_independent.py",
+      "sha256": "94cbe7012d6e96134ea985d8e51c4c321c7df90a50970659b8dea9b05dac481f"
+    },
+    {
+      "original": "tests/test_saa_saved_model_dispatch.py",
+      "reference": "reference/baseline/tests/test_saa_saved_model_dispatch.py",
+      "sha256": "cf79e0245e6c958d6bbd8d7780239a618e0577f2baced141ebeae9dbb9acd930"
+    },
+    {
+      "original": "tests/test_saa_saved_model_expense.py",
+      "reference": "reference/baseline/tests/test_saa_saved_model_expense.py",
+      "sha256": "a53c46a865efae6973abe8037687c745bdc39de9759e27cc55a912bd609361d0"
+    },
+    {
+      "original": "tests/test_saa_saved_model_policy.py",
+      "reference": "reference/baseline/tests/test_saa_saved_model_policy.py",
+      "sha256": "fb207786a9f493c375d552fc689b782d79d271930ad5caf5a04018cb3c30d904"
+    },
+    {
+      "original": "tests/test_saa_saved_model_recovery.py",
+      "reference": "reference/baseline/tests/test_saa_saved_model_recovery.py",
+      "sha256": "abef1445e561148793f71f2f5d775f33155e3bf81fcf8c9f846a088e23e7c93c"
+    },
+    {
+      "original": "tests/test_saa_streaming.py",
+      "reference": "reference/baseline/tests/test_saa_streaming.py",
+      "sha256": "6fd053ee118d52657ae77edc1a6cd306def3425934c336537f4ba63a3278a04f"
+    },
+    {
+      "original": "tests/test_saa_streaming_audit.py",
+      "reference": "reference/baseline/tests/test_saa_streaming_audit.py",
+      "sha256": "dac1cf274e6943b09f3936e172500613dbe7bcd2029e4ded3c9651030c3fc51a"
+    },
+    {
+      "original": "tests/test_saa_streaming_solve.py",
+      "reference": "reference/baseline/tests/test_saa_streaming_solve.py",
+      "sha256": "3b36318f3fa31436474c53afdb37696436228e7a5dd400e528af4ee8d7102cb6"
+    },
+    {
+      "original": "tests/test_saa_streaming_store.py",
+      "reference": "reference/baseline/tests/test_saa_streaming_store.py",
+      "sha256": "ed5335fe3c7379193e238e1b98f658ed7f1a485f8669bb99bba602e30eb459bd"
+    },
+    {
+      "original": "tests/test_saa_validator_recovery.py",
+      "reference": "reference/baseline/tests/test_saa_validator_recovery.py",
+      "sha256": "9c849f36298fd5a99e3ac36189a60d036e53c3311889af20f6bd456f4b64281a"
+    },
+    {
+      "original": "tests/test_saa_validator_recovery_independent.py",
+      "reference": "reference/baseline/tests/test_saa_validator_recovery_independent.py",
+      "sha256": "e50d77e3111b442d3a72b904d4950072bdf0ba454a633a2ff8ab25caa76c163a"
+    },
+    {
+      "original": "tests/test_saa_warm_start_recovery.py",
+      "reference": "reference/baseline/tests/test_saa_warm_start_recovery.py",
+      "sha256": "49e5fda1bf10a9a445690c21f2f98245abdfd685862f19226f9a7fab174e8efc"
+    },
+    {
+      "original": "tests/test_saa_zero_start_independent.py",
+      "reference": "reference/baseline/tests/test_saa_zero_start_independent.py",
+      "sha256": "7b521368eee8720d958fa4df20c8cef22308d4e2fb2d2ed2b84fad2e8d10247a"
+    },
+    {
+      "original": "tests/test_scale_ccg_cli.py",
+      "reference": "reference/baseline/tests/test_scale_ccg_cli.py",
+      "sha256": "dc7f91ba2091890fe15c0a81743b67817fbca8b7023af745fdc773e63c677819"
+    },
+    {
+      "original": "tests/test_scenario_features.py",
+      "reference": "reference/baseline/tests/test_scenario_features.py",
+      "sha256": "40a42611e9308968594b5bac559e9ef0dcfb86c83a8ae50bf15c77f808f2df58"
+    },
+    {
+      "original": "tests/test_sealed_plan_record.py",
+      "reference": "reference/baseline/tests/test_sealed_plan_record.py",
+      "sha256": "831f95c00c67ddedbf909b2de37f884071288de6058a10f98ad376f3d9c32af1"
+    },
+    {
+      "original": "tests/test_task_replay.py",
+      "reference": "reference/baseline/tests/test_task_replay.py",
+      "sha256": "8f41c762fbc442003b5c9ac6dbcd2b29b5829a109501ef8c3a025776d1fd7cf6"
+    },
+    {
+      "original": "tests/test_validate_formal_adapter.py",
+      "reference": "reference/baseline/tests/test_validate_formal_adapter.py",
+      "sha256": "d6340c491e32e082dba405cca73ea2d9f178a561dfa66bedc0ff7d148c62f516"
+    },
+    {
+      "original": "tests/test_wind_field.py",
+      "reference": "reference/baseline/tests/test_wind_field.py",
+      "sha256": "de24d055f12714e1dd4f8080a1bddb5029ec6eb5e3d9bce4fcfe65f7ccf96c09"
+    },
+    {
+      "original": "tests/test_wind_scenarios.py",
+      "reference": "reference/baseline/tests/test_wind_scenarios.py",
+      "sha256": "fb05f2735ec4a0ed2eedbe6452f41e7b93570d87543f03b0feebc9e493e93a12"
+    },
+    {
+      "original": "tests/test_zero_presolve.py",
+      "reference": "reference/baseline/tests/test_zero_presolve.py",
+      "sha256": "82817915d089dab79ba5c739161198b35c92c35cfcedc3a52d3426817ffdf3f1"
+    },
+    {
+      "original": "tests/test_zero_reduction_audit.py",
+      "reference": "reference/baseline/tests/test_zero_reduction_audit.py",
+      "sha256": "c725ddb195f34c6a6b8cb52d8a4483474f157e0b2626bf3a6feb6c647c132bdb"
+    },
+    {
+      "original": "powerai_l08/L08_DRO_R41_NESTED_BENDERS_ROOT/REPAIR_01/tools/certificate_core.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO_R41_NESTED_BENDERS_ROOT/REPAIR_01/tools/certificate_core.py",
+      "sha256": "0cff056199aebf368406aa5bc435fda008661cb53e521d13c07c48310d041ca1",
+      "origin": "supplemental-frozen-source"
+    },
+    {
+      "original": "powerai_l08/L08_DRO_R41_NESTED_BENDERS_ROOT/REPAIR_01/tools/r41_common.py",
+      "reference": "reference/baseline/powerai_l08/L08_DRO_R41_NESTED_BENDERS_ROOT/REPAIR_01/tools/r41_common.py",
+      "sha256": "e17f4b3556dfcbe017aa8529098af29d16f2c09e2d04533a7e6e9330c32e07f0",
+      "origin": "supplemental-frozen-source"
+    }
+  ],
+  "configuration_files": [
+    {
+      "original": "configs/local.example.toml",
+      "reference": "reference/baseline/configs/local.example.toml",
+      "sha256": "50509cfc8c9d83b8564386ff7c633f95772f225d27fd828f467809ad2fa56441"
+    }
+  ]
+}

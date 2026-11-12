@@ -13,11 +13,22 @@ def lock(store, study, decisions, *, methods, sample_ids, random_stream, protoco
         raise ValueError("Unique locked methods and samples required")
     if not protocol or not random_stream or len(decisions) != len(methods):
         raise ValueError("Incomplete evaluation lock")
+    from ev_assignment_experiments.workflows.audit import reaudit
+
     plans = {}
+    replaced = {
+        json_key(v["payload"].get("supersedes"))
+        for _, v in store.records("decisions")
+        if v["payload"].get("supersedes")
+    }
     for decision in decisions:
+        if json_key(decision.as_dict()) in replaced:
+            raise ValueError("A superseded acceptance cannot lock a new evaluation")
         row = store.read(decision)["payload"]
         if row.get("outcome") not in {"adopted", "approximate"} or row["study"] != study:
             raise ValueError("Evaluation requires explicit accepted plans for this study")
+        if not reaudit(store, Ref(**row["attempt"]))["passed"]:
+            raise ValueError("Accepted plan no longer passes independent audit")
         attempt = store.read(Ref(**row["attempt"]))["payload"]
         result = __import__("json").loads(store.object(Ref(**attempt["result"])))
         method = result["method"]
@@ -81,3 +92,9 @@ def paired_summary(locked, observations):
             for m, a in values.items()
         },
     )
+
+
+def json_key(value):
+    import json
+
+    return json.dumps(value, sort_keys=True)

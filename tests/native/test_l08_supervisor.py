@@ -57,7 +57,10 @@ def test_real_parent_worker_audit_and_offline_archive(tmp_path, method):
     with pytest.raises(ValueError, match="explicit checkpoint"):
         launch(store, run)
     destination = Store(tmp_path / "offline")
-    store.sync_to(destination, [attempt])
+    from ev_assignment_experiments.tracking.sync import synchronize
+    from ev_assignment_experiments.tracking.transfer import FilesystemSource
+    synchronize(FilesystemSource(store), destination, [attempt])
+    assert reaudit(destination, attempt)["execution_settlement"] is not None
     assert reaudit(destination, attempt)["passed"]
     assert not payload["accepted_for_comparison"]
     if method == "ARO":

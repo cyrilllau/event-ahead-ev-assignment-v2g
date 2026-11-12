@@ -78,7 +78,20 @@ def context(store: Store, study: str, limit: int = 10, *, offset=0, refresh=Fals
         from ev_assignment_experiments.runtime.supervisor import status
 
         claim = json.loads(current.read_text())
-        value = status(store, claim["attempt"])
+        if claim.get("kind") == "paired_evaluation":
+            from ev_assignment_experiments.runtime.identity import matches
+            from ev_assignment_experiments.runtime.ledger import BudgetLedger
+
+            state = BudgetLedger(store.root, claim["budget_group"]).read()
+            value = dict(
+                kind="paired_evaluation",
+                run=claim["run"],
+                owner_live=matches(claim["owner"]),
+                unsettled=state["active"] is not None,
+                spent_seconds=state["spent_seconds"],
+            )
+        else:
+            value = status(store, claim["attempt"])
         ref = store.put(
             "observations",
             dict(study=study, observed_at=utcnow(), origin="local_process_query", value=value),
@@ -107,6 +120,10 @@ def context(store: Store, study: str, limit: int = 10, *, offset=0, refresh=Fals
     adopted = [p for p in active if p.get("outcome") in {"adopted", "approximate"}]
     actions = [p for p in active if p.get("kind") == "next_action"]
     studies = records("studies")
+    runs = records("runs")
+    evaluation_audits = [r for r in records("audits") if r.get("kind") == "paired_evaluation_audit"]
+    finished_evaluations = {r["run"]["id"] for r in evaluation_audits if r.get("passed")}
+    pending_runs = [r for r in runs if r["ref"]["id"] not in settled | finished_evaluations]
     observations.sort(key=lambda p: p.get("observed_at", ""), reverse=True)
     failures = [r for r in rows if r["execution"] == "failed" or r["scientific"] == "fail"]
     result = dict(
@@ -120,6 +137,10 @@ def context(store: Store, study: str, limit: int = 10, *, offset=0, refresh=Fals
         offset=offset,
         next_offset=offset + limit if offset + limit < len(rows) else None,
         attempts=rows[offset : offset + limit],
+        planned_runs=[bounded(r) for r in pending_runs[offset : offset + limit]],
+        planned_runs_omitted=max(0, len(pending_runs) - len(pending_runs[offset : offset + limit])),
+        evaluation_audits=[bounded(r) for r in evaluation_audits[-limit:]],
+        evaluation_audits_omitted=max(0, len(evaluation_audits) - limit),
         objectives=studies[:limit],
         objectives_omitted=max(0, len(studies) - limit),
         unsettled_claims=unresolved[:limit],
@@ -155,6 +176,14 @@ def markdown(value):
                 f"- Goal: {p.get('objective', '')} / protocol: {p.get('protocol', '')}",
                 f"  Evidence: studies/{p['ref']['id']}",
             ]
+        )
+    for p in value.get("planned_runs", []):
+        lines.append(
+            f"- runs/{p['ref']['id']}: planned {p.get('kind', 'planning')}; inspect attempts/evaluation audits"
+        )
+    for p in value.get("evaluation_audits", []):
+        lines.append(
+            f"- audits/{p['ref']['id']}: paired evaluation {p.get('cells')}/{p.get('required_cells')}; passed={p.get('passed')}"
         )
     for p in value["attempts"]:
         lines.append(

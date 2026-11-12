@@ -37,7 +37,11 @@ ev-assignment --store /absolute/research-store audit --id ATTEMPT_SHA
 ev-assignment --store /absolute/research-store context --study l08-smoke-det --refresh --markdown
 ```
 
-DRO and ARO have corresponding small physical examples. Frozen400 runs require an
+DRO and ARO have corresponding small physical examples. Complete frozen-domain definitions
+are `experiments/l08/frozen-{det,dro,aro}.toml`; `plan-frozen` binds their explicit
+input root, study and resource budget. Only `ev-assignment` is installed by default.
+For historical cross-version checks, separately install `./reference/baseline` with
+`--no-deps`; it is never a runtime dependency. Frozen400 runs require an
 explicit input manifest and their own scientific/resource admission. A successful
 small example or a matrix identity check does not establish full-size convergence.
 
@@ -50,7 +54,7 @@ small example or a matrix identity check does not establish full-size convergenc
 | `tests/native` | Explicit real Gurobi validation |
 | `tests/scientific` | Preserved scientific assertions against extracted kernels |
 | `docs/`, `skills/` | Architecture, operating rules and task-specific agent instructions |
-| `src/evcs_experiments`, `powerai_l08`, original tests/scripts | Byte-preserved historical reference; no new-code dependency |
+| `reference/baseline/` | Original source/scripts/tests, byte-preserved and excluded from the active install |
 
 New core imports neither experiment infrastructure nor legacy code. Input roots are
 explicit. Optional Gurobi loads only when requested. Original source-bound acceptance
@@ -84,7 +88,11 @@ Metadata-only sync is explicitly **not** an archived result. Complete bundles co
 the exact installable source, input/evidence closure, environment and commands to audit,
 regenerate result tables, smoke-test and explicitly rerun a selected experiment.
 Publication selection requires recorded decisions. DET/DRO/ARO training objectives are
-not interchangeable evaluation metrics; paired evaluation has a separate plan/sample lock.
+not interchangeable evaluation metrics. `evaluate lock/run/audit/recover` executes
+bounded paired fixed-plan evaluation with per-sample witnesses, cumulative costs and
+checkpointed cells. `import-legacy` brings explicit historical files into the archive
+without granting new-source acceptance or adopting their processes. See the operating
+guide for complete command examples and schemas.
 
 The final paper repository will be created separately, after final results are selected
 and audited. This private development repository excludes results, artifacts, logs,

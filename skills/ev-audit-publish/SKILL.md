@@ -18,3 +18,9 @@ Use explicit publication items (label, attempt, decision, generator), then `bund
 outside the checkout. Publish the reviewed package in a separate public repository only
 when the user has selected the paper results and authorized publication. Engineering
 examples are not paper results. Metadata-only synchronization is not a complete archive.
+
+Execute common evaluation with `evaluate lock/run/audit` and its exact sample manifest;
+read `docs/operations/EVALUATION_CN.md`. Resume cells under the same Run/budget.
+Publication `evaluations` items bind the exact three plans to `paired_metrics`; incomplete
+comparison or missing settlement is rejected. Validate `reproduce.py evaluation` as
+well as offline figures. `import-legacy` observations alone cannot qualify paper results.

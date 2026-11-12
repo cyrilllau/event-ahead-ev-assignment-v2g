@@ -9,7 +9,9 @@ from ev_assignment_experiments.publication.bundle import build, verify, select, 
 from ev_assignment_experiments.runtime.release import verify as verify_release
 
 
-def test_selected_bundle_has_exact_installable_source_and_reproducible_tables(tmp_path):
+def test_selected_bundle_has_exact_installable_source_and_reproducible_tables(
+    tmp_path, monkeypatch
+):
     store = Store(tmp_path / "store")
     exp = Experiment.parse(
         dict(
@@ -53,6 +55,18 @@ def test_selected_bundle_has_exact_installable_source_and_reproducible_tables(tm
         check=True,
         capture_output=True,
     )
+    assert manifest["generator_source"]["id"] in manifest["source_releases"]
+    import io, zipfile
+
+    bad_source = io.BytesIO()
+    with zipfile.ZipFile(bad_source, "w") as z:
+        z.writestr("ev_assignment/__init__.py", "changed generator")
+    with monkeypatch.context() as patcher:
+        from ev_assignment_experiments.workflows import probability
+
+        patcher.setattr(probability, "source_snapshot", lambda: bad_source.getvalue())
+        with pytest.raises(ValueError, match="exact generator_source"):
+            render(out)
     (release / "src/ev_assignment/__init__.py").write_text("changed")
     with pytest.raises(ValueError, match="release changed"):
         verify(out)

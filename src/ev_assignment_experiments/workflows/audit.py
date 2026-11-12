@@ -112,7 +112,7 @@ def reaudit(store, ref, *, register=False):
         audit = store.put(
             "audits",
             dict(study=recipe.study, attempt=ref.as_dict(), report=report, observed_at=utcnow()),
-            [ref],
+            [ref] + ([sr] if settlement else []),
         )
         report["audit_ref"] = audit.as_dict()
     return report

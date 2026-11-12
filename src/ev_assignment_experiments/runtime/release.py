@@ -27,6 +27,7 @@ def build(source_bytes, destination):
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(archive.read(name))
     deps = [f"{k}=={env[k]}" for k in ("numpy", "scipy", "networkx", "psutil")]
+    deps += [f"{k}=={v}" for k, v in env.get("publication_dependencies", {}).items()]
     optional = (
         f'\n[project.optional-dependencies]\ngurobi = ["gurobipy=={env["gurobipy"]}"]\n'
         if env.get("gurobipy")

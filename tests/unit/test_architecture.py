@@ -67,7 +67,14 @@ def test_l08_source_and_extraction_manifest(pytestconfig):
     for row in manifest["files"]:
         for role in ("source", "target"):
             assert (
-                hashlib.sha256((root / row[role]).read_bytes()).hexdigest() == row[role + "_sha256"]
+                hashlib.sha256(
+                    (
+                        (root / "reference/baseline" / row[role])
+                        if role == "source"
+                        else (root / row[role])
+                    ).read_bytes()
+                ).hexdigest()
+                == row[role + "_sha256"]
             )
 
 
@@ -75,7 +82,10 @@ def test_baseline_source_bytes_preserved(pytestconfig):
     root = Path(pytestconfig.rootpath)
     manifest = json.loads((root / "docs/architecture/baseline-source-manifest.json").read_text())
     for row in manifest["files"]:
-        assert hashlib.sha256((root / row["path"]).read_bytes()).hexdigest() == row["sha256"]
+        assert (
+            hashlib.sha256((root / "reference/baseline" / row["path"]).read_bytes()).hexdigest()
+            == row["sha256"]
+        )
 
 
 def test_native_numerical_functions_keep_original_ast(pytestconfig):
@@ -101,11 +111,18 @@ def test_native_numerical_functions_keep_original_ast(pytestconfig):
     for row in manifest["files"]:
         for role in ("source", "target"):
             assert (
-                hashlib.sha256((root / row[role]).read_bytes()).hexdigest() == row[role + "_sha256"]
+                hashlib.sha256(
+                    (
+                        (root / "reference/baseline" / row[role])
+                        if role == "source"
+                        else (root / row[role])
+                    ).read_bytes()
+                ).hexdigest()
+                == row[role + "_sha256"]
             )
         old = {
             n.name: n
-            for n in ast.parse((root / row["source"]).read_text()).body
+            for n in ast.parse((root / "reference/baseline" / row["source"]).read_text()).body
             if isinstance(n, ast.FunctionDef)
         }
         new = {

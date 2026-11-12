@@ -5,11 +5,8 @@
 !/README.md
 !/pyproject.toml
 !/requirements.lock
-!/configs/local.example.toml
-!/src/evcs_experiments/**/*.py
 !/tests/**/*.py
 !/scripts/**/*.py
-!/powerai_l08/**/*.py
 !/AGENTS.md
 !/uv.lock
 !/docs/**/*.md
@@ -33,3 +30,14 @@
 **/*.egg-info/
 !/skills/**/SKILL.md
 !/reproduction/*.md
+
+!/reference/**/*.py
+!/reference/**/*.md
+!/reference/**/pyproject.toml
+
+**/build/
+**/dist/
+**/__pycache__/
+**/*.egg-info/
+
+!/reference/baseline/configs/*.toml

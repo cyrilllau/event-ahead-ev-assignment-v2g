@@ -10,6 +10,7 @@ def synchronize(source, destination, roots, *, mode="results"):
     if mode not in {"metadata", "results", "full"}:
         raise ValueError("Unknown sync mode")
     if mode != "metadata":
+        roots = include_settlements(source, roots)
         receipt = transfer(source, destination, roots)
         receipt.update(mode=mode, archived=True, observed_at=utcnow())
         return receipt
@@ -53,7 +54,7 @@ def synchronize(source, destination, roots, *, mode="results"):
 
 def study_roots(store, study, mode):
     kinds = (
-        ("attempts", "audits", "decisions", "publications")
+        ("attempts", "audits", "decisions", "publications", "observations")
         if mode == "results"
         else tuple(
             sorted(
@@ -102,7 +103,9 @@ def watch_ssh(source, destination, study, *, seconds=60, interval=5, mode="resul
     if not 0 < seconds <= 3600 or not 0 < interval <= 60:
         raise ValueError("Watch must be bounded")
     kinds = (
-        ("attempts",) if mode == "metadata" else ("attempts", "audits", "decisions", "publications")
+        ("attempts",)
+        if mode == "metadata"
+        else ("attempts", "audits", "decisions", "publications", "observations")
     )
     if mode == "full":
         kinds += ("studies", "experiments", "runs", "events", "checkpoints", "observations")
@@ -138,3 +141,25 @@ def watch_ssh(source, destination, study, *, seconds=60, interval=5, mode="resul
     return dict(
         observation=observation.as_dict(), receipts=receipts, error=error, remote_mutations=0
     )
+
+
+def include_settlements(source, roots):
+    """A sealed attempt precedes its parent's wait; pull that later receipt as a root."""
+    roots = list(roots)
+    attempts = {}
+    for ref in roots:
+        if ref.kind == "attempts":
+            value = record(source, ref)["payload"]
+            attempts.setdefault(value["study"], []).append(ref.as_dict())
+    for study, selected in attempts.items():
+        if isinstance(source, FilesystemSource):
+            candidates = [
+                r for r, v in source.store.records("events") if v["payload"].get("study") == study
+            ]
+        else:
+            candidates = source.inventory(study, ("events",))
+        for ref in candidates:
+            p = record(source, ref)["payload"]
+            if p.get("kind") == "parent_settlement" and p.get("attempt") in selected:
+                roots.append(ref)
+    return sorted(set(roots))

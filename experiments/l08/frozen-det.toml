@@ -1,0 +1,27 @@
+# Full frozen scientific domain; bind an explicit new study/budget before planning.
+# This does not replace or resume any historical PowerAI run.
+schema_version = 1
+[recipe]
+title = "L08 DET: frozen 30 EV experiment"
+method = "DET"
+input_kind = "frozen_l08"
+input_manifest = "310d39bcafa28a095460aa81d593cfef83e7dcb6f6a4009bdef06ce074258d7a"
+hypothesis = "Compare fixed-route reserve procurement under the common locked evaluation protocol"
+baseline = "DET forecast44; common paired evaluation, not training objective ranking"
+[science]
+protocol = "L08_FULL_DWELL_FORECAST44_V1"
+vehicles = 30
+planning_scenarios = "forecast44"
+forecast_id = 44
+support_size = 400
+fixed_routes = true
+fixed_factors = ["network", "fleet", "forecast", "route domain", "costs", "units", "initial states"]
+varied_factors = ["planning method"]
+metrics = ["audited objective bounds", "gap", "common evaluation cost", "critical ENS", "actual V2G", "shortfall"]
+oos_access = false
+[solver]
+threads = 1
+seed = 0
+mip_gap = 0
+absolute_gap = 1
+soft_memory_gb = 4

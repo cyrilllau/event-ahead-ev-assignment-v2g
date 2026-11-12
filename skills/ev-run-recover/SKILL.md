@@ -19,3 +19,8 @@ legacy jobs have their own authority, budgets and releases; this skill does not 
 adopting their process, installing over their code or restarting them. Stop the current
 inspection after a healthy bounded background launch; subsequent inspection verifies
 its receipt and scientific evidence separately.
+
+Use `plan-frozen` to bind a catalog recipe and explicit resources. Paired evaluation
+slices use `evaluate run` (<=60s) and share the study lock with planning. Only explicit
+`evaluate recover` can settle a proven dead evaluator; it archives the original ledger
+and retains previously completed cells. Imported old process IDs are never adopted.

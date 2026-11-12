@@ -15,6 +15,35 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
     p = sub.add_parser("plan")
     p.add_argument("--experiment", required=True)
+    p = sub.add_parser("plan-frozen")
+    p.add_argument("--recipe", required=True)
+    p.add_argument("--input-root", required=True)
+    p.add_argument("--study", required=True)
+    p.add_argument("--budget-group", required=True)
+    p.add_argument("--budget-seconds", type=float, required=True)
+    p.add_argument("--seconds", type=float, required=True)
+    p.add_argument("--master-seconds", type=float, required=True)
+    p = sub.add_parser("import-legacy")
+    p.add_argument("--manifest", required=True)
+    p.add_argument("--root", required=True)
+    p.add_argument("--host")
+    p = sub.add_parser("evaluate")
+    ev = p.add_subparsers(dest="action", required=True)
+    q = ev.add_parser("lock")
+    q.add_argument("--study", required=True)
+    q.add_argument("--decision", action="append", required=True)
+    q.add_argument("--manifest", required=True)
+    q.add_argument("--budget-group", required=True)
+    q.add_argument("--budget-seconds", type=float, required=True)
+    q = ev.add_parser("run")
+    q.add_argument("--id", required=True)
+    q.add_argument("--input-root", required=True)
+    q.add_argument("--seconds", type=float, default=60)
+    q.add_argument("--max-cells", type=int)
+    q = ev.add_parser("recover")
+    q.add_argument("--id", required=True)
+    q = ev.add_parser("audit")
+    q.add_argument("--id", required=True)
     p = sub.add_parser("run")
     p.add_argument("--id", required=True)
     p = sub.add_parser("audit")
@@ -98,6 +127,49 @@ def main(argv=None):
                 if value.get("schema_version") == 2
                 else probability.plan(store, Experiment.parse(value))
             ).as_dict()
+        elif args.command == "plan-frozen":
+            from ev_assignment_experiments.config.catalog import bind
+
+            recipe = bind(
+                args.recipe,
+                input_root=args.input_root,
+                study=args.study,
+                budget_group=args.budget_group,
+                budget_seconds=args.budget_seconds,
+                seconds=args.seconds,
+                master_seconds=args.master_seconds,
+            )
+            result = l08.plan(store, recipe).as_dict()
+        elif args.command == "import-legacy":
+            from ev_assignment_experiments.tracking.legacy import import_manifest
+
+            result = import_manifest(
+                store, json.loads(Path(args.manifest).read_text()), root=args.root, host=args.host
+            ).as_dict()
+        elif args.command == "evaluate":
+            from ev_assignment_experiments.workflows import evaluation
+
+            if args.action == "lock":
+                result = evaluation.prepare(
+                    store,
+                    study=args.study,
+                    decisions=[Ref("decisions", d) for d in args.decision],
+                    manifest=json.loads(Path(args.manifest).read_text()),
+                    budget_group=args.budget_group,
+                    budget_seconds=args.budget_seconds,
+                ).as_dict()
+            elif args.action == "run":
+                result = evaluation.execute(
+                    store,
+                    Ref("runs", args.id),
+                    input_root=args.input_root,
+                    seconds=args.seconds,
+                    max_cells=args.max_cells,
+                )
+            elif args.action == "recover":
+                result = evaluation.recover(store, Ref("runs", args.id))
+            else:
+                result = evaluation.audit(store, Ref("runs", args.id), register=True)
         elif args.command == "run":
             run = Ref("runs", args.id)
             if store.read(run)["payload"].get("schema_version") == 2:

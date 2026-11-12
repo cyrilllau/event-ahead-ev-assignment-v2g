@@ -285,7 +285,7 @@ class L08Dataset:
         )
         return self._ambiguity
 
-    def problem(self, method):
+    def problem(self, method, *, include_ambiguity=True):
         if method not in {"DET", "DRO", "ARO"}:
             raise ValueError("Unknown method")
         ids = ("forecast44",) if method == "DET" else tuple(f"train/{i:04d}" for i in range(400))
@@ -308,7 +308,7 @@ class L08Dataset:
             energy_bounds=self.bounds,
             scenario_ids=ids,
             scenario=self.scene,
-            ambiguity=self.ambiguity() if method == "DRO" else None,
+            ambiguity=self.ambiguity() if method == "DRO" and include_ambiguity else None,
             scope="L08_FROZEN400",
             det_proof=proof,
         )

@@ -63,6 +63,21 @@ def source_snapshot() -> bytes:
             name: metadata.version(name)
             for name in ("numpy", "scipy", "networkx", "psutil", "ev-assignment")
         }
+        versions["publication_dependencies"] = {
+            name: metadata.version(name)
+            for name in (
+                "matplotlib",
+                "contourpy",
+                "cycler",
+                "fonttools",
+                "kiwisolver",
+                "pillow",
+                "pyparsing",
+                "python-dateutil",
+                "tzdata",
+                "packaging",
+            )
+        }
         try:
             versions["gurobipy"] = metadata.version("gurobipy")
         except metadata.PackageNotFoundError:

@@ -10,7 +10,9 @@ Read `docs/architecture/IMPLEMENTATION_STATUS.md` and the relevant operating sec
   `--extra gurobi`. CI: `pytest tests/unit tests/integration` plus portable scientific checks.
 - Scientific inputs use explicit manifests. Preserve units, stream addresses, pairing,
   fixed routes/H, initial states, physical tolerances and OOS locks.
-- Baseline sources/scripts/tests are byte-preserved reference. Never repoint historical
+- Historical sources/scripts/tests are byte-preserved under `reference/baseline/`,
+  excluded from the active install and default test collection. Install its reference
+  distribution only for explicit scientific cross-version tests. Never repoint historical
   acceptance hashes or loosen assertions. Private scientific fixtures use explicit roots.
 - Source/config changes create a new Run; the same budget group retains old costs.
   Execution, physics, convergence and adoption are distinct. Near-optimal acceptance
@@ -26,3 +28,11 @@ Read `docs/architecture/IMPLEMENTATION_STATUS.md` and the relevant operating sec
 
 Task instructions: `skills/ev-develop/SKILL.md`, `skills/ev-run-recover/SKILL.md`,
 `skills/ev-audit-publish/SKILL.md`. These call the common CLI, not duplicate controllers.
+
+- Full frozen recipes: `experiments/l08/frozen-{det,dro,aro}.toml`, bound via `plan-frozen`.
+  Evaluation: `evaluate lock/run/audit/recover`; preserve exact accepted plans, sample
+  manifest, random stream and source. Each slice <=60s; resume same Run/budget.
+- Existing files enter through `import-legacy` with an explicit manifest. Imported
+  historical status is unchecked observation; do not reinterpret it as live/adopted.
+- Completion gate: `docs/architecture/DEFG_REMAINING_CN.md`. Historical small-test
+  acceptance does not prove full-scale convergence or production replacement admission.

@@ -19,7 +19,7 @@
       "capability_inequalities"
     ]
   },
-  "strategy": "Parallel extraction: baseline legacy callers retained byte-identical until workflow-specific source admission is complete.",
+  "strategy": "Two active namespaces only. Historical sources and controllers are relocated byte-identically under reference/baseline, outside default installation. Exact path/SHA translation: reference-locations.json.",
   "active_l08": {
     "domain": "ev_assignment.domain.planning",
     "compact_native": "ev_assignment.l08.native",
@@ -29,7 +29,12 @@
     "frozen_input_adapter": "ev_assignment_experiments.datasets.l08",
     "run_and_recovery": "ev_assignment_experiments.runtime.supervisor",
     "records": "ev_assignment_experiments.tracking",
-    "publication": "ev_assignment_experiments.publication.bundle"
+    "publication": "ev_assignment_experiments.publication.bundle",
+    "common_evaluation": "ev_assignment_experiments.workflows.evaluation",
+    "paired_inputs": "ev_assignment_experiments.datasets.evaluation",
+    "legacy_import": "ev_assignment_experiments.tracking.legacy",
+    "figures": "ev_assignment_experiments.publication.figures",
+    "formal_recipes": "experiments/l08/frozen-{det,dro,aro}.toml"
   },
   "historical_boundary": "Original bytes retained as references; current engineering validation does not re-admit or restart any historical campaign."
 }

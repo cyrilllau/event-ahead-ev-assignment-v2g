@@ -1,6 +1,6 @@
 """Frozen L08 run recipe; implementation, data, resources and budget stay explicit."""
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 import math
 from pathlib import Path
 import tomllib
@@ -23,6 +23,7 @@ class RunPlan:
     baseline: str = ""
     inherited_seconds: float = 0.0
     inherited_evidence: tuple = ()
+    design: dict = field(default_factory=dict)
 
     @classmethod
     def load(cls, path):
@@ -46,6 +47,7 @@ class RunPlan:
             "baseline",
             "inherited_seconds",
             "inherited_evidence",
+            "design",
         }
         required = {
             "schema_version",
@@ -111,6 +113,7 @@ class RunPlan:
             value.get("baseline", ""),
             float(inherited),
             evidence,
+            value.get("design", {}),
         )
 
     def as_dict(self):

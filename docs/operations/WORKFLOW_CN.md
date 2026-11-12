@@ -7,7 +7,8 @@
 
 Python 3.12：`uv sync --locked --group dev`。实际求解加 `--extra gurobi`，使用
 Gurobi 12.0.3 和用户已有许可；导入包不初始化许可证。所有 CLI 的 `--store ABS`
-放在子命令之前。可选 `evcs` 入口仅为保留的历史工具，不能据此启动旧工作流。
+放在子命令之前。默认只安装 `ev-assignment`。历史源码在 `reference/baseline/`，不进入 wheel；
+交叉版本测试显式 `pip install --no-deps ./reference/baseline`，其不安装旧 CLI。
 
 ```bash
 ev-assignment --store ABS plan --experiment experiments/l08/smoke-det.toml
@@ -86,11 +87,26 @@ ev-assignment --store ABS verify-bundle --destination /absolute/new-bundle
 ```
 
 selection JSON 包含 study、title、items；每项固定 label、attempt Ref、decision Ref、
-generator=`objective_table`。扩展图表生成器时增加具名实现和测试，不执行任意 shell。
+generator=`objective_table` 或 `procurement_profile`。可选 evaluations 列表的每项是
+label、run Ref、generator=`paired_metrics`，必须恰好绑定所选三个方法的方案。
+共同评价未齐或缺费用封口不可入包。生成目标表、采购表/图、共同指标表、配对成本差异图；
+PDF/SVG 使用 Matplotlib，误差棒为一个配对标准误，不标作置信区间。
 显式决定不得改写原 gap/native status/convergence；更正通过 supersedes 追加。
-共同评价用 `analysis.evaluation.lock` 锁定所有方法、计划 SHA、配对样本 ID、随机流和
-协议后，才可 `open_sample`。数据读取者显式注入，不会擅自打开未授权 OOS。
-`paired_summary` 拒绝错序、缺失和非有限值。
+共同评价用下面的实际入口锁定三个方法、计划 SHA、配对样本 ID、随机流、协议、
+场景清单和执行源码。锁前只读 manifest 元数据，不读 OOS 物理样本。每单元执行固定方案
+LP、原物理/电池/采购检查，保存 primal/dual 证据，再离线重算统计；缺失不是零。
+训练目标与共同评价严格分开。协议与清单具体格式见 [EVALUATION_CN.md](EVALUATION_CN.md)。
+
+```bash
+ev-assignment --store ABS evaluate lock --study STUDY --decision DET_DECISION --decision DRO_DECISION --decision ARO_DECISION --manifest /absolute/evaluation-manifest.json --budget-group EVAL_GROUP --budget-seconds 120
+ev-assignment --store ABS evaluate run --id EVAL_RUN --input-root /absolute/evaluation-inputs --seconds 60
+ev-assignment --store ABS evaluate audit --id EVAL_RUN
+```
+
+每片最多60秒，同一 Run 续跑只算缺失单元，保留旧费用、失败和已封存证据；源改动要新 Run
+但沿用 budget_group。与规划共用 study 独占锁。意外死亡须显式 `evaluate recover --id EVAL_RUN`，
+只有身份确认已死才保守结算并归档原账本；健康/未知进程拒绝恢复。
+评价的累计预算计入单片内加载、求解、逐样本复核/封存；独立离线审计不属于规划求解预算。
 
 导出包内有完整 archive、实际 source release、环境、结果 CSV/SVG 表及 `reproduce.py`。
 `figures` 从封存结果重绘，`verify` 重审，均不求解；`smoke` 显式新 store、小例和许可证。
@@ -104,3 +120,38 @@ Git 同步源码：本地 commit/push 私有分支；计算机 clone/fetch 后�
 清单；校验 `runtime.release.verify` 后在新环境安装。不得覆盖活动 release、current
 链接、任务 cwd 或输入。服务端临时开发必须在独立分支提交后由本地拉取验证，不将运行
 目录 rsync 到主代码。当前重构没有在 PowerAI 新部署、启动或重启求解器。
+
+## 完整冻结域配方
+
+```bash
+ev-assignment --store ABS plan-frozen --recipe experiments/l08/frozen-det.toml --input-root /absolute/frozen-inputs --study NEW_STUDY --budget-group NEW_GROUP --budget-seconds 120 --seconds 60 --master-seconds 30
+```
+
+此命令只登记，不启动求解。DRO/ARO 使用各自配方。120/60/30是有界开发示例，
+不是正式长任务准入预算；实际资源由该研究授权决定。科学域固定30车、预测44、支持400，
+原1 USD gap/单位/固定路线保留。新控制器不宣称复现历史搜索轨迹或自动接续旧预算。
+
+## 旧格式只读导入
+
+```bash
+ev-assignment --store LOCAL_ABS import-legacy --manifest /absolute/legacy-manifest.json --root /absolute/old-run
+# 显式远端只读，不要求向远端安装或写入：
+ev-assignment --store LOCAL_ABS import-legacy --manifest /absolute/legacy-manifest.json --root /absolute/old-run --host powerai
+```
+
+manifest 键为 schema_version=1、study、title、origin、observed_at、state、scope、files。
+scope 为 selected_reference_files 或 declared_evidence_closure；后者仍只是声明的覆盖范围，
+不是新科学验收。files 每项含 path（相对路径）、sha256、bytes、role、stability。
+role 为 source/config/input/result/audit/log/checkpoint/state；stability 为 sealed 或
+observed_snapshot。必须先明确文件集合/观察时间/哈希；变化文件传输失败时重新生成有新
+观察时间的清单，旧证据保留。导入不执行源码、不恢复 PID、不重标签结果、不扫描整盘 archive。
+结果在 context 的 observations 中有精确引用，之后可 full 同步/离线读取。
+
+## 离线复现层级
+
+`reproduce.py evaluation --evaluation EVAL_RUN --store NEW_ABS --budget-seconds 60`
+从已归档固定方案重算共同评价；不重新规划，也不更改原接受记录。`full --attempt ...`
+重做一项规划，需安装该项精确源码及商业后端；多个来源不能偷偷使用同一新版本。
+复杂研究的全部长任务仍由显式清单和预算逐项执行。开发验收脚本
+`scripts/validation/check_paired_delivery.py --output NEW_ABS` 会实际运行三个小规划、
+中断/续算共同评价并导出完整包，可用于部署新环境的有界验收。

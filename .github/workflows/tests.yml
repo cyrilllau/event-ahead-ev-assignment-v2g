@@ -19,11 +19,12 @@ jobs:
       - run: uv sync --locked --group dev
       - run: uv run ruff check src/ev_assignment_experiments tests/unit tests/integration
       - run: uv run pytest tests/unit tests/integration -q
+      - run: uv pip install --no-deps ./reference/baseline
       - name: Portable scientific regression tests
         shell: bash
         run: |
           for name in probability_check probability_phase1 random_streams first_stage recourse native_gurobi zero_presolve native_highs; do
-            uv run python -m unittest discover -s tests/scientific -p "test_${name}.py" -v || exit 1
+            .venv/bin/python -m unittest discover -s tests/scientific -p "test_${name}.py" -v || exit 1
           done
       - run: uv build --wheel
       # No SSH, no solver license, and no production experiment dispatch in CI.

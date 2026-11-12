@@ -73,3 +73,88 @@ def test_real_dead_parent_claim_preserves_budget(tmp_path):
     settlement = ledger.recover_dead_claim()
     assert settlement["charged_seconds"] == 7 and not settlement["actual_parent_wait"]
     assert ledger.claim({"new": "run"}, 10)["reserved_seconds"] == 3
+
+
+def test_evaluation_recovery_rejects_live_owner_and_archives_real_dead_claim(tmp_path):
+    import subprocess
+    import sys
+    from ev_assignment_experiments.tracking.store import Store, Ref, encode
+    from ev_assignment_experiments.workflows.evaluation import recover
+
+    store = Store(tmp_path / "evaluation")
+    sample = dict(
+        sample_id="s0",
+        origin="runtime-only fixture",
+        physical=dict(path="not-opened", sha256="1" * 64),
+        route_states=dict(path="not-opened", sha256="2" * 64),
+    )
+    spec = store.put_object(
+        encode(
+            dict(
+                schema_version=1,
+                scope="development",
+                domain_sha256="3" * 64,
+                protocol="L08_PAIRED_FIXED_PLAN_V1",
+                random_stream="runtime-fixture",
+                samples=[sample],
+            )
+        )
+    )
+    locked = store.put(
+        "experiments",
+        dict(
+            sample_ids=["s0"], random_stream="runtime-fixture", protocol="L08_PAIRED_FIXED_PLAN_V1"
+        ),
+    )
+    run = store.put(
+        "runs",
+        dict(
+            kind="paired_evaluation",
+            study="s",
+            budget_group="eval",
+            lock=locked.as_dict(),
+            manifest=spec.as_dict(),
+        ),
+        [locked, spec],
+    )
+    ledger = BudgetLedger(store.root, "eval")
+    ledger.create("s", 10)
+    live = ledger.claim(run.as_dict(), 2)
+    with pytest.raises(ValueError, match="live or unknown"):
+        recover(store, run)
+    ledger.settle(live["attempt"], 0, None)
+    # Use another fresh ledger/run to exercise actual process death, not a mocked PID.
+    run = store.put(
+        "runs",
+        dict(
+            kind="paired_evaluation",
+            study="s",
+            budget_group="dead-eval",
+            lock=locked.as_dict(),
+            manifest=spec.as_dict(),
+        ),
+        [locked, spec],
+    )
+    program = """import sys,json,os
+from ev_assignment_experiments.runtime.ledger import BudgetLedger
+l=BudgetLedger(sys.argv[1],'dead-eval');l.create('s',10);l.claim(json.loads(sys.argv[2]),4);os._exit(0)
+"""
+    import json
+
+    subprocess.run(
+        [sys.executable, "-c", program, str(store.root), json.dumps(run.as_dict())], check=True
+    )
+    result = recover(store, run)
+    assert (
+        result["spent_seconds"] == 4
+        and result["remaining_seconds"] == 6
+        and len(result["recovered"]) == 1
+    )
+    assert recover(store, run)["recovered"] == []
+    event = next(
+        v["payload"]
+        for _, v in store.records("events")
+        if v["payload"].get("kind") == "evaluation_recovery"
+    )
+    assert not event["original_settlement"]["actual_parent_wait"]
+    store.closure([Ref(**result["recovered"][0])])

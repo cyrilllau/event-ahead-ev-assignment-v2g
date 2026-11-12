@@ -140,12 +140,14 @@ def materialize_inputs(store, ref):
     return root
 
 
-def problem_for(store, run, recipe):
+def problem_for(store, run, recipe, *, for_evaluation=False):
     ref = Ref(**run["inputs"])
     value = store.read(ref)["payload"]
     if value["kind"] == "synthetic_l08":
         return synthetic.problem(recipe.method, value["definition"])
-    return L08Dataset(materialize_inputs(store, ref), recipe.input_manifest).problem(recipe.method)
+    return L08Dataset(materialize_inputs(store, ref), recipe.input_manifest).problem(
+        recipe.method, include_ambiguity=not for_evaluation
+    )
 
 
 def template_cache(store, problem, source):

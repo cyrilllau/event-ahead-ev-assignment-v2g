@@ -12,15 +12,15 @@ dependencies = [
     "scipy==1.18.1",
     "networkx==3.6.1",
     "psutil>=7,<8",
+    "matplotlib==3.10.7",
 ]
 
 [project.scripts]
 ev-assignment = "ev_assignment_experiments.cli:main"
-evcs = "evcs_experiments.cli:main"
-evcs-case0 = "evcs_experiments.case0_campaign:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["ev_assignment*", "ev_assignment_experiments*"]
 
 [dependency-groups]
 dev = ["pytest>=8", "ruff>=0.9", "build>=1.2"]
@@ -29,6 +29,8 @@ dev = ["pytest>=8", "ruff>=0.9", "build>=1.2"]
 gurobi = ["gurobipy==12.0.3"]
 
 [tool.pytest.ini_options]
+testpaths = ["tests/unit", "tests/integration"]
+norecursedirs = ["reference", ".venv"]
 addopts = "--import-mode=importlib --strict-markers"
 markers = ["gurobi: requires an explicitly configured commercial solver", "private_data: requires separately managed historical inputs"]
 

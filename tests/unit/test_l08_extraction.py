@@ -17,7 +17,7 @@ from ev_assignment.l08 import energy, physics, matrix, reduction
 
 
 def baseline(root):
-    folder = root / "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools"
+    folder = root / "reference/baseline/powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools"
     ns = {
         "np": np,
         "sp": sp,

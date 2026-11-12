@@ -38,7 +38,7 @@ def parent(args):
         sys.executable,
         "-u",
         "-m",
-        __name__,
+        "ev_assignment_experiments.analysis.diagnostic_native",
         "--role",
         "worker",
         "--root",
@@ -89,6 +89,9 @@ def parent(args):
 
 
 def worker(args):
+    if args.stage == "ENTRYPOINT_CHECK":
+        save(Path(args.out) / "ENTRYPOINT.json", dict(solver_calls=0, runtime_probe_only=True))
+        raise RuntimeError("Intentional runtime probe failure before solver import")
     import gurobipy as gp
 
     started = time.monotonic()

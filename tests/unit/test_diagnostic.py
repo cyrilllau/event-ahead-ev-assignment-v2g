@@ -60,3 +60,44 @@ def test_mps_preserves_names_order_bounds_objective(tmp_path):
     np.testing.assert_array_equal(A.toarray(), [[-3.0, 1.0]])
     np.testing.assert_array_equal(data["vtype"], ["B", "C"])
     assert data["hi"][0] == 1 and np.isneginf(data["lo"][1])
+
+
+def test_parent_charges_worker_import_failure_without_invalid_main_entry(tmp_path):
+    import json
+    import subprocess
+    import sys
+
+    out = tmp_path / "attempt"
+    # The explicit probe fails before any solver import, even if a license is
+    # installed: actual module launch and failed-child budget settlement.
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "ev_assignment_experiments.analysis.diagnostic_native",
+            "--root",
+            str(tmp_path / "legacy"),
+            "--replay",
+            str(tmp_path / "replay"),
+            "--out",
+            str(out),
+            "--store",
+            str(tmp_path / "store"),
+            "--stage",
+            "ENTRYPOINT_CHECK",
+            "--code-commit",
+            "test",
+            "--seconds",
+            "2",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "__main__.__spec__" not in (out / "worker.log").read_text()
+    assert json.loads((out / "ENTRYPOINT.json").read_text())["solver_calls"] == 0
+    budget = json.loads((out / "BUDGET_AFTER.json").read_text())
+    assert budget["active"] is None
+    assert 0 < budget["spent_seconds"] < 5
+    assert json.loads((out / "WAIT.json").read_text())["own_child_wait"]

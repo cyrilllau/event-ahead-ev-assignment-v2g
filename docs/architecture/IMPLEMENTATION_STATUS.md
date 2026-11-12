@@ -1,60 +1,26 @@
-# Architecture v2 implementation and acceptance
+# Refactor v2 当前真实状态
 
-Updated 2026-11-11 (America/Los_Angeles). **The planned engineering refactor is
-implemented and locally accepted.** All active source changes are in the new packages.
-Main may advance only after the matching private GitHub CI succeeds. The final Git
-branch/commit and its Actions checks are the delivery authority.
+更新：2026-11-11。当前分支 `codex/complete-refactor-defg`。
+**A/B/C 已完成；D/E/F 部分完成，G 未完成。禁止据此前的完成声明合并。**
 
-Read the [operating guide](../operations/WORKFLOW_CN.md) for actual commands and the
-[acceptance report](ACCEPTANCE_20261111.md) for evidence and scientific limits.
-The [approved plan](REFACTOR_PLAN_V2_CN.md) is retained unchanged. The previous
-[milestone report](IMPLEMENTATION_MILESTONES_1_2.md) is preserved as historical text.
+`970d937` 的“工程重构已全部实现并验收”结论撤回：当时检查证明了新包、
+小例及部分基础设施，并未证明旧结构退役、完整实验迁移或完整共同评价。
+[原验收记录](ACCEPTANCE_20261111.md)中的具体结果保留其原范围，不能扩大解释。
+[批准计划](REFACTOR_PLAN_V2_CN.md)不变。
 
-| Stage | Delivered and validated |
-|---|---|
-| A baseline/closure | Baseline tag, 691 original Python files preserved; current L08 input closure sealed locally: 2,047 files, 401 scenario identities; exact source maps |
-| B foundation | Installed `ev_assignment` core and `ev_assignment_experiments` orchestration; explicit typed inputs/results/config; lazy Gurobi; Python 3.12 / pinned numerical dependencies |
-| C full small workflow | DET/DRO/ARO planning → original physical audit → immutable journal → settlement → sync → offline readback |
-| D methods | Native compact formulation, original numerical certificates, DET R38 screening/cuts, DRO theta/probability separation, ARO max controller; real Gurobi small tests and frozen full-size structural checks |
-| E runtime | Immutable source releases, exclusive study parent, process identity handshake, whole-parent cumulative costs, explicit checkpoint resume, conservative dead-owner recovery; metadata/results/full sync and bounded local/SSH watch |
-| F publication | Explicit decisions/plan locks, paired evaluation guards, bounded JSON/Markdown context, selected source-complete bundles, solver-free audit/table regeneration, smoke and explicit full reproduction |
-| G delivery | Acceptance recorded; update private main only after matching CI success; no results/artifacts tracked |
+| 阶段 | 已有证据 | 剩余验收 |
+|---|---|---|
+| A/B/C | 来源清单、安装/依赖边界、真实小流程 | 保持回归 |
+| D | 数学内核迁移、三方法真实小例、冻结全规模结构比较 | 默认安装去旧包；历史源码隔离且字节可追溯；正式配方/参数/来源注册；方法与共同评价入口接线 |
+| E | supervisor/预算/恢复；新格式 metadata/results/full 同步 | 已有旧实验的只读导入与证据闭包；独立 release 的部署/传回全过程验收；已有运行保护复核 |
+| F | 决定/锁定辅助函数；目标表 bundle | 实际固定方案配对评价、逐样本审计与恢复；来源绑定的共同指标/图表；完整离线复现包 |
+| G | 旧范围 CI | 活动/历史目录收敛、准确迁移清单与运行文档；全门验收、干净安装/离线验证；再合并私有 main |
 
-Current-source acceptance: **71 tests passed**, including **11 actual Gurobi tests**;
-**111 scientific regressions passed** with explicit historical fixture roots. All seven
-structure checks pass, including source bytes/AST and no Gurobi import side effects.
-Clean wheel and exact exported-source installation, offline figures/audit, smoke and
-full reproduction of a development example pass. A 10,000-record context is bounded.
+执行清单：[DEFG_REMAINING_CN.md](DEFG_REMAINING_CN.md)。完成一项需填写当前来源和实际证据，
+组件测试、小例、冻结结构、正式全规模运行分别记录。正式求解尚未完成的结果不伪造；
+用户没有授权替换 PowerAI 健康实验或公开仓库。结果、输入、产物、日志留在外部 store。
 
-## Scientific and operational boundary
-
-This is acceptance of the refactored implementation and research infrastructure.
-It does not relabel historical results or assert convergence of a new full 30-EV,
-400-support campaign. The full frozen model was constructed and compared without
-optimization; a one-EV subset of the real IEEE33 data was solved and independently
-audited. Native global lower bounds remain `native_solver`; numerical LP/physics
-certificates remain `numerical_audit`. No exact-rational global MIP proof is claimed.
-
-The three development methods agree with direct formulations. The reusable controller
-preserves the model/certificate semantics, but does not claim identical historical
-solver trajectories, basis/node trees or S07 benchmark lineage. Production replacement
-requires its own explicit scientific/resource admission and a new immutable release.
-Original PowerAI jobs continue with their original sources and budgets.
-
-The old 1,887-test full suite had 4 failures/49 errors on both the isolated baseline
-and the earlier preserved checkout because of private evidence/configuration/source
-bindings. Those historical results remain unchanged and are not called PASS. No legacy
-assertion/source hash was relaxed. This slice revalidated the applicable 111 scientific
-cases using explicit original data roots; CI uses the portable subset and local tests.
-
-## Where to resume
-
-For development, read `AGENTS.md`, then the task skill in `skills/`. For a study, use
-`ev-assignment --store ABS context --study ID`; inspect the referenced records before
-acting. No OOS sample is opened without a plan/sample/protocol lock. No observation
-implies a server task is dead. No engineering example is automatically a paper result.
-
-Future work is research-specific: register authorized production recipes/releases,
-run the scientific protocol, select final paper evidence, and publish a separate public
-reproduction repository. These are not unfinished engineering migration stages and
-were not executed against the active PowerAI jobs during this refactor.
+2026-11-11 只读观测：L08 DET 原父/子 PID 2850511/2850521 存在，
+入口 SHA256 `8778427bfefd9548e939e6fd17716618b0cd00ea58672c73b0b608321a224fe8`。
+旧 S05 campaign 的 state/NEXT 仍记录九月任务；它不是 L08 运行的实时状态，不能用其
+静态 active_jobs 判断进程健康或替代 L08 进程观测。此次无远端写入、求解或信号。

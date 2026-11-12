@@ -36,14 +36,18 @@ used += sum(e["payload"]["charged_seconds"] for e in snapshot["events"]
             if e["payload"]["kind"] == "external_charge" and e["payload"]["run"].get("stage") == stage)
 available = min(config["stage_caps"][stage] - used, snapshot["remaining_seconds"])
 available = min(available, config.get("run_caps", {}).get(run_id, available))
-if stage != "R5":
+if stage not in config.get("report_stages", ["R5"]):
     available = min(available, snapshot["remaining_seconds"] - config.get("reserve_report_seconds", 0))
 if available < 5:
     raise RuntimeError(f"Stage {stage} has only {available}s remaining; no new admission")
 out = root / stage / run_id
 out.mkdir(parents=True, exist_ok=False)
+(out / "EXECUTION_CONFIG.json").write_bytes((root / "DESIGN_CONFIG.json").read_bytes())
 claim = ledger.claim(dict(stage=stage, run_id=run_id, source=reference(worker),
-                          wrapper=reference(__file__), config=reference(root / "DESIGN_CONFIG.json")),
+                          argv=[python, worker, *extra],
+                          release=reference(Path(worker).parent / "RELEASE.json") if (Path(worker).parent / "RELEASE.json").exists() else None,
+                          freeze=reference(root / "FREEZE.json") if (root / "FREEZE.json").exists() else None,
+                          wrapper=reference(__file__), config=reference(out / "EXECUTION_CONFIG.json")),
                      available, charge_process_start=True)
 save(out / "CLAIM.json", claim)
 rc = 1
@@ -53,8 +57,9 @@ def status(message):
     (root / "CASE_DESIGN_STATUS.md").write_text(
         f"# 合成实例设计状态\n\n{message}\n\n"
         f"Run: {stage}/{run_id}; source: {worker}\n"
-        f"开发已结算 {snapshot['spent_seconds']:.6f}/7200秒；本次预留 {available:.6f}秒，"
-        "预留不是免费额度，所有重试累计。验证未开放。\n"
+        f"预算组 {config.get('budget_group', 'structured-design-development-v1')}："
+        f"已结算 {snapshot['spent_seconds']:.6f}/{config['development_budget']}秒；本次预留 {available:.6f}秒，"
+        "所有重试累计；验证准入以冻结文件与证据为准。\n"
         f"PID/身份: {out}/CHILD.json；日志 {out}/WORKER.log；配置 {root}/DESIGN_CONFIG.json。\n"
         "恢复时先读取预算 active、CHILD.json 并核对远端进程；未知/离线不当作已死，勿重复提交。\n"
         f"下一步：读取 {out}/RESULT.json 与 WAIT.json，按阶段门决定后续；未验收阶段不得宣称通过。\n")
@@ -71,7 +76,7 @@ try:
         identity = wait_identity(child.pid)
         ledger.child(claim["attempt"], identity)
         save(out / "CHILD.json", identity)
-        status(f"A0已通过解析门；{stage}运行中，其结果尚未验收。")
+        status(f"{stage}运行中，其结果尚未验收；之前阶段见追加式 CASE_SEARCH_LEDGER.jsonl。")
         try:
             rc = child.wait(timeout=max(.01, available - (time.monotonic() - start) - 1))
         except subprocess.TimeoutExpired:

@@ -49,7 +49,7 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
     if tuple(s["identity"] for s in scenes) != ambiguity.support_ids:
         raise ValueError("Complete case/ambiguity support identity mismatch")
     nx, ns = len(first["cost"]), len(scenes)
-    options = SolverOptions(seconds=max(.01, allotted), threads=4, seed=101,
+    options = SolverOptions(seconds=min(60., max(.01, allotted)), threads=4, seed=101,
                             mip_gap=relative_gap, absolute_gap=absolute_gap, soft_memory_gb=20,
                             master_seconds=60)
     state = dict(method=method_name, science_identity=case["identity"],
@@ -65,8 +65,12 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                  lower_evidence="native_solver_or_finite_box_LP_certificate",
                  upper_evidence="NUMERICALLY_AUDITED_RECOURSE_PLUS_CERTIFIED_RISK_DUAL",
                  status="RUNNING", prepass_rounds=0)
+    state["first_size"] = dict(vars=nx, rows=first["A"].shape[0], nnz=first["A"].nnz)
+    state["recourse_sizes"] = []
     templates, cached, best_y = {}, {}, None
     def progress():
+        if state["LB"] is not None and state["UB"] is not None:
+            state["gap"] = state["UB"] - state["LB"]
         state["elapsed_seconds"] = time.monotonic() - begun
         event(state.copy())
     def target():
@@ -107,26 +111,30 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                     templates[sid] = cat.build_recourse(case["network"], case["packages"],
                                                        scene["physical"], scene["route_states"], first)
                     state["timing"]["build"] += time.monotonic() - t
+                    state["recourse_sizes"].append(dict(sid=sid, vars=templates[sid].W.shape[1],
+                        rows=templates[sid].W.shape[0], W_nnz=templates[sid].W.nnz, T_nnz=templates[sid].T.nnz))
                 t = time.monotonic()
                 result = recourse.solve(templates[sid], x, options, cc, env=env)
                 state["timing"]["recourse"] += time.monotonic() - t
                 state["recourse_calls"] += 1
                 t = time.monotonic()
-                theta.add_supports(model, variables, nx, tmap[sid],
+                _, _, support_proof = theta.add_supports(model, variables, nx, tmap[sid],
                                    sparse.csr_matrix(result["beta"][None, :]), [result["alpha"]],
                                    [pid], first["lo"], first["hi"], f"support/{sid}/{phase}/{iteration}")
                 state["cuts"] += 1
                 records.append(dict(qL=result["qL"], qU=result["qU_audited"],
-                                    residual=result["residual"], qbar=templates[sid].qbar))
+                                    residual=result["residual"], qbar=templates[sid].qbar,
+                                    global_cut_valid=result["global_cut_valid"], stored_cut_proof=support_proof))
                 ys.append(result["y"])
                 witness("recourse", phase, iteration, sid, x, result)
                 state["timing"]["certificate_and_io"] += time.monotonic() - t
-                if sid % 8 == 0:
+                if sid % 8 == 0 or sid + 1 == ns:
                     state["current_evaluation"] = dict(point=pid, phase=phase, completed=sid + 1, total=ns)
                     progress()
             t = time.monotonic()
             rr = risk.solve(ambiguity, [r["qL"] for r in records], [r["qU"] for r in records],
-                            [r["qbar"] for r in records], cc)
+                            [r["qbar"] for r in records], Control(min(60., cc.remaining),
+                            stop=lambda: cc.stop() or cc.remaining <= 0))
             state["timing"]["probability"] += time.monotonic() - t
             state["probability_calls"] += 1
             pp = rr["pstar"]
@@ -225,6 +233,7 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                         len(case["network"]["station_buses"]), weights, ports=case.get("ports", 20), individual=True)
                 x = np.asarray(state["best"])
                 audits = []
+                state["original_audit"] = audits
                 canonical_contracts = None
                 for sid, scene in enumerate(scenes):
                     control.check()
@@ -240,6 +249,11 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                                  scene["physical"], scene["route_states"], fi)
                     zo, yo = cat.to_original(adapter, fi, ti, xi, yi)
                     original = adapter["matrix"]
+                    if sid == 0:
+                        state["individual_recourse_size"] = dict(vars=ti.W.shape[1], rows=ti.W.shape[0],
+                                                                  W_nnz=ti.W.nnz, T_nnz=ti.T.nnz)
+                        state["original_recourse_size"] = dict(vars=len(original.cost),
+                            rows=original.A.shape[0] + original.H.shape[0], nnz=original.A.nnz + original.H.nnz)
                     component_delta = original.parts @ yo - templates[sid].data["parts"] @ best_y[sid]
                     first_delta = adapter["first"]["cost"] @ zo - first["cost"] @ x
                     if max(np.max(abs(component_delta), initial=0), abs(first_delta)) > 1e-5:
@@ -257,6 +271,9 @@ def solve_structured(case, ambiguity, control, *, weights=(1, 1, 1, 1),
                             name.startswith("incident_capability/") for name in original.row_names["ub"]),
                         canonical_contracts_unchanged=True))
                     witness("original_audit", "integer", rounds, sid, zo, dict(y=yo, audit=audits[-1]))
+                    if sid % 8 == 0 or sid + 1 == ns:
+                        state["audit_completed"] = sid + 1
+                        progress()
                 state["original_audit"] = audits
                 state["original_expansion_audited"] = True
                 state["timing"]["audit"] += time.monotonic() - audit_begin

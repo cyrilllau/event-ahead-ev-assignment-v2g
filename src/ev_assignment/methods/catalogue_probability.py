@@ -50,7 +50,7 @@ def calibrated(identities, features, calibration_features, control, *, marginal=
     lp = linprog(np.r_[np.zeros(len(identities)), -1], A_ub=A, b_ub=np.r_[hi, -lo],
                  A_eq=np.r_[np.ones(len(identities)), 0][None, :], b_eq=[1],
                  bounds=[(0, None)] * len(identities) + [(0, None)], method="highs",
-                 options=dict(threads=1, time_limit=max(.01, control.remaining),
+                 options=dict(threads=1, time_limit=max(.01, min(60., control.remaining)),
                               primal_feasibility_tolerance=1e-9, dual_feasibility_tolerance=1e-9))
     if not lp.success:
         raise ValueError(f"Synthetic moment/support set infeasible or unproved: {lp.message}")

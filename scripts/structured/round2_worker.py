@@ -73,6 +73,8 @@ def main():
     result = dict(status="RUNNING", mode=mode, moment_scope="P3-DRO", original_322311=False,
                   source=reference(__file__), passed=False)
     try:
+        if mode not in {"decompose", "direct", "fixed"}:
+            raise ValueError("Unsupported Round2 development mode; validation uses its own explicit method entry")
         if mode in ["decompose", "direct"]:
             with data.open("rb") as f:
                 case = pickle.load(f)

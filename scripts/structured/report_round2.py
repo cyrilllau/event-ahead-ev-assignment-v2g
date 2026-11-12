@@ -247,7 +247,8 @@ def run_record(ev, root, stage, run_id, budget):
         settled = True
     optimization = raw.get("optimization", {})
     partial = False
-    if progress is not None or (not raw and (folder / "PROGRESS.json").is_file()):
+    if progress is not None or (not optimization and (folder / "PROGRESS.json").is_file()
+            and (not raw or stage in ("R0", "R1", "R2", "VCORE", "VIND", "VABL", "VSTRESS"))):
         progress = progress if progress is not None else ev.json(folder / "PROGRESS.json")
         optimization = progress.get("optimization", progress)
         partial = True
@@ -1127,6 +1128,7 @@ def render_report(data, *, display_root=None):
              "非优化作业（准备、固定政策评价、OOS与汇总）的全局LB/UB、gap及优化原审计列为N/A；其job状态与自身验收单列，不因这些字段不适用而记为界失败。",
              "报告额外核对完整CLAIM与账本payload、整数退出码、冻结source/argv/wrapper/config身份，以及V0中原始SID/权重和方法支持。仅核验metadata及字节哈希，不反序列化CASE/NPZ或重算模型。非有限、负值、缺失分量及非法残差不能被其他0分量抵消；异常布尔标志不当作接受。",
              "审计覆盖采用保存的original_audit列表长度；audit_completed是可能滞后的progress计数，单独保留而不替代实际行数。即使gap已闭合，未完成原审计的政策仍不满足冻结OOS准入；缺任一方法时全部六方法的正式CI保持NOT_ELIGIBLE，不事后放宽。",
+             "若预算停止的最终RESULT未包含optimization，报告从PROGRESS读取最后保存的界及审计，标记progress_only=true并保留双方文件哈希；它不是完整优化收尾或最终审计覆盖，不能支持接受。",
              "## 开发全局结果与失败历史", run_table(data["development"]),
              "额外Run（若存在只列历史，不替换冻结job）：", run_table(data["additional_runs_not_substituted_for_frozen_jobs"]),
              "R0区间对照：" + fmt(data["R0_comparison"]),

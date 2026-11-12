@@ -96,6 +96,15 @@ class SSHSource:
             raise ValueError("Invalid remote size")
         return size
 
+    def inventory(self, study, kinds, limit=10000):
+        roots = []
+        for kind in kinds:
+            value = subprocess.check_output(
+                self.command("inventory", Ref(kind, sha256(study.encode())), limit), timeout=45
+            )
+            roots.extend(Ref(**r) for r in json.loads(value))
+        return sorted(set(roots))
+
     def digest(self, ref, length):
         value = subprocess.check_output(self.command("digest", ref, length)).decode().strip()
         if not re.fullmatch("[0-9a-f]{64}", value):

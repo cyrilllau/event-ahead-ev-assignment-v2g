@@ -35,7 +35,14 @@ def source_snapshot() -> bytes:
             for source in sorted(root.rglob("*.py")):
                 name = module.__name__ + "/" + source.relative_to(root).as_posix()
                 archive.writestr(zipfile.ZipInfo(name, (1980, 1, 1, 0, 0, 0)), source.read_bytes())
-        versions = {name: metadata.version(name) for name in ("numpy", "scipy", "ev-assignment")}
+        versions = {
+            name: metadata.version(name)
+            for name in ("numpy", "scipy", "networkx", "psutil", "ev-assignment")
+        }
+        try:
+            versions["gurobipy"] = metadata.version("gurobipy")
+        except metadata.PackageNotFoundError:
+            versions["gurobipy"] = None
         versions.update(python=platform.python_version(), platform=platform.platform())
         archive.writestr(
             zipfile.ZipInfo("environment.json", (1980, 1, 1, 0, 0, 0)), encode(versions)

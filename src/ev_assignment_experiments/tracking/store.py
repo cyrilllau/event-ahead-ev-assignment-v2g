@@ -17,7 +17,20 @@ import sqlite3
 import tempfile
 
 KINDS = frozenset(
-    {"studies", "experiments", "runs", "attempts", "audits", "decisions", "publications", "objects"}
+    {
+        "studies",
+        "experiments",
+        "runs",
+        "attempts",
+        "audits",
+        "decisions",
+        "publications",
+        "objects",
+        "inputs",
+        "checkpoints",
+        "events",
+        "observations",
+    }
 )
 
 
@@ -47,6 +60,7 @@ class Ref:
 class Store:
     def __init__(self, root):
         self.root = Path(root).expanduser().resolve()
+        self._verified_objects = {}
 
     def path(self, ref: Ref) -> Path:
         return self.root / ref.kind / ref.id
@@ -160,8 +174,13 @@ class Store:
             else:
                 from .transfer import FilesystemSource, file_digest
 
-                if file_digest(FilesystemSource(self)._path(ref)) != ref.id:
-                    raise ValueError("Digest mismatch in closure")
+                path = FilesystemSource(self)._path(ref)
+                stat = path.stat()
+                stamp = (stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns)
+                if self._verified_objects.get(ref) != stamp:
+                    if file_digest(path) != ref.id:
+                        raise ValueError("Digest mismatch in closure")
+                    self._verified_objects[ref] = stamp
             visited.add(ref)
         return sorted(visited)
 
@@ -172,8 +191,11 @@ class Store:
         receipt = transfer(FilesystemSource(self), destination, roots)
         # Stable content receipt; transport statistics belong to the individual
         # transfer operation and must not change a bundle's content identity.
-        return {k: v for k, v in receipt.items()
-                if k not in {"copied_bytes", "resumed_bytes", "reused_records"}}
+        return {
+            k: v
+            for k, v in receipt.items()
+            if k not in {"copied_bytes", "resumed_bytes", "reused_records"}
+        }
 
     def records(self, kind: str):
         if kind not in KINDS - {"objects"}:

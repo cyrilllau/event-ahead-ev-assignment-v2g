@@ -115,3 +115,29 @@ def test_modified_partial_is_rejected(tmp_path):
 def test_ssh_host_is_data(host):
     with pytest.raises(ValueError):
         SSHSource(host, "/archive")
+
+
+def test_remote_watch_reads_only_sealed_namespaces_and_tracks_offline(tmp_path):
+    from ev_assignment_experiments.tracking.sync import watch_ssh
+
+    store = Store(tmp_path / "remote")
+    raw = store.put_object(b"evidence")
+    attempt = store.put("attempts", dict(study="watched", execution="exited"), [raw])
+
+    class Loopback(SSHSource):
+        def command(self, action, ref, count):
+            argv = shlex.split(super().command(action, ref, count)[-1])
+            return [sys.executable, *argv[1:]]
+
+    destination = Store(tmp_path / "local")
+    remote = Loopback("powerai", str(store.root))
+    result = watch_ssh(remote, destination, "watched", seconds=0.01, interval=0.01)
+    assert result["error"] is None and destination.object(raw) == b"evidence"
+    assert destination.closure([attempt]) == store.closure([attempt])
+
+    class Offline:
+        def inventory(self, *args):
+            raise OSError("offline")
+
+    failed = watch_ssh(Offline(), destination, "watched", seconds=0.01, interval=0.01)
+    assert "offline" in failed["error"] and destination.object(raw) == b"evidence"

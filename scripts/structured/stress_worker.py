@@ -43,6 +43,7 @@ def main():
                 view = dict(case, identity=dict(case["identity"], first_stage_restriction="all_packages"))
                 result["deployment"] = deployment(first, view, solved["best"])
             result["service"] = service_summary(case, solved)
+            result["service"].update(support="stress_TRAIN400", cross_method_common_support_comparison=False)
     except Exception as exc:
         status = ("PROBABILITY_DESIGN_GATE_FAILED" if isinstance(exc, ProbabilityDomainInfeasible) else
                   "STRESS_BUDGET_OR_ORACLE_INCOMPLETE" if isinstance(exc, (TimeoutError, RuntimeError, InterruptedError)) else

@@ -262,6 +262,28 @@ def job_coverage(records):
                 accepted=sum(r["job_acceptance_supported"] for r in records))
 
 
+def certificate_limitations(critic):
+    """Disclose the read-only review without changing stored acceptance or values."""
+    return dict(
+        status="KNOWN_LOCAL_ROUNDING_DEFECT_PENDING_INDEPENDENT_VERSION_FIX",
+        critic=critic, critic_available=critic is not None,
+        review_scope="Read-only source review and analytical counterexample; not frozen-release byte-parity verification or validation/OOS replay",
+        confirmed_issue="recourse.audit evaluates the valid alpha+beta*x cut with ordinary rounding to qL; the scalar can exceed exact Q under the analytical counterexample conditions",
+        affected_fields=["recourse.qL", "risk.risk_L", "fixed_policy_risk_lower_endpoints",
+                         "OOS.mean_cost_interval[0]", "OOS.cvar95_cost_interval[0]"],
+        affected_lower_endpoints_strictly_downward_certified=False,
+        qL_occurrence_in_frozen_cases_established=False,
+        global_master_LB_UB_failure_proven=False,
+        structural_global_bound_blocker_found_in_review=False,
+        master_bound_scope="Master LB and stored alpha/beta cuts do not directly use the rounded qL scalar; qL affects probability separation, whose added probabilities still require domain membership checks",
+        risk_upper_scope="Risk upper plane is shifted to dominate every qU with floating-point guards/checks; not a claim of exact-rational dominance or exact primal feasibility",
+        numerical_upper_evidence="NUMERICALLY_AUDITED_ONLY",
+        end_to_end_strict_rational_certificate=False,
+        interpretation="qL/risk_L and qL-derived OOS endpoints are numerical quantities, not rigorously enclosing lower bounds; this local defect has not established failure of the frozen master LB or full-support risk UB",
+        disposition="Record for a separately versioned directed-rounding repair and independent checks; do not modify frozen code/criteria, overwrite evidence, recompute runs, or silently upgrade certificate claims",
+    )
+
+
 def collect(root, stopped=None):
     """Read and bind evidence. Returns a report payload; does not write files."""
     ev = Evidence()
@@ -362,6 +384,7 @@ def collect(root, stopped=None):
                  validation / "CASE_SEARCH_LEDGER.jsonl", root / "DEVELOPMENT_CRITIC_CN.md",
                  root / "PRE_VALIDATION_REVIEW_CN.md", vreport_path(vreport) / "FROZEN_EVIDENCE_HASHES.json"):
         ev.ref(path)
+    limitations = certificate_limitations(ev.ref(root / "IMPLEMENTATION_CRITIC_CN.md"))
     all_core_pass = all(r["acceptance_supported"] for r in core)
     oos = [by_id[freeze["oos_run_ids"][str(seed)]] for seed in freeze["validation_seeds"]]
     formal_stats = all(s["summary"] and s["summary"].get("formal_ci") for s in stats.values())
@@ -387,6 +410,7 @@ def collect(root, stopped=None):
         all_frozen_jobs_accepted=all(r["job_acceptance_supported"] for r in runs),
         all_frozen_jobs_settled=all_settled, all_frozen_jobs_reported_passed=all(r["reported_passed"] for r in runs),
         report_is_new_scientific_certificate=False, contradiction_requires_review=contradiction,
+        known_certificate_limitations=limitations,
         development=[public_run(r) for r in dev], validation=[public_run(r) for r in runs],
         additional_runs_not_substituted_for_frozen_jobs=[public_run(r) for r in additional],
         core_run_order=[r["id"] for r in core], algorithm_pairs=pairs, no_prepass_comparisons=ablations,
@@ -426,6 +450,7 @@ def collect(root, stopped=None):
             "P3 has three calibrated moments; 400 scenarios do not restore the original 322311 rows.",
             "DET optimizes the forecast singleton; other methods optimize 400 scenarios. Their training objectives are not a common ranking.",
             "Lower bounds are native or finite-box numerical certificates; upper values combine numerically audited recourse with risk-dual certificates, not exact-rational feasibility proofs.",
+            "Known local rounding defect: qL/risk_L and qL-derived OOS lower endpoints are not strictly downward certified; no frozen master LB/UB failure has been established by this review. Pending independent-version repair.",
             "Healthy zero-EV/zero-shedding audits use fixed N6 demand. Optional N30 capacity is not large service demand.",
             "Stress G changes physical types/SOC and seed; it is not a pure representation timing experiment.",
             "R04/r05 historical oracle settings were not all capped at60; later releases cap calls. Do not relabel old execution.",
@@ -484,6 +509,20 @@ def run_table(rows):
           [r["wrapper_seconds"], r["worker_seconds"], r["controller_seconds"]]] for r in rows])
 
 
+def certificate_section(data, *, display_root=None):
+    limitation = data["known_certificate_limitations"]
+    critic = evidence_link(limitation["critic"], "IMPLEMENTATION_CRITIC_CN.md",
+                           execution_root=data["root"], display_root=display_root)
+    return "\n\n".join([
+        "### 已知局部证书舍入缺陷（待独立版本修复）",
+        "只读审查：" + critic + "。该审查是源码与解析反例审查，不是冻结release逐字节一致性认证，也未重放validation/OOS。",
+        "已确认：有效仿射割的普通舍入标量求值`qL`存在略高于真实Q的解析反例。因此`qL`、由其导出的`risk_L`及固定政策/OOS区间的qL下端，均不能称为严格向下证书或保证包围真实最优值的下界。解析反例有相应平台精度条件，不等于已在本冻结算例中观测到该偏差。",
+        "影响范围须区分：主master LB及存储的alpha/beta割不直接使用该qL标量；概率分离虽使用qL目标，加入的概率行仍须通过完整域成员检查。风险UB的对偶平面依据全部qU上移并检查支配。此次审查未发现全局界的结构性blocker，也未证明冻结主LB/UB已失效；这同样不能反过来宣称所有数值证书均严格有效。",
+        "保留`NUMERICALLY_AUDITED_ONLY`证据边界：原primal残差门、native MIP bound及有浮点保护的风险对偶，不组成端到端严格有理证明。OOS的qL/qU端点表仍按原值列出，但不是严格数值包围区间；bootstrap抽样CI与这些数值端点是不同口径。",
+        "处置：作为待独立版本修复并验证的局部舍入缺陷记录；不修改冻结源码/标准，不调整原验收状态，不重算或覆盖既有证据。",
+    ])
+
+
 def render_report(data, *, display_root=None):
     def link(ref, label="证据"):
         return evidence_link(ref, label, execution_root=data["root"], display_root=display_root)
@@ -511,6 +550,7 @@ def render_report(data, *, display_root=None):
              "新类型与初始SOC、有限套餐、共同工程天气、线路20/23短恢复与corridor1封锁、负荷及预测均是新合成假设。保留原P/Q、电压、线路、能量、到达/资格内核不等于保持原分布或完整原任务域。整数聚合等价只在声明的同类套餐域内成立，不主张原LP松弛等价或对旧模型无损。",
              "健康网核对：" + fmt(data["physical_summary"]) + "。同负荷、线路全健康、EV注入0、削减0；不靠提高线路限额掩盖过载。",
              "数值口径：原行容差1e-9、目标分项1e-5、gap阈值max(1美元,1%×max(1,|UB|))。LB来自native bound或有限盒证书；UB依赖数值审计原recourse及风险对偶，**不是精确有理数物理可行性证明**。固定政策风险下界不是全局LB。",
+             certificate_section(data, display_root=display_root),
              "**gap闭合、原矩阵审计完成、最终接受分开报告。** gap_passed只核对已保存LB/UB达到项目阈值；audit_complete还要求完整匹配支持和1e-9原残差；acceptance_supported保留正式接受与结算条件，不要求每个native子调用都返回OPTIMAL。TIME_LIMIT可能发生在原审计而非优化搜索：`GAP_PASSED_AUDIT_INCOMPLETE`不是gap未收敛，但仍未达到完整验收。原status/native_status不改写。",
              "审计覆盖采用保存的original_audit列表长度；audit_completed是可能滞后的progress计数，单独保留而不替代实际行数。即使gap已闭合，未完成原审计的政策仍不满足冻结OOS准入；缺任一方法时全部六方法的正式CI保持NOT_ELIGIBLE，不事后放宽。",
              "## 开发全局结果与失败历史", run_table(data["development"]),
@@ -519,6 +559,7 @@ def render_report(data, *, display_root=None):
              "R5/evidence400-r06的float residual元数据读取错误发生在新增参考LP之前；r07修复后的结果单列，旧失败及费用保留。Round1负荷缩放设计门失败原报告不改写。R3/R4是允许跳过的有限范围，不记为容量修订PASS。",
              table(["Run", "错误/原因", "证据"], [[r["id"], r["error"], link(r["result"])] for r in data["development"] if not r["reported_passed"]]),
              "## 三参考政策：固定政策评价，不是全局排名",
+             "本表沿用保存的数值端点；qL/risk_L相关下端受上述局部舍入缺陷限制，不称为严格政策下界，与主master LB分开。",
              table(["政策", "F", "DET", "SAA", "ARO", "P3", "P2"],
                    [[r["name"], r["first_cost"], *[(r["total"] or {}).get(k) for k in ("DET", "SAA", "ARO", "P3-DRO", "P2-DRO")]] for r in data["reference_policy_evaluations"]]),
              "保留全局优化发现的第四种政策。实际DET部署见核心表（已观察到的两车策略也不应被三参考表覆盖）；这些评价规则不同，不能把各自训练目标直接作共同OOS排名。",
@@ -546,12 +587,12 @@ def render_report(data, *, display_root=None):
                      link(r["result"])] for r in data["validation"] if r["stage"] == "VSTRESS"]),
              "这些运行改变物理类型/SOC，stress seed2101与验证三seed不同；G6参考也不是同seed另一次严格控制试验。不可删除失败或称为纯表示缩放曲线。",
              "## 三组配对OOS与已保存的bootstrap区间",
-             "只有完整1000样本及全部六方法时给正式CI。共同前缀仅描述，不把缺失填0。500次四层配对bootstrap，保留层样本数/质量，seed=910000+validationseed；条件于已冻结训练政策，不包含训练不确定性或概率集覆盖，也没有多重比较校正。成本采用F+qU，qL/qU数值区间另列。"]
+             "只有完整1000样本及全部六方法时给正式CI。共同前缀仅描述，不把缺失填0。500次四层配对bootstrap，保留层样本数/质量，seed=910000+validationseed；条件于已冻结训练政策，不包含训练不确定性或概率集覆盖，也没有多重比较校正。成本采用F+qU，保存的qL/qU数值端点另列；qL端未获严格向下认证，不能将端点表当作严格包围区间。"]
     for seed, item in data["oos_statistics"].items():
         run = next(r for r in data["oos"] if r["id"] == data["freeze"]["contents"]["oos_run_ids"][seed])
         parts += [f"### seed {seed}：{run['status']}，{run['common_completed']}/{run['expected']}",
             "缺失方法：" + fmt(run["missing_methods"]) + "；口径：" + fmt(run["inference_scope"]),
-            table(["方法", "均值成本 / 数值区间", "CVaR95 / 数值区间", "关键ENS均值(kWh)"],
+            table(["方法", "均值成本 / 保存端点(非严格包围)", "CVaR95 / 保存端点(非严格包围)", "关键ENS均值(kWh)"],
                   [[m, [s.get("mean_cost"), s.get("mean_cost_interval")],
                     [s.get("cvar95_cost"), s.get("cvar95_cost_interval")], s.get("critical_ENS_kwh")]
                    for m, s in run["summaries"].items()])]

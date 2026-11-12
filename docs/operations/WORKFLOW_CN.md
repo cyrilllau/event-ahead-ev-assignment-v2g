@@ -3,6 +3,10 @@
 代码、研究记录、计算位置分别管理。代码仓库不保存 results/artifacts；下文 `ABS`
 是仓库之外的绝对研究存储路径。新流程不接管旧 PowerAI campaign。
 
+新增结构化合成 P3/P2 分支的入口、冻结身份与安全续跑见
+[STRUCTURED_ROUND2_CN.md](STRUCTURED_ROUND2_CN.md)；其 validation 尚未整轮验收，
+不等同下文原冻结 L08 丰富矩模型的复现。
+
 ## 安装与入口
 
 Python 3.12：`uv sync --locked --group dev`。实际求解加 `--extra gurobi`，使用

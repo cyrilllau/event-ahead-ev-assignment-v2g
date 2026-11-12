@@ -24,6 +24,10 @@ def main(argv=None):
     p = sub.add_parser("sync")
     p.add_argument("--attempt", required=True)
     p.add_argument("--destination", required=True)
+    p = sub.add_parser("pull", help="Read sealed artifacts over SSH into the local store")
+    p.add_argument("--host", required=True)
+    p.add_argument("--remote-store", required=True)
+    p.add_argument("--attempt", required=True)
     sub.add_parser("index")
     p = sub.add_parser("bundle")
     p.add_argument("--attempt", action="append", required=True)
@@ -52,6 +56,14 @@ def main(argv=None):
         elif args.command == "index":
             store.rebuild_index()
             result = {"rebuilt": True}
+        elif args.command == "pull":
+            from ev_assignment_experiments.tracking.transfer import SSHSource, transfer
+
+            result = transfer(
+                SSHSource(args.host, args.remote_store),
+                store,
+                [Ref("attempts", args.attempt)],
+            )
         elif args.command == "bundle":
             result = build(store, [Ref("attempts", x) for x in args.attempt], args.destination)
         else:

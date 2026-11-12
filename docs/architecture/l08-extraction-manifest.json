@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "source": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/energy_ledger.py",
+      "source_sha256": "b76fe6ff899ed498a3750f458f8a6dd2767c2b034b08f36f4a679316d5916e9a",
+      "target": "src/ev_assignment/l08/energy.py",
+      "target_sha256": "b76fe6ff899ed498a3750f458f8a6dd2767c2b034b08f36f4a679316d5916e9a"
+    },
+    {
+      "source": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/r3_common.py",
+      "source_sha256": "1a0533a11046aba7dcb36a604910cf28222413b9efe9ea9749df15facae2e3ea",
+      "target": "src/ev_assignment/l08/physics.py",
+      "target_sha256": "5f6312034f65f778ce13760c79b0b89ac96c4e1fc11e6bc7ea6cf0f4f6ecdd4a"
+    },
+    {
+      "source": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/contract_matrix.py",
+      "source_sha256": "3622f345768f62ed7a89ae17d1e64edf502c02711ad15b79fa36968af3ab90a6",
+      "target": "src/ev_assignment/l08/matrix.py",
+      "target_sha256": "06e4175f5689f4845f65904bd62470a26796b597f79c4ccb3f97438f4e5c66ab"
+    },
+    {
+      "source": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/exact_transform.py",
+      "source_sha256": "2441c10cf9a4cd6d8f2e1cd772239edecaf6e032dbd951c9fda41dc572b016f3",
+      "target": "src/ev_assignment/l08/reduction.py",
+      "target_sha256": "974ab776130708efd6f3ace33c7d32b6d397337e3cf1e623cf1f7ceb8350570c"
+    }
+  ],
+  "scope": "L08 frozen energy, islanding, explicit task matrices, and exact PF reduction",
+  "transformations": [
+    "energy module copied byte-for-byte",
+    "selected pure functions only; no module-level campaign initialization",
+    "CFG ports and island threshold become explicit parameters with original defaults",
+    "Matrix.save omitted; serialization is an orchestration responsibility",
+    "solver formulation, row and column order, physical tolerances preserved"
+  ],
+  "validation": "5 synthetic scenario categories: ordered coefficients/bounds/names/metadata, objective, lifted primal residual; 2 negative/energy checks",
+  "formal_controller_admitted": false
+}

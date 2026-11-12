@@ -31,6 +31,10 @@ def test_import_from_outside_checkout_does_not_load_gurobi(tmp_path):
 import ev_assignment.models.first_stage
 import ev_assignment.models.recourse
 import ev_assignment.methods.probability
+import ev_assignment.l08.energy
+import ev_assignment.l08.physics
+import ev_assignment.l08.matrix
+import ev_assignment.l08.reduction
 import ev_assignment_experiments.cli
 assert 'gurobipy' not in sys.modules
 """
@@ -55,3 +59,20 @@ def test_migrated_numerical_ast_matches_baseline(pytestconfig):
         tree = NoImports().visit(ast.parse((root / path).read_text()))
         digest = hashlib.sha256(ast.dump(tree, include_attributes=False).encode()).hexdigest()
         assert digest == expected, path
+
+
+def test_l08_source_and_extraction_manifest(pytestconfig):
+    root = Path(pytestconfig.rootpath)
+    manifest = json.loads((root / "docs/architecture/l08-extraction-manifest.json").read_text())
+    for row in manifest["files"]:
+        for role in ("source", "target"):
+            assert hashlib.sha256((root / row[role]).read_bytes()).hexdigest() == row[
+                role + "_sha256"
+            ]
+
+
+def test_baseline_source_bytes_preserved(pytestconfig):
+    root = Path(pytestconfig.rootpath)
+    manifest = json.loads((root / "docs/architecture/baseline-source-manifest.json").read_text())
+    for row in manifest["files"]:
+        assert hashlib.sha256((root / row["path"]).read_bytes()).hexdigest() == row["sha256"]

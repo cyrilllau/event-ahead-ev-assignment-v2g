@@ -47,9 +47,19 @@ Planning seals the actual source snapshot and environment. Source changes requir
 a new Run. Re-executing a claimed Run is refused: budget-aware recovery belongs
 to the runtime stage. Context labels local snapshots and unsettled claims; it
 does not infer server liveness or scientific adoption.
-The current sync transfers sealed closures between filesystem stores. It is not
-an SSH transfer daemon and reads objects into memory; large-artifact streaming
-and interrupted byte-range transfer remain pending.
+Sync streams sealed closures with bounded memory. Interrupted transfers retain a
+partial file, verify its prefix against the source, and resume at that offset.
+Existing complete artifacts are never overwritten. A read-only SSH transport is
+also available for stores created by this new workflow:
+
+```bash
+ev-assignment --store /absolute/local/archive pull --host powerai --remote-store /absolute/remote/sealed-store --attempt ATTEMPT_ID
+```
+
+This command requires an explicit sealed store and attempt. It does not import
+old campaign folders, watch active files, deploy code or restart jobs. The remote
+reader protocol is tested in a separate local process; no new store or release
+has been deployed to PowerAI during this refactor.
 
 ## Package boundaries
 
@@ -66,6 +76,11 @@ the baseline after removing import nodes only. Legacy sources, scripts and tests
 remain byte-identical to the baseline while entire workflows are migrated. New
 scientific tests exercise the extracted modules. Historical source-bound
 acceptance gates are not changed or treated as new-release admission.
+
+The `ev_assignment.l08` subpackage additionally extracts L08's full-dwell energy,
+islanding, explicit task matrices and exact power-factor reduction. Five scenario
+categories compare original and extracted matrices, LP solutions and lifted
+physical residuals. This is component equivalence, not controller admission.
 
 ## Validation
 

@@ -85,12 +85,36 @@ class Store:
         self._put(ref, data)
         return ref
 
+    def put_file(self, path) -> Ref:
+        """Seal a large artifact with bounded memory; a changing file is refused."""
+        from contextlib import contextmanager
+        from .transfer import copy_one, file_digest
+
+        path = Path(path)
+        ref = Ref("objects", file_digest(path))
+
+        class Source:
+            def size(self, ref):
+                return path.stat().st_size
+
+            def digest(self, ref, length):
+                return file_digest(path, length)
+
+            @contextmanager
+            def open(self, ref, offset=0):
+                with path.open("rb") as handle:
+                    handle.seek(offset)
+                    yield handle
+
+        copy_one(Source(), self, ref)
+        return ref
+
     def put(self, kind: str, payload: dict, refs=()) -> Ref:
         if kind == "objects":
             raise ValueError("Use put_object for artifacts")
         references = sorted(set(refs))
         for ref in references:
-            self._read(ref)
+            self.closure([ref])
         data = encode(
             {
                 "schema_version": 1,
@@ -109,6 +133,7 @@ class Store:
         value = json.loads(self._read(ref))
         if (
             set(value) != {"schema_version", "kind", "payload", "refs"}
+            or type(value["schema_version"]) is not int
             or value["schema_version"] != 1
             or value["kind"] != ref.kind
             or not isinstance(value["payload"], dict)
@@ -130,32 +155,25 @@ class Store:
             ref = pending.pop()
             if ref in visited:
                 continue
-            self._read(ref)
             if ref.kind != "objects":
                 pending.extend(Ref(**r) for r in self.read(ref)["refs"])
+            else:
+                from .transfer import FilesystemSource, file_digest
+
+                if file_digest(FilesystemSource(self)._path(ref)) != ref.id:
+                    raise ValueError("Digest mismatch in closure")
             visited.add(ref)
         return sorted(visited)
 
     def sync_to(self, destination: Store, roots) -> dict:
-        """Copy a sealed closure, validate every byte; retry is idempotent.
+        """Copy a sealed closure with bounded memory and verified range resume."""
+        from .transfer import FilesystemSource, transfer
 
-        Interrupted transfers can leave unreferenced complete objects, never a
-        false success receipt. Streaming/SSH transport is a separate later phase.
-        """
-        roots = list(roots)
-        closure = self.closure(roots)
-        for ref in closure:
-            destination._put(ref, self._read(ref))
-        verified = destination.closure(roots)
-        if closure != verified:
-            raise ValueError("Destination closure differs")
-        return {
-            "schema_version": 1,
-            "complete": True,
-            "records": len(verified),
-            "roots": [r.as_dict() for r in roots],
-            "closure_sha256": sha256(encode([r.as_dict() for r in verified])),
-        }
+        receipt = transfer(FilesystemSource(self), destination, roots)
+        # Stable content receipt; transport statistics belong to the individual
+        # transfer operation and must not change a bundle's content identity.
+        return {k: v for k, v in receipt.items()
+                if k not in {"copied_bytes", "resumed_bytes", "reused_records"}}
 
     def records(self, kind: str):
         if kind not in KINDS - {"objects"}:

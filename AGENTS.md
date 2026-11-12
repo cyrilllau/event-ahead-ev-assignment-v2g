@@ -5,6 +5,9 @@ design is `docs/architecture/REFACTOR_PLAN_V2_CN.md`; a plan is not acceptance e
 
 - Scope: IEEE33 event-ahead EV assignment / V2G reserve; L08 DET/DRO/ARO mainline.
 - Core: `src/ev_assignment/`; orchestration: `src/ev_assignment_experiments/`.
+- L08 pure mathematics: `src/ev_assignment/l08/`; frozen source/extraction map:
+  `docs/architecture/l08-extraction-manifest.json`. Its component tests do not admit
+  a complete DET/DRO/ARO controller or a production release.
 - `evcs_experiments`, `powerai_l08`, and old scripts are transitional reference/legacy
   implementation. Their existence does not admit a new production dispatcher.
 - Core must not import experiments or legacy modules, mutate sys.path, infer dataset
@@ -20,6 +23,8 @@ design is `docs/architecture/REFACTOR_PLAN_V2_CN.md`; a plan is not acceptance e
   campaigns, symlinks, process parameters or processes for a refactor.
 - Source uses Git; artifacts use a separately configured store. Do not commit live
   results/logs/data/checkpoints or credentials to this private development repo.
+- Archive `sync`/`pull` resumes sealed byte transfers only; it never resumes an
+  experiment. Do not point it at active logs, mutable checkpoints or campaign roots.
 - Public paper reproduction is a separate repository, built from audited local
   archive manifests after selection. Do not automatically publish or change visibility.
 - Keep factual phase status and remaining scientific admission gaps explicit.

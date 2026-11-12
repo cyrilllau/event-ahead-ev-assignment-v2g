@@ -1245,6 +1245,17 @@ def render_report(data, *, display_root=None):
             table(["P3−对照", "指标", "点差", "percentile95% CI"],
                   [[method, metric, answer.get("difference"), answer.get("ci95")]
                    for method, metrics in stats.get("comparisons", {}).items() for metric, answer in metrics.items()])]
+        if run["common_completed"] == run["expected"] == 1000:
+            summaries = run["summaries"]
+            for other in ("SAA", "P2"):
+                if "P3" not in summaries or other not in summaries:
+                    continue
+                p3, comparator = summaries["P3"], summaries[other]
+                metrics = ("mean_cost", "cvar95_cost", "critical_ENS_kwh")
+                if not all(numeric(s.get(k)) for s in (p3, comparator) for k in metrics):
+                    continue
+                relations = ["较低" if p3[k] < comparator[k] else "较高" if p3[k] > comparator[k] else "相同" for k in metrics]
+                parts += [f"仅描述本组已保存的1000共同样本：P3相对{other}的平均成本{relations[0]}、CVaR95{relations[1]}、关键ENS{relations[2]}。这些点值不构成显著性或跨训练seed稳定优势的证明；不以嵌套训练目标下降替代OOS评价。"]
     parts += ["## 计时、模型大小与累计预算",
         table(["Run", "最后保存阶段 / controller累计(s)", "准备计时(s)", "build(s)", "master / direct native(s)",
                "recourse(s)", "probability(s)", "certificate+IO(s)", "原audit(s)", "最大已记录阶段"],

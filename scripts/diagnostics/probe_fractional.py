@@ -203,7 +203,7 @@ def run(root, config, out, deadline):
     save(
         out / "RESULT.json",
         dict(
-            status="COMPLETE"
+            status="COMPLETE_Q"
             if len(records) == 400 and all(v is not None for v in qu)
             else "PARTIAL",
             point_sha256=point_sha,
@@ -211,15 +211,17 @@ def run(root, config, out, deadline):
             first_cost=first_cost,
             point_DRO_lower=first_cost + max(risk_lowers),
             point_ARO_lower=first_cost + float(ql.max()),
-            point_upper=None,
-            bound_is_infinite=True,
+            point_upper=first_cost + max(qu) if all(v is not None for v in qu) else None,
+            point_upper_kind="simplex upper bound before exact DRO risk aggregation",
+            bound_is_infinite=any(v is None for v in qu),
             explicitly_solved_count=len(records),
             bounded_only_count=400 - len(records),
             certified_zero_count=0,
             missing_upper_bound_count=sum(v is None for v in qu),
             coverage_complete=all(v is not None for v in qu),
-            accuracy_met=all(v is not None for v in qu)
-            and max(float(u - l) for l, u in zip(ql, qu)) < 1e-3,
+            accuracy_met=False,
+            recourse_accuracy_met=all(v is not None for v in qu)
+            and all(0 <= float(upper - lower) < 1e-3 for lower, upper in zip(ql, qu)),
             full400_expansion_started=expansion,
             global_continuous_lower=None,
             point_lower_is_not_global_lower=True,
@@ -227,7 +229,8 @@ def run(root, config, out, deadline):
             solver_calls=new_calls,
             reused_scenario_count=len(reused_ids),
             max_archive_or_dual_above_primal_upper=max(
-                (float(l - u) for l, u in zip(ql, qu) if u is not None), default=None
+                (float(lower - upper) for lower, upper in zip(ql, qu) if upper is not None),
+                default=None,
             ),
             missing_reason=(
                 None

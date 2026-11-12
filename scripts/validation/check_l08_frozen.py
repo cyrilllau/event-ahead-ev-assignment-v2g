@@ -24,7 +24,7 @@ with gp.Env(params={'OutputFlag':0}) as env:
   original=sparse.load_npz(d.inputs.path(R41+'/identity/FIRST_A.npz'))
   z=d.inputs.npz(R41+'/identity/FIRST_ARRAYS.npz')
   assert actual['A'].shape==original.shape and (actual['A']!=original).nnz==0
-  for k in ['cost','lo','hi','rhs','sense']:assert np.array_equal(actual[k],z[k]),k
+  for k in ['cost','lo','hi','rhs','sense','vtype']:assert np.array_equal(actual[k],z[k]),k
   names=d.inputs.read(R41+'/identity/FIRST_NAMES.json');rows=d.inputs.read(R41+'/identity/FIRST_ROWS.json')
   assert actual['names']==names and actual['row_names']==rows
   report['first_stage']=dict(rows=model.NumConstrs,columns=model.NumVars,binaries=model.NumBinVars,exact_coefficients=True)
@@ -34,7 +34,7 @@ with gp.Env(params={'OutputFlag':0}) as env:
   report['det_r38']=dict(rows=model.NumConstrs,columns=model.NumVars,binaries=model.NumBinVars,
     screened_routes=sum(v.VarName.startswith('route[') and v.UB==0 for v in model.getVars()),
     exact_capacity_proof=True)
-  assert model.NumVars==99234 and model.NumBinVars==25770
+  assert model.NumVars==99234 and model.NumBinVars==25770 and model.NumConstrs==140611
   # Shared strengthening is redundant in the integer model and remains explicit.
  finally:model.dispose()
 report.update(passed=True,elapsed_seconds=time.monotonic()-begun,oos_opened=False)

@@ -23,6 +23,30 @@ def utcnow():
     return datetime.now(timezone.utc).isoformat()
 
 
+def source_revision():
+    """Git is optional metadata; the executing source archive remains authoritative."""
+    import subprocess
+    import ev_assignment
+
+    location = Path(ev_assignment.__file__).parent
+    try:
+        commit = subprocess.check_output(
+            ["git", "-C", str(location), "rev-parse", "HEAD"],
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+            text=True,
+        ).strip()
+        changed = subprocess.check_output(
+            ["git", "-C", str(location), "status", "--porcelain", "--untracked-files=normal"],
+            stderr=subprocess.DEVNULL,
+            timeout=5,
+            text=True,
+        )
+        return dict(git_commit=commit, worktree_modified=bool(changed), provenance="checkout")
+    except (OSError, subprocess.SubprocessError):
+        return dict(git_commit=None, worktree_modified=None, provenance="installed_source_snapshot")
+
+
 def source_snapshot() -> bytes:
     """Archive actual executing sources, including uncommitted development edits."""
     import ev_assignment
@@ -60,6 +84,7 @@ def plan(store: Store, experiment: Experiment) -> Ref:
             "scope": "development_probability_oracle",
             "experiment": definition.as_dict(),
             "source": source.as_dict(),
+            "code_revision": source_revision(),
         },
         [source, definition],
     )

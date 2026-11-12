@@ -22,7 +22,7 @@ from ev_assignment_experiments.datasets import synthetic
 from ev_assignment_experiments.datasets.l08 import FrozenInputs, L08Dataset
 from ev_assignment_experiments.runtime.ledger import BudgetLedger, publish
 from ev_assignment_experiments.tracking.store import Ref, Store, encode, sha256
-from .probability import source_snapshot, utcnow
+from .probability import source_snapshot, source_revision, utcnow
 
 
 def plain(value):
@@ -87,6 +87,7 @@ def plan(store: Store, recipe: RunPlan):
             study=recipe.study,
             scope=recipe.input_kind,
             source=source.as_dict(),
+            code_revision=source_revision(),
             experiment=experiment.as_dict(),
             inputs=inputs.as_dict(),
             budget_group=recipe.budget_group,

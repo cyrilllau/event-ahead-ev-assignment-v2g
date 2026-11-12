@@ -219,6 +219,7 @@ def verified_recovery(ev, folder, claim, settlement, recovery):
 
 def run_record(ev, root, stage, run_id, budget):
     folder = root / stage / run_id
+    optimization_stage = stage in ("R0", "R1", "R2", "VCORE", "VIND", "VABL", "VSTRESS")
     raw = ev.json(folder / "RESULT.json", optional=True)
     claim = ev.json(folder / "CLAIM.json", optional=True)
     wait = ev.json(folder / "WAIT.json", optional=True)
@@ -246,11 +247,15 @@ def run_record(ev, root, stage, run_id, budget):
         recovery, progress = verified_recovery(ev, folder, claim, settlements[0], recovery_record)
         settled = True
     optimization = raw.get("optimization", {})
+    nonoptimization_progress = {}
     partial = False
     if progress is not None or (not optimization and (folder / "PROGRESS.json").is_file()
-            and (not raw or stage in ("R0", "R1", "R2", "VCORE", "VIND", "VABL", "VSTRESS"))):
+            and (not raw or optimization_stage)):
         progress = progress if progress is not None else ev.json(folder / "PROGRESS.json")
-        optimization = progress.get("optimization", progress)
+        if optimization_stage:
+            optimization = progress.get("optimization", progress)
+        else:
+            nonoptimization_progress = progress
         partial = True
     if settled and not recovery and wait["returncode"] != 0 and (
             raw.get("passed") is True or optimization.get("passed") is True):
@@ -331,6 +336,7 @@ def run_record(ev, root, stage, run_id, budget):
         gap_first_passed_seconds=optimization.get("gap_first_passed_seconds"),
         largest_recorded_timing_part=max(recorded_parts, key=recorded_parts.get) if recorded_parts else None,
         settled=settled, progress_only=partial, returncode=wait.get("returncode"),
+        nonoptimization_progress=nonoptimization_progress,
         result=result_ref, claim=claim, wait=receipt, recovery=recovery,
         progress=ev.ref(folder / "PROGRESS.json") if partial else None,
         worker_finalization_proven=bool(raw and wait and settled and not recovery),
@@ -797,6 +803,44 @@ def verified_controller_recovery(ev, validation, freeze, runs):
                 scope="orchestration-only recovery; frozen science release and jobs unchanged")
 
 
+def oos_evidence(record):
+    raw = record["raw"] or record.get("nonoptimization_progress", {})
+    return dict(id=record["id"], status=record["status"], passed=record["reported_passed"],
+        common_completed=raw.get("common_completed", 0), expected=raw.get("expected", 1000),
+        missing_methods=raw.get("missing_methods"), summaries=raw.get("summaries", {}),
+        inference_scope=raw.get("inference_scope", "PARTIAL_SAVED_PROGRESS_ONLY" if record["progress_only"] else None),
+        result=record["result"], progress=record["progress"], progress_only=record["progress_only"])
+
+
+def oos_complete_metadata(record):
+    """Check the saved six-method completion claim, without recomputing metrics."""
+    raw = record["raw"]
+    rows = raw.get("records", [])
+    valid = (record["job_acceptance_supported"] is True and record["progress_only"] is False
+        and raw.get("common_completed") == raw.get("expected") == 1000
+        and raw.get("missing_methods") == [] and set(raw.get("methods", {})) == set(METHODS)
+        and isinstance(rows, list) and len(rows) == 1000
+        and all(isinstance(r, dict) and set(r.get("methods", {})) == set(METHODS) for r in rows))
+    if raw.get("passed") is True and not valid:
+        raise ValueError(f"OOS passed flag contradicts saved completion metadata: {record['id']}")
+    return valid
+
+
+def bind_review_results(review, runs):
+    """A review and its statistics may only describe the same saved RESULT bytes."""
+    current = {r["id"]: r for r in runs if r["stage"] != "VREPORT"}
+    rows = review["raw"].get("runs", [])
+    seen = set()
+    for row in rows:
+        name = row.get("id")
+        if name not in current or name in seen or row.get("result") != current[name]["result"]:
+            raise ValueError(f"VREPORT result identity differs from current evidence: {name}")
+        seen.add(name)
+    if review["reported_passed"] and seen != set(current):
+        raise ValueError("Completed VREPORT omitted or duplicated frozen runs")
+    return seen
+
+
 def collect(root, stopped=None):
     """Read and bind evidence. Returns a report payload; does not write files."""
     ev = Evidence()
@@ -845,17 +889,23 @@ def collect(root, stopped=None):
         r["frozen_support_binding"] = bind_prepared_support(ev, validation, freeze, job, r, preparation)
     orchestration_recovery = verified_controller_recovery(ev, validation, freeze, runs)
     vreport = next(r for r in runs if r["stage"] == "VREPORT")
+    reviewed_ids = bind_review_results(vreport, runs)
     stats = {}
     for seed in freeze["validation_seeds"]:
         ref = vreport["raw"].get("oos_statistics", {}).get(str(seed))
         summary = ev.bound_json(ref) if ref else None
+        oos_run = by_id[freeze["oos_run_ids"][str(seed)]]
+        if summary and (oos_run["id"] not in reviewed_ids or not oos_run["result"]
+                or summary.get("observed_n") != oos_run["raw"].get("common_completed")):
+            raise ValueError(f"Statistics lack matching reviewed OOS result: seed{seed}")
         if summary and "formal_ci" in summary and type(summary["formal_ci"]) is not bool:
             raise ValueError(f"Stored formal_ci is not a boolean: seed{seed}")
         if summary and (summary.get("seed") != 910000 + seed or summary.get("expected_n") != 1000
                         or summary.get("replicates") != 500 or summary.get("fixture_override")):
             raise ValueError(f"Stored statistics do not match preregistration: seed{seed}")
         if summary and summary.get("formal_ci") and (summary.get("observed_n") != 1000
-                or summary.get("completed_replicates") != 500 or summary.get("missing_method_rows")):
+                or summary.get("completed_replicates") != 500 or summary.get("missing_method_rows")
+                or not oos_complete_metadata(oos_run)):
             raise ValueError(f"Stored CI reports incomplete coverage: seed{seed}")
         stats[str(seed)] = dict(reference=ref, summary=summary,
                                status="AVAILABLE" if ref else "NOT_AVAILABLE_NOT_RECOMPUTED")
@@ -911,7 +961,8 @@ def collect(root, stopped=None):
         "NO_ACCEPTED_MECHANISM_INTERVALS")
     oos = [by_id[freeze["oos_run_ids"][str(seed)]] for seed in freeze["validation_seeds"]]
     formal_stats = all(s["summary"] and s["summary"].get("formal_ci") is True for s in stats.values())
-    complete_oos = all(r["reported_passed"] and r["raw"].get("common_completed") == 1000 for r in oos)
+    oos_completion_checks = [oos_complete_metadata(r) for r in oos]
+    complete_oos = all(oos_completion_checks)
     contradiction = any(p["status"] == "CONTRADICTORY_INTERVALS" for p in [r0, *pairs, *mechanisms, *ablations])
     statuses = dict(
         adapter_status="SAME_CASE_INTERVAL_AND_ORIGINAL_AUDIT_PASS" if r0["both_accepted"] and r0["status"] != "CONTRADICTORY_INTERVALS" else "INCOMPLETE_OR_REVIEW_REQUIRED",
@@ -942,10 +993,7 @@ def collect(root, stopped=None):
         core_run_order=[r["id"] for r in core], algorithm_pairs=pairs, no_prepass_comparisons=ablations,
         mechanism_intervals=mechanisms, R0_comparison=r0, reference_policy_evaluations=references,
         reference_policies_are_global_optima=False, oos_statistics=stats,
-        oos=[dict(id=r["id"], status=r["status"], passed=r["reported_passed"],
-            common_completed=r["raw"].get("common_completed", 0), expected=r["raw"].get("expected", 1000),
-            missing_methods=r["raw"].get("missing_methods"), summaries=r["raw"].get("summaries", {}),
-            inference_scope=r["raw"].get("inference_scope"), result=r["result"]) for r in oos],
+        oos=[oos_evidence(r) for r in oos],
         VREPORT=dict(result=vreport["result"], status=vreport["status"], passed=vreport["reported_passed"],
                      comparisons=vreport["raw"].get("comparisons", [])),
         budget=dict(development=dev_budget, validation=val_budget, units="wall seconds",

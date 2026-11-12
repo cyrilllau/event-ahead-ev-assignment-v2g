@@ -29,6 +29,21 @@ def audit(root, r):
             assert digest(ref["path"]) == ref["sha256"]
             verified.add(ref["path"])
     assert full["solver_calls"] == 392 and full["reused_scenario_count"] == 8
+    names = read(r / "replay-r1/DRO/NAMES.json")["cols"]
+    theta_sids = {int(n.rsplit("_", 1)[1]) for n in names if n.startswith("THETA_SCENARIO_")}
+    absent = sorted(set(range(400)) - theta_sids)
+    by_sid = {row["sid"]: row for row in full["records"]}
+    save(
+        r / "OMITTED_THETA_CHECK.json",
+        dict(
+            missing_theta_count=len(absent),
+            scenario_ids=absent,
+            q_upper_max_at_this_point=max(by_sid[s]["q_upper"] for s in absent),
+            positive_count=sum(by_sid[s]["q_lower"] > 1e-6 for s in absent),
+            all_explicitly_solved=True,
+            global_zero_certificate_claimed=False,
+        ),
+    )
     raw = root / "L08_K4L4_CALIBRATION_AND_FORECAST_R29/05_DRO_MOMENTS"
     phi = np.load(raw / "SUPPORT_UNIQUE.npy")
     bs = npz(raw / "EFFECTIVE_INTERVALS.npz")

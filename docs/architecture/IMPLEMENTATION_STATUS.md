@@ -45,6 +45,7 @@ the remaining stages pass. See [approved plan](REFACTOR_PLAN_V2_CN.md).
 | Synthetic record scale | 10,000 records; context ~0.96s, index rebuild ~0.91s, 3193-byte summary |
 | PowerAI interaction | Read-only process/resource/source checks; no new solver run or deployment |
 | GitHub CI, milestone 1 | Linux + macOS PASS, run 43130774768 |
+| GitHub CI, milestone 2 | Linux + macOS PASS, run 43131484661 |
 | Milestone 2 clean wheel | Outside-checkout solve/audit/transfer/bundle PASS; 64 MiB streamed artifact, ~2 MiB Python peak allocation |
 
 ## Milestone 2

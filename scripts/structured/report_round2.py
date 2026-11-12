@@ -1023,6 +1023,7 @@ def collect(root, stopped=None):
         reporter_source=ev.ref(Path(__file__).resolve()),
         previous_round2_status=dict(reference=ev.ref(prior_status), text=prior_status.read_text() if prior_status.exists() else None),
         scope_limits=["Original network/energy kernels retained; new type/SOC/catalogue/weather/load distribution assumptions.",
+            "R0 direct extensive and decomposed solvers share physical catalogue/recourse kernels; their assembly and bound comparison is not a fully independent physical implementation audit.",
             "Catalogue integer equivalence is internal to the declared restricted catalogue, not lossless equivalence to the old task model or LP relaxation.",
             "P3 has three calibrated moments; 400 scenarios do not restore the original 322311 rows.",
             "DET optimizes the forecast singleton; other methods optimize 400 scenarios. Their training objectives are not a common ranking.",
@@ -1031,7 +1032,7 @@ def collect(root, stopped=None):
             "Healthy zero-EV/zero-shedding audits use fixed N6 demand. Optional N30 capacity is not large service demand.",
             "Stress G changes physical types/SOC and seed, and its 600s whole-worker caps differ from 1000s core caps; it is not a pure representation scaling experiment. Timeout alone cannot identify a type-count effect.",
             "R04/r05 historical oracle settings were not all capped at60; later releases cap calls. Do not relabel old execution.",
-            "All statistics are copied from VREPORT, conditional on fixed training policies; no probability-set or simultaneous coverage claim."],
+            "Bootstrap eligibility/CI are copied from VREPORT; descriptive OOS summaries are copied from saved OOS RESULT files. Conditional on fixed training policies; no probability-set or simultaneous coverage claim."],
         paper_gaps=["高服务规模：按各seed实际选车/合同/站点及放电证据判断；扩充候选池或full400通过不等于容量受限的多区域服务已得到验证。",
                     "丰富moments：P3仍只有三行，不恢复原322311行；这需要独立科学版本与证据，不能由表示或审计工程优化替代。"],
         next_improvement=next_improvement(timing_findings))
@@ -1180,6 +1181,7 @@ def render_report(data, *, display_root=None):
              "## 开发全局结果与失败历史", run_table(data["development"]),
              "额外Run（若存在只列历史，不替换冻结job）：", run_table(data["additional_runs_not_substituted_for_frozen_jobs"]),
              "R0区间对照：" + fmt(data["R0_comparison"]),
+             "R0直接有限场景模型与分解器共享物理catalogue/recourse内核；该对照验证不同优化组装路径、界与原逐车展开的一致性，不构成两套完全独立物理实现的交叉验证。",
              "R0的legacy-r0-all-packages-v1仅适用于decompose-r04/direct-r05：确切CLAIM/RESULT/CASE/概率域、worker、wheel及ZIP成员哈希核对后，由已审阅源码推导全72套餐域。original first_stage_restriction缺失仍保留，effective字段不回填原记录；旧CLAIM缺argv/release/freeze，r04无RELEASE.json也明确保留。任何身份不符拒绝适配，不推广到其他Run，不声称执行时模块取证或新科学证明。",
              table(["R0 Run", "源码文件或wheel成员", "审阅行（含首尾）", "SHA256", "域证据"],
                    [[r["id"], link(s.get("reference", s.get("archive")), s.get("member", "round2_worker.py")),
@@ -1339,9 +1341,29 @@ def render_reproduce(data):
                           "```bash\n" + shlex.join(rebuilt) + "\n```"]
     parts += ["## 重新格式化报告（不会重算科学结果）",
         "```bash\n" + shlex.join([str(release / ".venv/bin/python"), data["reporter_source"]["path"], str(root)]) + "\n```",
-        "默认拒绝活动账本或未完成campaign；显式`--stopped '原因'`仅生成标注的未完成快照，不意味着活动进程已停止。三个新报告文件采用排他创建，已有输出拒绝覆盖；仅Round2状态页可更新，其旧内容封存在JSON。",
+        "默认拒绝活动账本或未完成campaign；显式`--stopped '原因'`仅生成标注的未完成快照，不意味着活动进程已停止。三个新报告文件采用排他创建，已有输出拒绝覆盖；仅Round2状态页可更新，其旧内容封存在JSON及status-history中的按哈希命名副本。",
         "本报告读取RESULT/PROGRESS、账本、FREEZE、RELEASE与VREPORT统计；R0历史适配只哈希CASE字节并读取ZIP源码成员，不反序列化CASE、不执行wheel源码，不调用模型/优化器/原矩阵/概率LP/bootstrap。新的科学重跑需要另行授权与新Run，同时保留当前累计账本、失败和冻结来源。"]
     return "\n\n".join(parts) + "\n"
+
+
+def prepare_status_archive(data, root):
+    """Keep the historical status reference resolvable after updating the live page."""
+    prior = data["previous_round2_status"]
+    old = prior["reference"]
+    if old is None:
+        return None
+    source = Path(old["path"])
+    raw = source.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != old["sha256"] or len(raw) != old["bytes"]:
+        raise ValueError("Previous status changed during report assembly")
+    target = root / "status-history" / f"{digest}.md"
+    if target.exists() and target.read_bytes() != raw:
+        raise ValueError("Existing status archive bytes differ")
+    archived = dict(path=str(target), bytes=len(raw), sha256=digest)
+    prior.update(reference=archived, original_location=str(source), text=raw.decode("utf-8"))
+    data["evidence"] = [archived if r == old else r for r in data["evidence"]]
+    return source, target, raw
 
 
 def main(argv=None):
@@ -1360,6 +1382,7 @@ def main(argv=None):
             raise FileExistsError(f"Preserve existing report: {root / name}")
     begun = time.monotonic()
     data = collect(root, args.stopped)
+    old_status = prepare_status_archive(data, root)
     data["markdown_display_root"] = str(args.display_root) if args.display_root else None
     report, reproduce = render_report(data, display_root=args.display_root), render_reproduce(data)
     data["report_formatting_seconds"] = time.monotonic() - begun
@@ -1381,6 +1404,16 @@ def main(argv=None):
         current = BudgetLedger(b["ledger_store"], b["group"]).read()
         if current["previous"] != b["chain_head"]:
             raise RuntimeError("Ledger changed before report publication")
+    if old_status:
+        source, target, raw = old_status
+        if source.read_bytes() != raw:
+            raise RuntimeError("Live status changed before report publication")
+        target.parent.mkdir(exist_ok=True)
+        if not target.exists():
+            with target.open("xb") as stream:
+                stream.write(raw)
+        elif target.read_bytes() != raw:
+            raise RuntimeError("Historical status archive changed")
     for name in (OUTPUTS[0], OUTPUTS[1], OUTPUTS[3]):
         with (root / name).open("x") as stream:
             stream.write(contents[name])

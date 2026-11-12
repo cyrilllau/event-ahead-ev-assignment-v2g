@@ -63,6 +63,7 @@ def prepare(store, *, study, decisions, manifest, budget_group, budget_seconds):
         if manifest["scope"] == "oos" and p.scope == "development":
             raise ValueError("Development plans cannot be relabelled as paper OOS")
         check_first_vector(p, result["plan"]["entries"], result["plan"]["first_stage"])
+    BudgetLedger(store.root, budget_group).create(study, budget_seconds)
     run = store.put(
         "runs",
         dict(
@@ -87,7 +88,6 @@ def prepare(store, *, study, decisions, manifest, budget_group, budget_seconds):
         ),
         [locked, spec, source],
     )
-    BudgetLedger(store.root, budget_group).create(study, budget_seconds)
     return run
 
 

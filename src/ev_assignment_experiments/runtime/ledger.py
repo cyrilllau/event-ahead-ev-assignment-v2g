@@ -46,7 +46,8 @@ class BudgetLedger:
     def __init__(self, store, group):
         if not isinstance(group, str) or not group.strip():
             raise ValueError("Missing budget group")
-        self.root = Path(store) / "runtime" / "budgets" / sha256(group.encode())
+        self.store_root = Path(store)
+        self.root = self.store_root / "runtime" / "budgets" / sha256(group.encode())
         self.group = group
 
     def create(self, study, limit, *, inherited=0.0, evidence=()):
@@ -72,6 +73,17 @@ class BudgetLedger:
                 if json.loads(path.read_text()) != definition:
                     raise ValueError("Budget cannot be reset or replaced")
             else:
+                from ev_assignment_experiments.tracking.store import Store
+
+                archive = Store(self.store_root)
+                if any(
+                    v["payload"].get("budget_group") == self.group
+                    for _, v in archive.records("runs")
+                ):
+                    raise ValueError(
+                        "Archived budget group has no execution ledger; refuse cost reset. "
+                        "Use its original execution store or an explicit fresh reproduction budget"
+                    )
                 publish(path, definition)
         return definition
 

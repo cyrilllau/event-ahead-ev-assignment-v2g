@@ -106,6 +106,8 @@ def test_evaluation_recovery_rejects_live_owner_and_archives_real_dead_claim(tmp
             sample_ids=["s0"], random_stream="runtime-fixture", protocol="L08_PAIRED_FIXED_PLAN_V1"
         ),
     )
+    ledger = BudgetLedger(store.root, "eval")
+    ledger.create("s", 10)
     run = store.put(
         "runs",
         dict(
@@ -117,13 +119,12 @@ def test_evaluation_recovery_rejects_live_owner_and_archives_real_dead_claim(tmp
         ),
         [locked, spec],
     )
-    ledger = BudgetLedger(store.root, "eval")
-    ledger.create("s", 10)
     live = ledger.claim(run.as_dict(), 2)
     with pytest.raises(ValueError, match="live or unknown"):
         recover(store, run)
     ledger.settle(live["attempt"], 0, None)
     # Use another fresh ledger/run to exercise actual process death, not a mocked PID.
+    BudgetLedger(store.root, "dead-eval").create("s", 10)
     run = store.put(
         "runs",
         dict(
@@ -158,3 +159,21 @@ l=BudgetLedger(sys.argv[1],'dead-eval');l.create('s',10);l.claim(json.loads(sys.
     )
     assert not event["original_settlement"]["actual_parent_wait"]
     store.closure([Ref(**result["recovered"][0])])
+
+
+def test_archived_run_cannot_silently_recreate_zero_cost_budget(tmp_path):
+    from ev_assignment_experiments.tracking.store import Store
+
+    source, mirror = Store(tmp_path / "source"), Store(tmp_path / "mirror")
+    original = BudgetLedger(source.root, "scientific-budget")
+    original.create("study", 10, inherited=3, evidence=["recorded-prior-cost"])
+    run = source.put("runs", dict(study="study", budget_group="scientific-budget"))
+    source.sync_to(mirror, [run])
+    with pytest.raises(ValueError, match="refuse cost reset"):
+        BudgetLedger(mirror.root, "scientific-budget").create("study", 10)
+    assert not (BudgetLedger(mirror.root, "scientific-budget").root / "definition.json").exists()
+    assert original.read()["spent_seconds"] == 3
+    original.create("study", 10, inherited=3, evidence=["recorded-prior-cost"])
+    # Explicit independent reproduction is possible, never aliases the historical group.
+    BudgetLedger(mirror.root, "new-explicit-reproduction").create("study", 10)
+    assert source.read(run) == mirror.read(run)

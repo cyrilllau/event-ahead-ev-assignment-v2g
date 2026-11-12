@@ -51,6 +51,12 @@ def atomic_pointer(path, value):
 def plan(store: Store, recipe: RunPlan):
     cost_refs = [Ref(**r) for r in recipe.inherited_evidence]
     store.closure(cost_refs)
+    BudgetLedger(store.root, recipe.budget_group).create(
+        recipe.study,
+        recipe.budget_seconds,
+        inherited=recipe.inherited_seconds,
+        evidence=recipe.inherited_evidence,
+    )
     source = store.put_object(source_snapshot())
     study = store.put(
         "studies",
@@ -93,12 +99,6 @@ def plan(store: Store, recipe: RunPlan):
             budget_group=recipe.budget_group,
         ),
         [source, experiment, inputs] + cost_refs,
-    )
-    BudgetLedger(store.root, recipe.budget_group).create(
-        recipe.study,
-        recipe.budget_seconds,
-        inherited=recipe.inherited_seconds,
-        evidence=recipe.inherited_evidence,
     )
     return run
 

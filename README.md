@@ -1,107 +1,91 @@
 # Event-Ahead EV Assignment and V2G Reserve Procurement
 
-Research software for event-ahead electric-delivery-fleet task assignment and V2G
-reserve procurement under coupled grid/road disruptions (IEEE33 v54-Q1).
+IEEE33 event-ahead electric-delivery-fleet assignment and V2G reserve procurement
+under coupled grid/road disruptions. The active implementation separates scientific
+models from experiments, execution and research records.
 
-**Architecture v2 is being implemented in stages.** Read the
-[implementation status](docs/architecture/IMPLEMENTATION_STATUS.md) and
-[approved complete plan](docs/architecture/REFACTOR_PLAN_V2_CN.md).
-The development probability workflow is executable. Formal L08 DET/DRO/ARO
-execution, automatic remote synchronization and paper publication are not yet
-admitted in v2. Existing PowerAI experiments use their original releases.
+Start with the [acceptance status](docs/architecture/IMPLEMENTATION_STATUS.md),
+[approved design](docs/architecture/REFACTOR_PLAN_V2_CN.md) and
+[operating guide](docs/operations/WORKFLOW_CN.md). Existing PowerAI experiments keep
+using their original immutable releases; this refactor does not take them over.
 
-## Install
+## Install and validate
 
-Use Python 3.12. Numerical dependency versions are preserved.
+Python 3.12, with pinned numerical dependencies:
 
 ```bash
 uv sync --locked --group dev
-```
-
-For pip, create/activate a Python 3.12 environment, then:
-
-```bash
-python -m pip install -r requirements.lock -e .
-```
-
-Gurobi is optional (`uv sync --extra gurobi`) and needs a separately configured
-license. Importing the new packages does not initialize it.
-
-## Executable development workflow
-
-Choose an archive outside the code checkout. This example is a two-support
-probability LP with a hand-computed optimum of 5 USD, not a full planning run.
-
-```bash
-ev-assignment --store /tmp/ev-assignment-example plan --experiment experiments/examples/probability-oracle.toml
-ev-assignment --store /tmp/ev-assignment-example run --id RUN_ID
-ev-assignment --store /tmp/ev-assignment-example audit --id ATTEMPT_ID
-ev-assignment --store /tmp/ev-assignment-example context --study development-probability
-ev-assignment --store /tmp/ev-assignment-example sync --attempt ATTEMPT_ID --destination /tmp/ev-assignment-local-copy
-ev-assignment --store /tmp/ev-assignment-local-copy bundle --attempt ATTEMPT_ID --destination /tmp/ev-assignment-bundle
-ev-assignment --store /tmp/ev-assignment-local-copy verify-bundle --destination /tmp/ev-assignment-bundle
-```
-
-Replace RUN_ID / ATTEMPT_ID with the IDs printed by the preceding commands.
-Planning seals the actual source snapshot and environment. Source changes require
-a new Run. Re-executing a claimed Run is refused: budget-aware recovery belongs
-to the runtime stage. Context labels local snapshots and unsettled claims; it
-does not infer server liveness or scientific adoption.
-Sync streams sealed closures with bounded memory. Interrupted transfers retain a
-partial file, verify its prefix against the source, and resume at that offset.
-Existing complete artifacts are never overwritten. A read-only SSH transport is
-also available for stores created by this new workflow:
-
-```bash
-ev-assignment --store /absolute/local/archive pull --host powerai --remote-store /absolute/remote/sealed-store --attempt ATTEMPT_ID
-```
-
-This command requires an explicit sealed store and attempt. It does not import
-old campaign folders, watch active files, deploy code or restart jobs. The remote
-reader protocol is tested in a separate local process; no new store or release
-has been deployed to PowerAI during this refactor.
-
-## Package boundaries
-
-| Package / directory | Role |
-|---|---|
-| ev_assignment | Migrated models, probability methods, physics and audits |
-| ev_assignment_experiments | Config, immutable records, local transfer, development bundles |
-| evcs_experiments | Transitional legacy callers, not a new formal release |
-| powerai_l08 | Source references; no direct execution during refactoring |
-| experiments | Experiment definitions, no generated outputs |
-
-Eleven numerical modules were extracted; their scientific AST is checked against
-the baseline after removing import nodes only. Legacy sources, scripts and tests
-remain byte-identical to the baseline while entire workflows are migrated. New
-scientific tests exercise the extracted modules. Historical source-bound
-acceptance gates are not changed or treated as new-release admission.
-
-The `ev_assignment.l08` subpackage additionally extracts L08's full-dwell energy,
-islanding, explicit task matrices and exact power-factor reduction. Five scenario
-categories compare original and extracted matrices, LP solutions and lifted
-physical residuals. This is component equivalence, not controller admission.
-
-## Validation
-
-```bash
 uv run pytest tests/unit tests/integration -q
 uv run ruff check src/ev_assignment_experiments tests/unit tests/integration
 uv build --wheel
 ```
 
-Original scientific tests remain under tests/. Their full suite requires
-separately managed private inputs, source-bound evidence and explicit paths
-(EVCS_CONFIG); see implementation status for current results. CI runs only
-self-contained local checks, never SSH or a commercial solver.
+Pip alternative: `python -m pip install -r requirements.lock -e .`.
+For actual optimization, add `uv sync --locked --group dev --extra gurobi` and a
+Gurobi 12.0.3 license, then run `uv run --extra gurobi pytest tests/native -q`.
+CI does not use a commercial license or connect to PowerAI.
 
-## Development, compute and publication
+## Run an experiment
 
-Local development and private GitHub own code history. PowerAI executes fixed
-versions and temporarily stores artifacts. Completed research is verified and
-archived locally. A separate public repository will be assembled from explicitly
-selected, audited paper results and exact source versions.
+Use an absolute storage path outside this checkout. Definitions contain no outputs.
 
-Generated data, results, checkpoints, logs, manuscripts and credentials are
-excluded from tracked files. Synthetic definitions and source migration
-manifests are tracked.
+```bash
+ev-assignment --store /absolute/research-store plan --experiment experiments/l08/smoke-det.toml
+ev-assignment --store /absolute/research-store job launch --id RUN_SHA
+ev-assignment --store /absolute/research-store job status --attempt LAUNCH_TOKEN
+ev-assignment --store /absolute/research-store audit --id ATTEMPT_SHA
+ev-assignment --store /absolute/research-store context --study l08-smoke-det --refresh --markdown
+```
+
+DRO and ARO have corresponding small physical examples. Frozen400 runs require an
+explicit input manifest and their own scientific/resource admission. A successful
+small example or a matrix identity check does not establish full-size convergence.
+
+| Location | Responsibility |
+|---|---|
+| `src/ev_assignment/` | Typed problems, physics, models, DET/DRO/ARO, numerical certificates |
+| `src/ev_assignment_experiments/` | Input adapters, RunPlan, supervision, budgets, immutable records, analysis/export |
+| `experiments/` | Explicit experiment definitions and small examples |
+| `tests/unit`, `tests/integration` | Portable engineering and numerical checks |
+| `tests/native` | Explicit real Gurobi validation |
+| `tests/scientific` | Preserved scientific assertions against extracted kernels |
+| `docs/`, `skills/` | Architecture, operating rules and task-specific agent instructions |
+| `src/evcs_experiments`, `powerai_l08`, original tests/scripts | Byte-preserved historical reference; no new-code dependency |
+
+New core imports neither experiment infrastructure nor legacy code. Input roots are
+explicit. Optional Gurobi loads only when requested. Original source-bound acceptance
+is preserved as historical evidence; it is never silently reassigned to new code.
+
+## Keep track as experiments grow
+
+Study → ExperimentRevision → Run → Attempt → Audit/Decision → Publication. Each Run
+pins actual source, environment, recipe and input identity. Failed attempts remain
+visible. Checkpoint recovery retains cumulative costs; source changes require a new
+Run. Execution, scientific validation, convergence and research adoption are separate.
+
+`context` produces bounded JSON and Markdown with exact evidence links, recorded next
+actions, unresolved claims and pagination. It labels observations by time. Missing or
+stale metadata never means a process has died. The SQLite index is disposable.
+
+## Compute, sync and publish
+
+Git synchronizes code with the private repository. PowerAI installs a fixed version
+into a new release directory. Never rsync over an active release or its working files.
+Artifacts live in a separate content-addressed store, with verified resumable transfers.
+
+```bash
+ev-assignment --store /absolute/research-store sync --study STUDY --mode full --destination /absolute/local-archive
+ev-assignment --store /absolute/local-archive pull --host powerai --remote-store /absolute/remote-store --attempt ATTEMPT_SHA
+ev-assignment --store /absolute/local-archive bundle --attempt ATTEMPT_SHA --destination /absolute/reproduction-bundle
+ev-assignment --store /absolute/local-archive verify-bundle --destination /absolute/reproduction-bundle
+```
+
+Metadata-only sync is explicitly **not** an archived result. Complete bundles contain
+the exact installable source, input/evidence closure, environment and commands to audit,
+regenerate result tables, smoke-test and explicitly rerun a selected experiment.
+Publication selection requires recorded decisions. DET/DRO/ARO training objectives are
+not interchangeable evaluation metrics; paired evaluation has a separate plan/sample lock.
+
+The final paper repository will be created separately, after final results are selected
+and audited. This private development repository excludes results, artifacts, logs,
+checkpoints, private data and credentials. No public repository is created by the refactor.

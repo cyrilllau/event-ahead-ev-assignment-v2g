@@ -1,30 +1,28 @@
 # EV assignment development
 
-Read `docs/architecture/IMPLEMENTATION_STATUS.md` before choosing work. The approved
-design is `docs/architecture/REFACTOR_PLAN_V2_CN.md`; a plan is not acceptance evidence.
+Scope: IEEE33 event-ahead EV assignment and V2G reserve; active L08 DET/DRO/ARO.
+Read `docs/architecture/IMPLEMENTATION_STATUS.md` and the relevant operating section in
+`docs/operations/WORKFLOW_CN.md`. Design: `docs/architecture/REFACTOR_PLAN_V2_CN.md`.
 
-- Scope: IEEE33 event-ahead EV assignment / V2G reserve; L08 DET/DRO/ARO mainline.
-- Core: `src/ev_assignment/`; orchestration: `src/ev_assignment_experiments/`.
-- L08 pure mathematics: `src/ev_assignment/l08/`; frozen source/extraction map:
-  `docs/architecture/l08-extraction-manifest.json`. Its component tests do not admit
-  a complete DET/DRO/ARO controller or a production release.
-- `evcs_experiments`, `powerai_l08`, and old scripts are transitional reference/legacy
-  implementation. Their existence does not admit a new production dispatcher.
-- Core must not import experiments or legacy modules, mutate sys.path, infer dataset
-  roots from source locations, or start solvers/filesystem writes on import.
-- Use Python 3.12 and the installed package: `uv sync --group dev`.
-- Unit/integration checks: `uv run pytest tests/unit tests/integration`.
-  Historical tests require explicit `EVCS_PROJECT_ROOT` / `EVCS_CONFIG` and private
-  fixtures. Report their failures; never remove assertions to obtain PASS.
-- Lint: `uv run ruff check src/ev_assignment_experiments tests/unit tests/integration`.
-- Preserve physical tolerances, random streams, sample pairing, bound scope,
-  inherited budget and original approximate-acceptance flags.
-- PowerAI currently runs independently. Never modify its active code, locks,
-  campaigns, symlinks, process parameters or processes for a refactor.
-- Source uses Git; artifacts use a separately configured store. Do not commit live
-  results/logs/data/checkpoints or credentials to this private development repo.
-- Archive `sync`/`pull` resumes sealed byte transfers only; it never resumes an
-  experiment. Do not point it at active logs, mutable checkpoints or campaign roots.
-- Public paper reproduction is a separate repository, built from audited local
-  archive manifests after selection. Do not automatically publish or change visibility.
-- Keep factual phase status and remaining scientific admission gaps explicit.
+- Core `src/ev_assignment/`; experiment IO/control `src/ev_assignment_experiments/`.
+  Core must not import experiments/legacy, mutate sys.path, infer data roots or compute on import.
+- Python 3.12, installed package: `uv sync --locked --group dev`. Real native tests need
+  `--extra gurobi`. CI: `pytest tests/unit tests/integration` plus portable scientific checks.
+- Scientific inputs use explicit manifests. Preserve units, stream addresses, pairing,
+  fixed routes/H, initial states, physical tolerances and OOS locks.
+- Baseline sources/scripts/tests are byte-preserved reference. Never repoint historical
+  acceptance hashes or loosen assertions. Private scientific fixtures use explicit roots.
+- Source/config changes create a new Run; the same budget group retains old costs.
+  Execution, physics, convergence and adoption are distinct. Near-optimal acceptance
+  retains original gap/native status and requires a recorded authorized decision.
+- PowerAI jobs retain their original releases. Do not modify active sources, current links,
+  campaigns, locks, budgets or unrelated processes. New runtime never adopts legacy PIDs.
+- Git contains source/config/tests/docs. Research stores must be outside the checkout.
+  Do not commit results/artifacts/data/logs/checkpoints/licenses or credentials.
+- Read `context --study ID` from the specified store; use `--refresh` only for observations
+  on that host. Offline/unknown does not mean dead. Consult precise evidence references.
+- Public reproduction uses a separate repository after explicit paper selection. A bundle
+  or passing small test is not formal full-scale convergence or permission to publish.
+
+Task instructions: `skills/ev-develop/SKILL.md`, `skills/ev-run-recover/SKILL.md`,
+`skills/ev-audit-publish/SKILL.md`. These call the common CLI, not duplicate controllers.

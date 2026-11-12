@@ -13,12 +13,23 @@
     "native_highs": "ev_assignment.solvers.highs",
     "native_gurobi": "ev_assignment.solvers.gurobi"
   },
-  "remaining": "Full DET/DRO/ARO adapters, historical source admission, runtime and publication stages remain pending.",
   "extracted_functions": {
     "reactive_support_model": [
       "capability_facets",
       "capability_inequalities"
     ]
   },
-  "strategy": "Parallel extraction: baseline legacy callers retained byte-identical until workflow-specific source admission is complete."
+  "strategy": "Parallel extraction: baseline legacy callers retained byte-identical until workflow-specific source admission is complete.",
+  "active_l08": {
+    "domain": "ev_assignment.domain.planning",
+    "compact_native": "ev_assignment.l08.native",
+    "det_capacity_proof": "ev_assignment.l08.det_strengthening",
+    "methods": "ev_assignment.methods.l08",
+    "independent_physics": "ev_assignment.validation.l08",
+    "frozen_input_adapter": "ev_assignment_experiments.datasets.l08",
+    "run_and_recovery": "ev_assignment_experiments.runtime.supervisor",
+    "records": "ev_assignment_experiments.tracking",
+    "publication": "ev_assignment_experiments.publication.bundle"
+  },
+  "historical_boundary": "Original bytes retained as references; current engineering validation does not re-admit or restart any historical campaign."
 }

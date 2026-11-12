@@ -1,0 +1,18 @@
+schema_version = 2
+study = "l08-smoke-aro"
+title = "L08 ARO: independent small physical validation"
+method = "ARO"
+input_kind = "synthetic_l08"
+budget_group = "l08-smoke-aro-v1"
+budget_seconds = 60
+hypothesis = "Compact controller agrees with direct formulation and original physics"
+baseline = "Direct finite-support formulation"
+
+[solver]
+seconds = 30
+threads = 1
+seed = 0
+mip_gap = 0
+absolute_gap = 0.00001
+soft_memory_gb = 4
+master_seconds = 15

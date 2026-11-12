@@ -7,7 +7,12 @@ name = "ev-assignment"
 version = "0.2.0.dev0"
 description = "Reproducible IEEE33 EV assignment experiments"
 requires-python = ">=3.12,<3.13"
-dependencies = ["numpy==2.4.2", "scipy==1.18.1", "networkx==3.6.1"]
+dependencies = [
+    "numpy==2.4.2",
+    "scipy==1.18.1",
+    "networkx==3.6.1",
+    "psutil>=7,<8",
+]
 
 [project.scripts]
 ev-assignment = "ev_assignment_experiments.cli:main"
@@ -21,7 +26,7 @@ where = ["src"]
 dev = ["pytest>=8", "ruff>=0.9", "build>=1.2"]
 
 [project.optional-dependencies]
-gurobi = ["gurobipy>=12,<14"]
+gurobi = ["gurobipy==12.0.3"]
 
 [tool.pytest.ini_options]
 addopts = "--import-mode=importlib --strict-markers"

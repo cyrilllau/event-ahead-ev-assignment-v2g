@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "source": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/compact_first_stage.py",
+      "target": "src/ev_assignment/l08/native.py",
+      "source_sha256": "5acde6ac6c41a742900256a55fed1fe65defad293ffe75d308f0c7778e02d057",
+      "target_sha256": "4b62d596ef4b7fd0156d1adccb6feff99dd1eb6327793f1c819cccc9a494c428",
+      "transformation": "lazy imports; frozen local CFG values",
+      "functions": [
+        "add_first",
+        "decode",
+        "fix_first"
+      ]
+    },
+    {
+      "source": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/exact_transform.py",
+      "target": "src/ev_assignment/l08/native.py",
+      "source_sha256": "2441c10cf9a4cd6d8f2e1cd772239edecaf6e032dbd951c9fda41dc572b016f3",
+      "target_sha256": "4b62d596ef4b7fd0156d1adccb6feff99dd1eb6327793f1c819cccc9a494c428",
+      "transformation": "lazy imports; campaign setup excluded",
+      "functions": [
+        "add_strengthening",
+        "compact_base",
+        "original_expressions"
+      ]
+    },
+    {
+      "source": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/compact_recourse_pf.py",
+      "target": "src/ev_assignment/l08/native.py",
+      "source_sha256": "257adcb2c25a5a2fb8bc06fcbc937249ee2f21a833bf34e07ab14429cfeb9bd4",
+      "target_sha256": "4b62d596ef4b7fd0156d1adccb6feff99dd1eb6327793f1c819cccc9a494c428",
+      "transformation": "lazy imports; frozen local CFG values",
+      "functions": [
+        "add_recourse"
+      ]
+    },
+    {
+      "source": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/safe_probability_certificate.py",
+      "target": "src/ev_assignment/l08/probability_certificate.py",
+      "source_sha256": "e70cda2fd9feec2a045b707fd28f73b70db67c4383d313dd45b86b01a4ee0d9f",
+      "target_sha256": "2678c97aaf468a6e4a41033a82ba94b23f5c013c18b2d063f1d92cc10c4f3972",
+      "transformation": "imports only",
+      "functions": [
+        "dyadic_simplex",
+        "compensation",
+        "certify_with_feasible_anchor"
+      ]
+    },
+    {
+      "source": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/envelope_sparse.py",
+      "target": "src/ev_assignment/l08/envelope.py",
+      "source_sha256": "56f1b58e66d3f0cf2a7914742787cd7b83a26292e8f0cb828921f98da8e60b48",
+      "target_sha256": "bf05318c0b8d84888c0651cef293ffa893808d4504e71cffd216bde07fbe3fed",
+      "transformation": "imports only",
+      "functions": [
+        "digest",
+        "simplex",
+        "enclosure",
+        "protect"
+      ]
+    },
+    {
+      "source": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/strict_upper.py",
+      "target": "src/ev_assignment/l08/strict_primal.py",
+      "source_sha256": "9fa167f53a5fa777cb972ca3416728fb5fc73a5770072b7db2c5fde7218a7304",
+      "target_sha256": "a9c49f6581f27e3c877862fbf32ed4e707ae2faf3d6a6d19043835b474d3b782",
+      "transformation": "imports only",
+      "functions": [
+        "fraction",
+        "upper",
+        "check",
+        "cost_upper"
+      ]
+    },
+    {
+      "source": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/theta_kernel.py",
+      "target": "src/ev_assignment/l08/theta.py",
+      "source_sha256": "740a69781590d648c0147fbb351ab43156d9a005ab051fc027476f8d915ca646",
+      "target_sha256": "452f993e3e6357a08a42eb713358ab600a0c9e60dca0d54ce55d9994b72d1f06",
+      "transformation": "imports only",
+      "functions": [
+        "down",
+        "upper",
+        "compensate",
+        "add_supports",
+        "add_probability",
+        "model_arrays",
+        "lift",
+        "lagrangian",
+        "external_gap"
+      ]
+    },
+    {
+      "source": "powerai_l08/L08_DRO400_THETA_MULTICUT_REPAIR02_NATIVE_RESUME_V1/ATTEMPT_05/tools/lifecycle/base_r44.py",
+      "target": "src/ev_assignment/l08/certificates.py",
+      "source_sha256": "d5224a11059a069cd39a109c76fdcdf5f39fdc22ff94ac09d1a4a50eb37834ed",
+      "target_sha256": "32e3f78000ba1171bd625cd44605228fd41905a8a7aa004f408efff51e66acbc",
+      "transformation": "imports only",
+      "functions": [
+        "enclosure",
+        "row_audit",
+        "lagrangian",
+        "replay_cut"
+      ]
+    },
+    {
+      "source": "powerai_l08/L08_DRO_R41_NESTED_BENDERS_ROOT/REPAIR_01/tools/certificate_core.py",
+      "target": "src/ev_assignment/l08/certificates.py",
+      "source_sha256": "0cff056199aebf368406aa5bc435fda008661cb53e521d13c07c48310d041ca1",
+      "target_sha256": "32e3f78000ba1171bd625cd44605228fd41905a8a7aa004f408efff51e66acbc",
+      "transformation": "finite_bounds returns proof instead of writing it; out parameter removed"
+    },
+    {
+      "source": "powerai_l08/L08_K4L4_DRO_READY_PARALLEL_R36/tools/lp_certificate.py",
+      "target": "src/ev_assignment/l08/fixed_plan.py",
+      "source_sha256": "0a59c0de2b69eabca324b16d5cc24b41d7819f31c1154047b6814d4620dbece3",
+      "target_sha256": "aae9c7a03e424e93de8eb62a634bd86089172babfd4496642a706ae535fcbadb",
+      "transformation": "imports only",
+      "functions": [
+        "certify"
+      ]
+    },
+    {
+      "source": "powerai_l08/L08_ARO400_SHARED_INTEGER_AUTONOMOUS_V1/CODE_REVISIONS/REPAIR_02_PREFLIGHT_REUSE/aro_state_policy.py",
+      "target": "src/ev_assignment/l08/aro_policy.py",
+      "source_sha256": "c0073d2ff69533d0a325cb4e8bdbc0bbf3ee1cc8e0694ed7fc8e9924ba6487be",
+      "target_sha256": "604932be7bb6fbc3d0bbbe9306b89ce97b812ad3ac575453b885d5f186415b59",
+      "transformation": "imports only",
+      "functions": [
+        "next_action",
+        "candidate_transition"
+      ]
+    }
+  ],
+  "controller_scope": "portable DET compact / DRO theta / ARO max; no claim of identical historical solver trajectory",
+  "historical_execution_sources_unchanged": true
+}

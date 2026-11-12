@@ -66,9 +66,9 @@ def test_l08_source_and_extraction_manifest(pytestconfig):
     manifest = json.loads((root / "docs/architecture/l08-extraction-manifest.json").read_text())
     for row in manifest["files"]:
         for role in ("source", "target"):
-            assert hashlib.sha256((root / row[role]).read_bytes()).hexdigest() == row[
-                role + "_sha256"
-            ]
+            assert (
+                hashlib.sha256((root / row[role]).read_bytes()).hexdigest() == row[role + "_sha256"]
+            )
 
 
 def test_baseline_source_bytes_preserved(pytestconfig):
@@ -76,3 +76,58 @@ def test_baseline_source_bytes_preserved(pytestconfig):
     manifest = json.loads((root / "docs/architecture/baseline-source-manifest.json").read_text())
     for row in manifest["files"]:
         assert hashlib.sha256((root / row["path"]).read_bytes()).hexdigest() == row["sha256"]
+
+
+def test_native_numerical_functions_keep_original_ast(pytestconfig):
+    import copy
+
+    root = Path(pytestconfig.rootpath)
+    manifest = json.loads(
+        (root / "docs/architecture/l08-native-migration-manifest.json").read_text()
+    )
+
+    class Normalize(ast.NodeTransformer):
+        def visit_Import(self, node):
+            return None
+
+        def visit_ImportFrom(self, node):
+            return None
+
+        def visit_Assign(self, node):
+            if any(isinstance(t, ast.Name) and t.id == "CFG" for t in node.targets):
+                return None
+            return self.generic_visit(node)
+
+    for row in manifest["files"]:
+        for role in ("source", "target"):
+            assert (
+                hashlib.sha256((root / row[role]).read_bytes()).hexdigest() == row[role + "_sha256"]
+            )
+        old = {
+            n.name: n
+            for n in ast.parse((root / row["source"]).read_text()).body
+            if isinstance(n, ast.FunctionDef)
+        }
+        new = {
+            n.name: n
+            for n in ast.parse((root / row["target"]).read_text()).body
+            if isinstance(n, ast.FunctionDef)
+        }
+        for name in row.get("functions", []):
+            assert ast.dump(
+                Normalize().visit(copy.deepcopy(old[name])), include_attributes=False
+            ) == ast.dump(Normalize().visit(copy.deepcopy(new[name])), include_attributes=False), (
+                row["target"],
+                name,
+            )
+
+
+def test_all_core_modules_import_without_solver_or_io(tmp_path):
+    source = """import importlib,pkgutil,sys
+import ev_assignment
+for m in pkgutil.walk_packages(ev_assignment.__path__,ev_assignment.__name__+'.'):
+ importlib.import_module(m.name)
+assert 'gurobipy' not in sys.modules
+"""
+    subprocess.run([sys.executable, "-c", source], cwd=tmp_path, check=True)
+    assert list(tmp_path.iterdir()) == []

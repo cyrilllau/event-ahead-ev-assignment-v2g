@@ -77,6 +77,9 @@ validation 冻结计算源码为 `1bd6cf7dd27a9ddfef8f732bab3e84fd93b56924`，
 报告 formatter 最初提交为 `bf37879`；后续格式化修订以最终报告记录的脚本哈希为准，
 它是独立格式化工具版本，**不替换冻结计算源码**。
 开发 R0/R1/R2/R5 保留各自历史 release；不得用 r08 重新标记旧结果。
+资源中断后的调度恢复采用独立控制器 `controllers/52933fe/validation_campaign.py`，
+仍调用原 r08 worker/wrapper；绑定记录为 `validation/CONTROLLER_RECOVERY_MANIFEST.json`。
+该控制器只认可已核实的保守结算链，不修改冻结计算源码或重复中断的科学 Run。
 
 | 身份层 | 证据及含义 |
 |---|---|
@@ -114,8 +117,10 @@ pickle 只限可信、清单绑定的私有输入；报告脚本不打开 pickle
    失联/死亡场景先按既有身份与账本恢复规则核实并留证；本脚本没有手工清锁、删 Run、
    删除 ledger、重建零费用预算或接管原生产 PID 的恢复入口。
 4. 仅当原 controller 确已退出、相关 claim 均已合法结算、冻结身份一致且有尚未执行的
-   已授权 job 时，才可恢复同一冻结 controller。已有目录缺 `WAIT.json` 会拒绝继续；
-   有 WAIT 仍须匹配 CLAIM 的 argv/release/FREEZE/配置及账本 settlement receipt。
+   已授权 job 时，才可恢复登记的 controller。有 WAIT 须匹配 CLAIM 的
+   argv/release/FREEZE/配置及账本 settlement receipt。缺 WAIT 默认拒绝；唯一受支持的
+   例外是 `RECOVERY.json` 严格绑定原 claim、原进度、父子死亡/OOM观测及公共账本的
+   全预留保守结算事件。它不创建虚假 WAIT/RESULT，不将资源中断视为科学通过。
 5. 已结算的失败、超时也保留并复用；controller 不自动重算这些 job。
    它恢复的是剩余 job 的调度，**不承诺恢复已终止求解器树或从逐场景中断处继续同一 worker**。
    确需实现修复时按既有授权登记新 release/Run、沿用累计预算，保留原失败；不按验证结果改模型。
@@ -125,7 +130,8 @@ pickle 只限可信、清单绑定的私有输入；报告脚本不打开 pickle
 ```bash
 ROUND2_ROOT=/home/Shixin/ev-assignment-synthetic/structured-fleet-design-20261112/round2
 ROUND2_RELEASE="$ROUND2_ROOT/releases/r08"
-"$ROUND2_RELEASE/.venv/bin/python" "$ROUND2_RELEASE/validation_campaign.py" \
+ROUND2_CONTROLLER="$ROUND2_ROOT/controllers/52933fe/validation_campaign.py"
+"$ROUND2_RELEASE/.venv/bin/python" "$ROUND2_CONTROLLER" \
   "$ROUND2_ROOT/validation" "$ROUND2_RELEASE"
 ```
 

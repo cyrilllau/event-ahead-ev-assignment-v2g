@@ -4,7 +4,8 @@ Usage: python report_round2.py ROOT [--stopped 'reason'] [--display-root LOCAL_R
 
 ROOT is the actual execution-host Round2 directory, not an offline mirror.
 The default requires both ledgers idle, the campaign completion marker, and
-matching settlement receipts for all frozen jobs. --stopped permits an explicit
+matching WAIT receipts or verified dead-claim recovery chains for all frozen
+jobs. Recovery settlement never implies scientific acceptance. --stopped permits an explicit
 incomplete snapshot; it neither terminates nor declares dead an active worker.
 No model, witness, statistic, bootstrap, or probability certificate is recomputed.
 Existing reports are not overwritten, except ROOT/CASE_DESIGN_STATUS.md, whose
@@ -30,6 +31,7 @@ METHODS = ("DET", "SAA", "ARO", "P3", "P2", "P3-noadvance")
 OUTPUTS = ("CASE_DESIGN_ROUND2_REPORT_CN.md", "CASE_DESIGN_ROUND2_RESULTS.json",
            "CASE_DESIGN_STATUS.md", "REPRODUCE_CN.md")
 OLD_COST = 211.08199704252183
+RECOVERY_REASON = "dead_owner_unknown_overhead_conservatively_charged_full_reservation"
 
 
 class Evidence:
@@ -80,9 +82,12 @@ def ledger_summary(ledger, *, development):
         raise ValueError(f"Unexpected frozen budget limit: {definition}")
     claims = {e["payload"]["attempt"]: e["payload"] for e in snap["events"]
               if e["payload"]["kind"] == "claim"}
+    children = {e["payload"]["attempt"]: e["payload"]["identity"] for e in snap["events"]
+                if e["payload"]["kind"] == "child"}
     charges, stages = [], {}
     new_wrapper_wall = 0.
-    for event in snap["events"]:
+    new_conservative_charge = 0.
+    for index, event in enumerate(snap["events"]):
         p = event["payload"]
         if p["kind"] not in ("settlement", "external_charge"):
             continue
@@ -94,10 +99,15 @@ def ledger_summary(ledger, *, development):
         new_round = not development or stage in {f"R{i}" for i in range(6)}
         if new_round and p["kind"] == "settlement" and p.get("actual_parent_wait"):
             new_wrapper_wall += seconds
+        if new_round and p["kind"] == "settlement" and p.get("reason") == RECOVERY_REASON:
+            new_conservative_charge += seconds
         charges.append(dict(kind=p["kind"], attempt=p.get("attempt"), run=run,
                             charged_seconds=seconds, actual_parent_wait=p.get("actual_parent_wait"),
                             receipt=p.get("receipt"), returncode=p.get("returncode"),
-                            observed_epoch=p.get("observed_epoch"), evidence=p.get("evidence")))
+                            observed_epoch=p.get("observed_epoch"), evidence=p.get("evidence"),
+                            reason=p.get("reason"), claim_payload=claim,
+                            child_identity=children.get(p.get("attempt")), event_payload=p,
+                            ledger_event=reference(ledger.root / "events" / f"{index:08d}.json")))
     return dict(group=ledger.group, ledger_root=str(ledger.root), definition=definition,
         ledger_store=str(ledger.store_root),
         chain_head=snap["previous"], event_count=len(snap["events"]),
@@ -106,7 +116,60 @@ def ledger_summary(ledger, *, development):
         historical_round1_seconds=OLD_COST if development else 0.,
         round2_charged_seconds=snap["spent_seconds"] - (OLD_COST if development else 0.),
         inherited_cost_already_in_total=True, new_actual_wrapper_wall_seconds=new_wrapper_wall,
+        new_conservative_reservation_charge_seconds=new_conservative_charge,
         active=snap["active"], stage_charged_seconds=stages, charges=charges)
+
+
+def verified_recovery(ev, folder, claim, settlement, recovery):
+    """Bind an OOM recovery to the already verified ledger, never fabricate WAIT."""
+    if ev.ref(folder / "WAIT.json") is not None or ev.ref(folder / "RESULT.json") is not None:
+        raise ValueError(f"Recovery cannot replace an existing WAIT/RESULT: {folder}")
+    if (recovery.get("schema") != "round2-dead-claim-recovery-v1"
+            or recovery.get("status") != "RESOURCE_INTERRUPTED_OOM"
+            or recovery.get("attempt") != claim.get("attempt")
+            or recovery.get("actual_parent_wait") is not False
+            or recovery.get("reported_passed", False) is not False
+            or recovery.get("science_recomputed", False) is not False):
+        raise ValueError(f"Unsupported or inconsistent recovery record: {folder}")
+    if (recovery.get("claim") != ev.ref(folder / "CLAIM.json")
+            or ev.bound_json(recovery["claim"]) != claim
+            or settlement.get("claim_payload") != claim
+            or recovery.get("progress") != ev.ref(folder / "PROGRESS.json")
+            or recovery.get("settlement_event") != settlement.get("ledger_event")):
+        raise ValueError(f"Recovery claim/progress/event identity mismatch: {folder}")
+    event = ev.bound_json(recovery["settlement_event"])
+    payload = event.get("payload", {})
+    if (payload != settlement.get("event_payload") or payload.get("kind") != "settlement"
+            or payload.get("attempt") != claim["attempt"]
+            or payload.get("reason") != RECOVERY_REASON
+            or payload.get("actual_parent_wait") is not False
+            or "receipt" in payload or "returncode" in payload
+            or not numeric(recovery.get("charged_seconds")) or recovery["charged_seconds"] <= 0
+            or recovery["charged_seconds"] != payload.get("charged_seconds")
+            or recovery["charged_seconds"] != claim.get("reserved_seconds")):
+        raise ValueError(f"Recovery is not the full-reservation ledger settlement: {folder}")
+    observation = ev.bound_json(recovery["evidence"])
+    identities = observation.get("identities", {})
+    for role, expected in (("owner", claim.get("owner")), ("child", settlement.get("child_identity"))):
+        observed = identities.get(role, {})
+        if not expected or observed.get("identity") != expected or observed.get("matches") is not False:
+            raise ValueError(f"Recovery lacks matching dead {role} observation: {folder}")
+    unit = dict(line.split("=", 1) for line in observation.get("unit", "").splitlines() if "=" in line)
+    if (observation.get("progress") != recovery["progress"]
+            or observation.get("wait_exists") is not False or observation.get("result_exists") is not False
+            or unit.get("Result") != "oom-kill" or unit.get("ActiveState") != "failed"
+            or "systemd-oomd" not in observation.get("journal", "")):
+        raise ValueError(f"Recovery lacks bound OOM/no-finalization observation: {folder}")
+    progress = ev.bound_json(recovery["progress"])
+    summary = dict(reference=ev.ref(folder / "RECOVERY.json"), record=recovery,
+        identity_chain_verified=True, observation_reference=recovery["evidence"],
+        observation=dict(observed_utc=observation.get("observed_utc"), diagnosis=observation.get("diagnosis"),
+            identities=identities, unit=unit,
+            campaign_unit_memory_peak_bytes=int(unit["MemoryPeak"]) if unit.get("MemoryPeak", "").isdigit() else None,
+            campaign_unit_memory_limit_bytes=int(unit["MemoryMax"]) if unit.get("MemoryMax", "").isdigit() else None,
+            memory_scope="whole campaign systemd unit, NOT per-run peak"),
+        worker_finalization_proven=False)
+    return summary, progress
 
 
 def run_record(ev, root, stage, run_id, budget):
@@ -115,18 +178,28 @@ def run_record(ev, root, stage, run_id, budget):
     claim = ev.json(folder / "CLAIM.json", optional=True)
     wait = ev.json(folder / "WAIT.json", optional=True)
     receipt = ev.ref(folder / "WAIT.json")
+    result_ref = ev.ref(folder / "RESULT.json")
+    recovery_record = ev.json(folder / "RECOVERY.json", optional=True)
     settlements = [c for c in budget["charges"] if c["kind"] == "settlement"
                    and c["attempt"] == claim.get("attempt")]
     settled = bool(claim and wait and len(settlements) == 1
+                   and settlements[0]["actual_parent_wait"] is True
                    and settlements[0]["receipt"] == receipt
                    and claim["run"].get("stage") == stage
                    and claim["run"].get("run_id") == run_id)
     if claim and wait and not settled:
         raise ValueError(f"Run receipt is not bound to this ledger: {folder}")
+    recovery, progress = None, None
+    if recovery_record:
+        if (not claim or len(settlements) != 1 or claim["run"].get("stage") != stage
+                or claim["run"].get("run_id") != run_id):
+            raise ValueError(f"Recovery has no unique matching ledger settlement: {folder}")
+        recovery, progress = verified_recovery(ev, folder, claim, settlements[0], recovery_record)
+        settled = True
     optimization = raw.get("optimization", {})
     partial = False
-    if not raw and (folder / "PROGRESS.json").is_file():
-        progress = ev.json(folder / "PROGRESS.json")
+    if progress is not None or (not raw and (folder / "PROGRESS.json").is_file()):
+        progress = progress if progress is not None else ev.json(folder / "PROGRESS.json")
         optimization = progress.get("optimization", progress)
         partial = True
     lb, ub = optimization.get("LB"), optimization.get("UB")
@@ -181,8 +254,8 @@ def run_record(ev, root, stage, run_id, budget):
     for name in ("ERROR.txt", "WORKER.log", "EXECUTION_CONFIG.json"):
         ev.ref(folder / name)
     return dict(id=run_id, stage=stage, directory=str(folder),
-        status=raw.get("status", "PARTIAL_PROGRESS_ONLY" if partial else "NO_RESULT"),
-        reported_passed=raw.get("passed", False), acceptance_supported=accepted,
+        status=recovery_record["status"] if recovery else raw.get("status", "PARTIAL_PROGRESS_ONLY" if partial else "NO_RESULT"),
+        reported_passed=False if recovery else raw.get("passed", False), acceptance_supported=accepted,
         attempted=attempted, job_acceptance_supported=job_accepted,
         gap_passed=gap_passed, gap_threshold=gap_threshold, audit_complete=complete_original,
         completion_class=completion, last_saved_phase=phase,
@@ -192,8 +265,13 @@ def run_record(ev, root, stage, run_id, budget):
         gap_first_passed_seconds=optimization.get("gap_first_passed_seconds"),
         largest_recorded_timing_part=max(recorded_parts, key=recorded_parts.get) if recorded_parts else None,
         settled=settled, progress_only=partial, returncode=wait.get("returncode"),
-        result=ev.ref(folder / "RESULT.json"), claim=claim, wait=receipt,
-        wrapper_seconds=settlements[0]["charged_seconds"] if settled else None,
+        result=result_ref, claim=claim, wait=receipt, recovery=recovery,
+        progress=ev.ref(folder / "PROGRESS.json") if partial else None,
+        worker_finalization_proven=bool(raw and wait and settled and not recovery),
+        charged_seconds=settlements[0]["charged_seconds"] if settled else None,
+        actual_parent_wait=settlements[0]["actual_parent_wait"] if settled else None,
+        accounting_basis="conservative reservation" if recovery else "observed parent wait" if settled else "unsettled",
+        wrapper_seconds=settlements[0]["charged_seconds"] if settled and settlements[0]["actual_parent_wait"] is True else None,
         worker_seconds=raw.get("total_seconds", raw.get("elapsed_seconds")),
         controller_seconds=optimization.get("elapsed_seconds"), timing_seconds=timing,
         preparation_timing_seconds=raw.get("timing", {
@@ -284,6 +362,39 @@ def certificate_limitations(critic):
     )
 
 
+def verified_controller_recovery(ev, validation, freeze, runs):
+    """Verify a separately registered orchestration repair; never execute it."""
+    path = validation / "CONTROLLER_RECOVERY_MANIFEST.json"
+    manifest = ev.json(path, optional=True)
+    if not manifest:
+        return None
+    expected_python = str(Path(freeze["source_release"]["path"]).parent / ".venv/bin/python")
+    recoveries = [r["recovery"]["reference"] for r in runs if r["recovery"]]
+    if (manifest.get("schema") != "round2-controller-recovery-v1"
+            or manifest.get("compute_source_unchanged") is not True
+            or manifest.get("frozen_jobs_unchanged") is not True
+            or manifest.get("worker_release") != freeze["source_release"]
+            or manifest.get("freeze") != ev.ref(validation / "FREEZE.json")
+            or manifest.get("recovery") not in recoveries
+            or manifest.get("python") != expected_python):
+        raise ValueError("Controller recovery does not preserve frozen compute/job identities")
+    source = manifest.get("source", {})
+    if (not source.get("path") or not Path(source["path"]).is_absolute()
+            or ev.ref(source["path"]) != source):
+        raise ValueError("Controller recovery source hash/path/size mismatch")
+    ev.bound_json(manifest["worker_release"])
+    ev.bound_json(manifest["freeze"])
+    ev.bound_json(manifest["recovery"])
+    if (not isinstance(manifest.get("unit"), str) or not manifest["unit"]
+            or not isinstance(manifest.get("resources"), dict)
+            or not manifest.get("launch_utc")):
+        raise ValueError("Controller recovery lacks launch/unit/resource provenance")
+    if datetime.fromisoformat(manifest["launch_utc"]).tzinfo is None:
+        raise ValueError("Controller recovery launch time must include a timezone")
+    return dict(reference=ev.ref(path), contents=manifest, identity_chain_verified=True,
+                scope="orchestration-only recovery; frozen science release and jobs unchanged")
+
+
 def collect(root, stopped=None):
     """Read and bind evidence. Returns a report payload; does not write files."""
     ev = Evidence()
@@ -331,6 +442,7 @@ def collect(root, stopped=None):
                 raise ValueError(f"Run not bound to frozen campaign: {r['id']}")
             if identity.get("release") != freeze["source_release"]:
                 raise ValueError(f"Run uses a different release: {r['id']}")
+    orchestration_recovery = verified_controller_recovery(ev, validation, freeze, runs)
     vreport = next(r for r in runs if r["stage"] == "VREPORT")
     stats = {}
     for seed in freeze["validation_seeds"]:
@@ -411,6 +523,8 @@ def collect(root, stopped=None):
         all_frozen_jobs_settled=all_settled, all_frozen_jobs_reported_passed=all(r["reported_passed"] for r in runs),
         report_is_new_scientific_certificate=False, contradiction_requires_review=contradiction,
         known_certificate_limitations=limitations,
+        recovered_failed_jobs=[r["id"] for r in runs if r["recovery"]],
+        orchestration_recovery_manifest=orchestration_recovery,
         development=[public_run(r) for r in dev], validation=[public_run(r) for r in runs],
         additional_runs_not_substituted_for_frozen_jobs=[public_run(r) for r in additional],
         core_run_order=[r["id"] for r in core], algorithm_pairs=pairs, no_prepass_comparisons=ablations,
@@ -425,7 +539,7 @@ def collect(root, stopped=None):
         budget=dict(development=dev_budget, validation=val_budget, units="wall seconds",
             software_work=dict(session_wall_seconds=wall, new_actual_wrapper_wall_seconds=wrappers,
                 session_wall_minus_new_wrapper_wall_seconds=wall - wrappers, exact_active_coding_seconds=None,
-                note="Wall difference includes reading/coding/deployment/waiting; coding can overlap wrappers. Not additive CPU/active labor time; old211.081997 is not subtracted again.")),
+                note="Wall difference includes reading/coding/deployment/waiting and unmeasured interrupted-worker time; coding can overlap wrappers. Conservative reservation debits are not observed wall time. Not additive CPU/active labor time; old211.081997 is not subtracted again.")),
         runtime_environment_scope=dict(existing_healthy_DET_task_colocated=True,
             dedicated_server_claim=False, cpu_pinning_claim=False,
             timing_ratios="Observed single same-case/budget runs; background load is not experimentally controlled; no universal speedup or runtime CI claim"),
@@ -502,11 +616,13 @@ def evidence_link(ref, label="证据", *, execution_root=None, display_root=None
 
 def run_table(rows):
     return table(["Run", "原状态 / 完成分类", "gap_passed / audit_complete / acceptance_supported",
-                  "LB / UB ($)", "gap ($)", "原审计/支持", "原残差", "wrapper / worker / controller (s)"],
+                  "LB / UB ($)", "gap ($)", "原审计/支持", "原残差", "observed wrapper / final worker / saved controller (s)",
+                  "charged(s) / accounting basis"],
         [[r["id"], f"{r['status']} / {r['completion_class']}",
           [r["gap_passed"], r["audit_complete"], r["acceptance_supported"]], [r["LB"], r["UB"]], r["gap"],
           f"{r['original_audit_count']}/{r['support']}", r["original_max_residual"],
-          [r["wrapper_seconds"], r["worker_seconds"], r["controller_seconds"]]] for r in rows])
+          [r["wrapper_seconds"], r["worker_seconds"], r["controller_seconds"]],
+          [r["charged_seconds"], r["accounting_basis"]]] for r in rows])
 
 
 def certificate_section(data, *, display_root=None):
@@ -545,6 +661,7 @@ def render_report(data, *, display_root=None):
     parts = ["# Round 2 实例设计与验证报告", "\n".join(f"{i}. **{q}** {a}" for i, (q, a) in enumerate(questions, 1)),
              f"报告时间：{data['generated_utc']}。显式停止原因：{fmt(data['stopped_reason'])}。campaign完成={data['campaign_complete']}；本文件只整理已有证据，不新增科学证书。Markdown链接显示根={fmt(display_root)}（仅展示映射，证据仍为实际执行路径）。",
              "冻结job覆盖：" + fmt(data["frozen_job_coverage"]) + "。attempted以匹配CLAIM定义（不保证已调用native求解）；settled表示账本结算；accepted按各job自己的门判断。全部尝试/全部结算不等于全部接受，VREPORT本身通过也不改变失败的科学Run。",
+             "结算可来自真实WAIT，或已核验的RECOVERY→CLAIM/PROGRESS/死亡观测/账本settlement身份链。`RESOURCE_INTERRUPTED_OOM`是已保守结算的失败，不伪造RESULT/WAIT或worker完整收尾；原PROGRESS中的界与审计只作为最后保存快照。",
              "## 科学身份与解释范围",
              "四项费用乘数均须为[1,1,1,1]。N30/G6/72套餐/96时段；物理需求固定在N6水平。P3仅L/R/LR三行，P2删除联合行；**不是恢复原322311行ST-DRO**。DET是forecast支持1，其他核心方法是400支持；SAA使用原分层权重，ARO为完整simplex。CAL2000逐坐标Wilson区间没有同时覆盖保证。",
              "新类型与初始SOC、有限套餐、共同工程天气、线路20/23短恢复与corridor1封锁、负荷及预测均是新合成假设。保留原P/Q、电压、线路、能量、到达/资格内核不等于保持原分布或完整原任务域。整数聚合等价只在声明的同类套餐域内成立，不主张原LP松弛等价或对旧模型无损。",
@@ -616,15 +733,25 @@ def render_report(data, *, display_root=None):
                for r in [*data["development"], *data["validation"]] if r["controller_seconds"] is not None]),
         "controller计时包含构建/证书/审计等；recourse项不等于纯native求解时间。wrapper、worker、controller是嵌套口径，不可相加。早期r04/r05失败调用及中断审计计时可能不完整；总账仍计整个wrapper。原始/聚合实际rows/vars/W/T nnz详见JSON各Run model_sizes及原证据；不外推缺失大小。",
         "内存口径：R2 unit已被GC，其MemoryPeak不可取得，记null而非0。若另有campaign MemoryPeak，它是整个campaign的峰值，不是逐Run峰值；不按运行时长分摊，也不编造任何per-run peak。",
+        "### 资源中断与保守结算",
+        table(["Run", "恢复身份链", "扣费(s)/依据", "observed wrapper(s)", "最后保存审计/支持", "campaign unit MemoryPeak/MemoryMax(bytes)", "观测"],
+              [[r["id"], link(r["recovery"]["reference"], "RECOVERY"), [r["charged_seconds"], r["accounting_basis"]],
+                r["wrapper_seconds"], f"{r['original_audit_count']}/{r['support']}",
+                [r["recovery"]["observation"]["campaign_unit_memory_peak_bytes"],
+                 r["recovery"]["observation"]["campaign_unit_memory_limit_bytes"]],
+                link(r["recovery"]["observation_reference"], "OBSERVATION")]
+               for r in [*data["development"], *data["validation"]] if r["recovery"]]),
+        "保守结算全额预留并非测得的wrapper墙钟：actual_parent_wait=false，observed wrapper秒数为null，charged_seconds单列。OOM证据来自绑定的unit/journal与owner/child死亡观测，不把campaign峰值当单Run峰值；峰值低于MemoryMax也不能单凭它排除systemd-oomd或认定精确压力原因。此失败不解释为数学非收敛，亦不提升科学验收。",
         table(["预算", "累计(s)", "上限(s)", "余额(s)", "活动claim", "分阶段累计(s)"],
               [[name, b["spent_seconds"], b["limit_seconds"], b["remaining_seconds"], b["active"], b["stage_charged_seconds"]]
                for name, b in (("development", budget["development"]), ("validation", budget["validation"]))]),
         "软件/阅读墙钟口径：" + fmt(budget["software_work"]),
         "旧211.08199704252183秒已包含在开发总账，不再次相加；失败、重试、构建、审计、外部扣账保留。精确active coding时间为null；session减新wrapper墙钟不是可加的人工工时，存在并行重叠。",
-        "## 完整冻结job账与证据", table(["stage/id", "状态", "attempted / settled / job accepted", "reported passed", "退出码", "RESULT"],
+        "## 完整冻结job账与证据", table(["stage/id", "状态", "attempted / settled / job accepted", "reported passed", "退出码", "RESULT或RECOVERY"],
               [[r["stage"] + "/" + r["id"], r["status"], [r["attempted"], r["settled"], r["job_acceptance_supported"]],
-                r["reported_passed"], r["returncode"], link(r["result"])] for r in data["validation"]]),
+                r["reported_passed"], r["returncode"], link(r["result"] or (r["recovery"] or {}).get("reference"))] for r in data["validation"]]),
         "VREPORT的passed表示证据汇总完成，**不是所有实验通过**。状态字段、原失败、所有时间和未决值均保留。",
+        "编排恢复登记（不替换冻结worker）：" + fmt(data["orchestration_recovery_manifest"]),
         "冻结源码：" + fmt(data["release_at_validation_freeze"]) + "。报告脚本：" + fmt(data["reporter_source"]),
         table(["证据", "SHA256", "bytes"], [[link(r, Path(r["path"]).name), r["sha256"], r["bytes"]] for r in data["evidence"]]),
         "## 下一步的单项改进", data["next_improvement"],
@@ -637,13 +764,24 @@ def render_reproduce(data):
     release = Path(data["freeze"]["contents"]["source_release"]["path"]).parent
     controller = [str(release / ".venv/bin/python"), str(release / "validation_campaign.py"),
                   str(root / "validation"), str(release)]
+    recovery_manifest = data.get("orchestration_recovery_manifest")
+    if recovery_manifest:
+        manifest = recovery_manifest["contents"]
+        controller = [manifest["python"], manifest["source"]["path"],
+                      str(root / "validation"), str(release)]
     parts = ["# Round2 复现与恢复说明", "以下命令仅供定位/复现，不由报告执行。已结算任务不得重复计算；不得重建/清零账本或修改原release。离线副本不能代替执行主机的ledger。",
         "## 只读定位", f"根：`{root}`；配置：`{root / 'DESIGN_CONFIG.json'}`与`{root / 'validation/DESIGN_CONFIG.json'}`。",
         "两个预算组：" + fmt({k: {f: data["budget"][k][f] for f in ("group", "ledger_root", "chain_head")} for k in ("development", "validation")}),
         "先读取实际ledger active、CLAIM/CHILD/WAIT与hash链。活动或未知任务不当作已死；报告脚本不恢复/接管任何PID。",
-        "## 使用同一冻结控制器、同一账本恢复（仅在确认无活动任务且有合法未执行job时）",
+        "## 按已登记编排入口、同一冻结worker与账本恢复（仅在确认无活动任务且有合法未执行job时）",
+        ("当前命令来自已核验的CONTROLLER_RECOVERY_MANIFEST：" + fmt(recovery_manifest)
+         + "。仅更换编排入口，Python及worker release/FREEZE保持原身份；恢复Run保留为失败结算，不重算。"
+         if recovery_manifest else "未登记新的编排恢复manifest；以下保留原r08控制器入口。"),
         "```bash\n" + shlex.join(controller) + "\n```",
         "该控制器按冻结30-job列表读取已完成Run的argv/release/FREEZE/配置及settlement receipt；已有未结算目录会拒绝重提。全部已结算时复用结果，不重复求解；实现错误必须先按既有规则处理，不能换seed/费用/模型绕过。",
+        ("禁止在已恢复的controller仍活动时再执行此命令；身份未知仍须先核对。"
+         if recovery_manifest else
+         "若存在无WAIT的RECOVERY结算，上述原r08控制器会拒绝该目录：它不是可直接执行的恢复命令。报告识别恢复链不等于控制器已支持恢复；恢复剩余job须使用另行验证的调度恢复入口，保留同一科学release、冻结列表与账本，不重跑中断job、不伪造WAIT/RESULT。"),
         "## 历史R0/R1/R2命令与版本（记录用途，禁止重复提交同Run）"]
     for r in data["development"]:
         identity = r["claim"].get("run", {})

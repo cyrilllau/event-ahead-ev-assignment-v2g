@@ -9,6 +9,8 @@ Start with the [acceptance status](docs/architecture/IMPLEMENTATION_STATUS.md),
 [operating guide](docs/operations/WORKFLOW_CN.md). Existing PowerAI experiments keep
 using their original immutable releases; this refactor does not take them over.
 
+[实验与算法回顾（中文）](docs/research/EXPERIMENT_HISTORY_CN.md) 汇总历史求解、收敛诊断、合成车队验证及各轮的失败原因。
+
 ## Install and validate
 
 Python 3.12, with pinned numerical dependencies:

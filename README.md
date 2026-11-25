@@ -27,6 +27,10 @@ CI does not use a commercial license or connect to PowerAI.
 
 ## Run an experiment
 
+For the structured-fleet experiment, the
+[Round 2 handoff](docs/operations/STRUCTURED_ROUND2_HANDOFF_CN.md) covers the
+PowerAI archive and setup for the next round.
+
 Use an absolute storage path outside this checkout. Definitions contain no outputs.
 
 ```bash
